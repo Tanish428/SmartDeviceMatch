@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SmartDeviceMatch.Web")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+99be3f3651f4e1becc3c423bc5043870261908fa")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f7620f43c0cb7fe6f623ebefc3bdab257e5f4d4d")]
 [assembly: System.Reflection.AssemblyProductAttribute("SmartDeviceMatch.Web")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SmartDeviceMatch.Web")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

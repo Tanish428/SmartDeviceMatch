@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\SEM-V\\WAD_PROJECT\\SmartDeviceMatch\\SmartDeviceMatch.Web\\SmartDeviceMatch.Web\\SmartDeviceMatch.Web.csproj": {}
+    "C:\\Users\\Tanu\\source\\repos\\Tanish428\\SmartDeviceMatch\\SmartDeviceMatch.Web\\SmartDeviceMatch.Web\\SmartDeviceMatch.Web.csproj": {}
   },
   "projects": {
-    "D:\\SEM-V\\WAD_PROJECT\\SmartDeviceMatch\\SmartDeviceMatch.Web\\SmartDeviceMatch.Web\\SmartDeviceMatch.Web.csproj": {
+    "C:\\Users\\Tanu\\source\\repos\\Tanish428\\SmartDeviceMatch\\SmartDeviceMatch.Web\\SmartDeviceMatch.Web\\SmartDeviceMatch.Web.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\SEM-V\\WAD_PROJECT\\SmartDeviceMatch\\SmartDeviceMatch.Web\\SmartDeviceMatch.Web\\SmartDeviceMatch.Web.csproj",
+        "projectUniqueName": "C:\\Users\\Tanu\\source\\repos\\Tanish428\\SmartDeviceMatch\\SmartDeviceMatch.Web\\SmartDeviceMatch.Web\\SmartDeviceMatch.Web.csproj",
         "projectName": "SmartDeviceMatch.Web",
-        "projectPath": "D:\\SEM-V\\WAD_PROJECT\\SmartDeviceMatch\\SmartDeviceMatch.Web\\SmartDeviceMatch.Web\\SmartDeviceMatch.Web.csproj",
+        "projectPath": "C:\\Users\\Tanu\\source\\repos\\Tanish428\\SmartDeviceMatch\\SmartDeviceMatch.Web\\SmartDeviceMatch.Web\\SmartDeviceMatch.Web.csproj",
         "packagesPath": "C:\\Users\\Tanu\\.nuget\\packages\\",
-        "outputPath": "D:\\SEM-V\\WAD_PROJECT\\SmartDeviceMatch\\SmartDeviceMatch.Web\\SmartDeviceMatch.Web\\obj\\",
+        "outputPath": "C:\\Users\\Tanu\\source\\repos\\Tanish428\\SmartDeviceMatch\\SmartDeviceMatch.Web\\SmartDeviceMatch.Web\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -51,6 +51,22 @@
         "net10.0": {
           "framework": "net10.0",
           "targetAlias": "net10.0",
+          "dependencies": {
+            "Microsoft.EntityFrameworkCore.Design": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.0, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
