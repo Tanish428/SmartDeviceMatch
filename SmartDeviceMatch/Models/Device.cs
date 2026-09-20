@@ -6,7 +6,7 @@ namespace SmartDeviceMatch.Models
     public class Device
     {
         [Key]
-        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public int Id { get; set; } 
 
         [Required]
         public required string OwnerId { get; set; }

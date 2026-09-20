@@ -10,7 +10,7 @@ namespace SmartDeviceMatch.Models
         public int Id { get; set; }
 
         [Required]
-        public required string DeviceId { get; set; }
+        public required int DeviceId { get; set; }
         [ForeignKey("DeviceId")]
         public Device? Device { get; set; }
 
