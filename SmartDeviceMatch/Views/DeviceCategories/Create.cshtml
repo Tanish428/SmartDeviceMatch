@@ -1,0 +1,30 @@
+﻿@model SmartDeviceMatch.Models.DeviceCategory
+
+<div class="container mt-4">
+    <h2>Create New Category</h2>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-6">
+         
+            <form asp-action="Create" method="post">
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label">Category Name</label>
+                    <input asp-for="Name" class="form-control" placeholder="e.g. Smartphones" />
+           
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">Description</label>
+                    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-success">Save to Database</button>
+                <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
