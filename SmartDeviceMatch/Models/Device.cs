@@ -9,7 +9,7 @@ namespace SmartDeviceMatch.Models
         public int Id { get; set; } 
 
         [Required]
-        public required string OwnerId { get; set; }
+        public required int OwnerId { get; set; }
         [ForeignKey("OwnerId")]
         public AppUser? Owner { get; set; }
 

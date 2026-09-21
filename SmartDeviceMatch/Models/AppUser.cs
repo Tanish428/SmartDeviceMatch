@@ -1,10 +1,19 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace SmartDeviceMatch.Models
 {
-    public class AppUser : IdentityUser
+    public class AppUser
     {
+        // 2. ADDED: Standard Primary Key for your dedicated AppUser table
+        [Key]
+        public int Id { get; set; }
+
+        // 3. ADDED: The 1-to-1 link back to Microsoft's AspNetUsers table
+        [Required]
+        public required string IdentityUserId { get; set; }
+
+        
+
         [Required, StringLength(100)]
         public required string FullName { get; set; }
 
