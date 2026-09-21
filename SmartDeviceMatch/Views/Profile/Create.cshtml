@@ -1,0 +1,60 @@
+﻿@model SmartDeviceMatch.Models.AppUser
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Complete Your Profile";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 bg-light">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-2">Welcome to SmartDeviceMatch!</h2>
+                    <p class="text-muted text-center mb-4">Let's finish setting up your account.</p>
+
+                    <form asp-action="Create" method="post">
+
+                        <div class="mb-3">
+                            <label asp-for="FullName" class="form-label fw-bold">Full Name</label>
+                            <input asp-for="FullName" class="form-control" placeholder="e.g. John Doe" required />
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="UserType" class="form-label fw-bold">I am primarily a...</label>
+                            <select asp-for="UserType" class="form-select" required>
+                                <option value="">-- Select Your Role --</option>
+                                <option value="DeviceOwner">Device Owner (Selling broken electronics)</option>
+                                <option value="RepairShop">Repair Technician / Shop</option>
+                                <option value="Buyer">General Buyer / Refurbisher</option>
+                            </select>
+                            <span asp-validation-for="UserType" class="text-danger"></span>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="City" class="form-label fw-bold">City</label>
+                                <input asp-for="City" class="form-control" />
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="State" class="form-label fw-bold">State</label>
+                                <input asp-for="State" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="PinCode" class="form-label fw-bold">Pin Code</label>
+                            <input asp-for="PinCode" class="form-control" />
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">Save Profile & Continue</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
