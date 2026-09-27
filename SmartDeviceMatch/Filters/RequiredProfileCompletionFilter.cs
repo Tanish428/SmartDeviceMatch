@@ -1,19 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SmartDeviceMatch.Data;
+using Microsoft.AspNetCore.Identity;
 
 namespace SmartDeviceMatch.Filters
 {
     public class RequireProfileFilter : IAsyncActionFilter
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<IdentityUser> _userManager;
 
         public RequireProfileFilter(
             ApplicationDbContext context,
-            UserManager<ApplicationUser> userManager)
+            UserManager<IdentityUser> userManager)
         {
             _context = context;
             _userManager = userManager;

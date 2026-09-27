@@ -1,0 +1,314 @@
+﻿@model SmartDeviceMatch.Models.Device
+
+@{
+    ViewData["Title"] = "List a Device";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            <div class="mb-4">
+                <h2>List a Broken or Used Device</h2>
+                <p class="text-muted">
+                    Provide details to help repair shops and buyers give you the best offer.
+                </p>
+            </div>
+
+            <form asp-action="Create" method="post">
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3"></div>
+
+                <!-- Device Basics -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Device Basics</h5>
+                    </div>
+
+                    <div class="card-body">
+
+                        <!-- Category -->
+                        <div class="mb-3">
+                            <label asp-for="CategoryId" class="form-label">
+                                Device Category
+                            </label>
+
+                            <select asp-for="CategoryId"
+                                    class="form-select"
+                                    asp-items="ViewBag.CategoryId">
+                                <option value="">Select Category</option>
+                            </select>
+
+                            <span asp-validation-for="CategoryId"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <!-- Brand -->
+                        <div class="mb-3">
+                            <label asp-for="BrandName" class="form-label">
+                                Brand
+                            </label>
+
+                            <input asp-for="BrandName"
+                                   class="form-control"
+                                   placeholder="e.g. Apple, Samsung, Dell" />
+
+                            <span asp-validation-for="BrandName"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <!-- Model -->
+                        <div class="mb-3">
+                            <label asp-for="ModelName" class="form-label">
+                                Model
+                            </label>
+
+                            <input asp-for="ModelName"
+                                   class="form-control"
+                                   placeholder="Enter device model" />
+
+                            <span asp-validation-for="ModelName"
+                                  class="text-danger"></span>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- Condition & Damage -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Condition & Damage</h5>
+                    </div>
+
+                    <div class="card-body">
+
+                        <!-- Condition Grade -->
+                        <div class="mb-3">
+                            <label asp-for="ConditionGrade" class="form-label">
+                                Condition Grade
+                            </label>
+
+                            <select asp-for="ConditionGrade"
+                                    class="form-select">
+
+                                <option value="">Select Condition</option>
+                                <option value="A">A - Excellent</option>
+                                <option value="B">B - Good</option>
+                                <option value="C">C - Fair</option>
+                                <option value="D">D - Poor</option>
+                                <option value="E">E - Very Poor</option>
+                                <option value="F">F - Heavily Damaged</option>
+
+                            </select>
+
+                            <span asp-validation-for="ConditionGrade"
+                                  class="text-danger"></span>
+                        </div>
+
+
+                        <!-- Damage Type -->
+                        <div class="mb-3">
+                            <label asp-for="DamageType" class="form-label">
+                                Primary Damage Type
+                            </label>
+
+                            <select asp-for="DamageType"
+                                    class="form-select">
+
+                                <option value="">Select Damage Type</option>
+                                <option value="Screen">Screen</option>
+                                <option value="Battery">Battery</option>
+                                <option value="Water Damage">Water Damage</option>
+                                <option value="Camera">Camera</option>
+                                <option value="Charging Port">Charging Port</option>
+                                <option value="Software">Software</option>
+                                <option value="Other">Other</option>
+
+                            </select>
+
+                            <span asp-validation-for="DamageType"
+                                  class="text-danger"></span>
+                        </div>
+
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label asp-for="ConditionDescription"
+                                   class="form-label">
+
+                                Detailed Description
+                            </label>
+
+                            <textarea asp-for="ConditionDescription"
+                                      class="form-control"
+                                      rows="4"
+                                      placeholder="Describe the device condition and damage"></textarea>
+
+                            <span asp-validation-for="ConditionDescription"
+                                  class="text-danger"></span>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- Pricing & Location -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">Pricing & Location</h5>
+                    </div>
+
+                    <div class="card-body">
+
+                        <!-- Asking Price -->
+                        <div class="mb-3">
+                            <label asp-for="AskingPrice"
+                                   class="form-label">
+
+                                Asking Price
+                            </label>
+
+                            <div class="input-group">
+                                <span class="input-group-text">₹</span>
+
+                                <input asp-for="AskingPrice"
+                                       class="form-control"
+                                       type="number"
+                                       step="0.01"
+                                       placeholder="0.00" />
+                            </div>
+
+                            <span asp-validation-for="AskingPrice"
+                                  class="text-danger"></span>
+                        </div>
+
+
+                        <!-- Estimated Value -->
+                        <div class="mb-3">
+                            <label asp-for="EstimatedValue"
+                                   class="form-label">
+
+                                Estimated Value (Optional)
+                            </label>
+
+                            <div class="input-group">
+                                <span class="input-group-text">₹</span>
+
+                                <input asp-for="EstimatedValue"
+                                       class="form-control"
+                                       type="number"
+                                       step="0.01"
+                                       placeholder="0.00" />
+                            </div>
+
+                            <span asp-validation-for="EstimatedValue"
+                                  class="text-danger"></span>
+                        </div>
+
+
+                        <!-- City -->
+                        <div class="mb-3">
+                            <label asp-for="City"
+                                   class="form-label">
+
+                                City
+                            </label>
+
+                            <input asp-for="City"
+                                   class="form-control"
+                                   placeholder="Enter city" />
+
+                            <span asp-validation-for="City"
+                                  class="text-danger"></span>
+                        </div>
+
+
+                        <!-- State -->
+                        <div class="mb-3">
+                            <label asp-for="State"
+                                   class="form-label">
+
+                                State
+                            </label>
+
+                            <input asp-for="State"
+                                   class="form-control"
+                                   placeholder="Enter state" />
+
+                            <span asp-validation-for="State"
+                                  class="text-danger"></span>
+                        </div>
+
+
+                        <!-- Pin Code -->
+                        <div class="mb-3">
+                            <label asp-for="PinCode"
+                                   class="form-label">
+
+                                Pin Code
+                            </label>
+
+                            <input asp-for="PinCode"
+                                   class="form-control"
+                                   placeholder="Enter pin code" />
+
+                            <span asp-validation-for="PinCode"
+                                  class="text-danger"></span>
+                        </div>
+
+
+                        <!-- Urgent -->
+                        <div class="form-check mb-3">
+
+                            <input asp-for="IsUrgent"
+                                   class="form-check-input" />
+
+                            <label asp-for="IsUrgent"
+                                   class="form-check-label">
+
+                                Mark as Urgent Sale
+                                <small class="text-muted">
+                                    (Need to sell/repair within 48 hours)
+                                </small>
+
+                            </label>
+
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- Buttons -->
+                <div class="d-flex gap-2 mb-5">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        Publish Listing
+
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn btn-secondary">
+
+                        Cancel
+
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,111 @@
+﻿@model IEnumerable<SmartDeviceMatch.Models.Device>
+
+@{
+    ViewData["Title"] = "My Devices";
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>My Devices</h2>
+            <p class="text-muted">
+                Manage the devices you have listed.
+            </p>
+        </div>
+
+        <a asp-action="Create" class="btn btn-primary">
+            + List New Device
+        </a>
+    </div>
+
+
+    @if (!Model.Any())
+    {
+        <div class="card text-center p-5">
+
+            <h4>You haven't listed any devices yet.</h4>
+
+            <p class="text-muted">
+                List your broken or used electronics to start receiving offers.
+            </p>
+
+            <div>
+                <a asp-action="Create" class="btn btn-primary">
+                    List a Device
+                </a>
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+
+            <table class="table table-bordered table-hover align-middle">
+
+                <thead class="table-light">
+                    <tr>
+                        <th>Device</th>
+                        <th>Category</th>
+                        <th>Condition</th>
+                        <th>Asking Price</th>
+                        <th>Status</th>
+                        <th>Listed On</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+
+                            <td>
+                                <strong>
+                                    @item.BrandName @item.ModelName
+                                </strong>
+                            </td>
+
+                            <td>
+                                @item.Category?.Name
+                            </td>
+
+                            <td>
+                                Grade @item.ConditionGrade
+                            </td>
+
+                            <td>
+                                ₹@item.AskingPrice.ToString("0.00")
+                            </td>
+
+                            <td>
+                                @if (item.Status == "Listed")
+                                {
+                                    <span class="badge bg-success">
+                                        Active
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        @item.Status
+                                    </span>
+                                }
+                            </td>
+
+                            <td>
+                                @item.CreatedAt.ToShortDateString()
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    }
+
+</div>
