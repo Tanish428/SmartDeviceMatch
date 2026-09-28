@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SmartDeviceMatch.Models
 {
@@ -8,7 +9,9 @@ namespace SmartDeviceMatch.Models
         public int Id { get; set; }
 
         [Required]
-        public required string UserId { get; set; }
+        public int UserId { get; set; }
+
+        [ForeignKey(nameof(UserId))]
         public AppUser? User { get; set; }
 
         [Required, StringLength(100)]

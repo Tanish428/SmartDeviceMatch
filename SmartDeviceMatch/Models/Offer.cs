@@ -13,7 +13,9 @@ namespace SmartDeviceMatch.Models
         public Device? Device { get; set; }
 
         [Required]
-        public required string BuyerId { get; set; } 
+        public int BuyerId { get; set; }
+
+        [ForeignKey(nameof(BuyerId))]
         public AppUser? Buyer { get; set; }
 
         [Required]

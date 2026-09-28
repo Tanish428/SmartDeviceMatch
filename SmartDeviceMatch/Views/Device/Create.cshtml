@@ -15,7 +15,9 @@
                 </p>
             </div>
 
-            <form asp-action="Create" method="post">
+            <form asp-action="Create"
+                  method="post"
+                  enctype="multipart/form-data">
 
                 <div asp-validation-summary="ModelOnly"
                      class="text-danger mb-3"></div>
@@ -86,7 +88,8 @@
 
                         <!-- Condition Grade -->
                         <div class="mb-3">
-                            <label asp-for="ConditionGrade" class="form-label">
+                            <label asp-for="ConditionGrade"
+                                   class="form-label">
                                 Condition Grade
                             </label>
 
@@ -110,7 +113,8 @@
 
                         <!-- Damage Type -->
                         <div class="mb-3">
-                            <label asp-for="DamageType" class="form-label">
+                            <label asp-for="DamageType"
+                                   class="form-label">
                                 Primary Damage Type
                             </label>
 
@@ -137,7 +141,6 @@
                         <div class="mb-3">
                             <label asp-for="ConditionDescription"
                                    class="form-label">
-
                                 Detailed Description
                             </label>
 
@@ -166,7 +169,6 @@
                         <div class="mb-3">
                             <label asp-for="AskingPrice"
                                    class="form-label">
-
                                 Asking Price
                             </label>
 
@@ -189,7 +191,6 @@
                         <div class="mb-3">
                             <label asp-for="EstimatedValue"
                                    class="form-label">
-
                                 Estimated Value (Optional)
                             </label>
 
@@ -212,7 +213,6 @@
                         <div class="mb-3">
                             <label asp-for="City"
                                    class="form-label">
-
                                 City
                             </label>
 
@@ -229,7 +229,6 @@
                         <div class="mb-3">
                             <label asp-for="State"
                                    class="form-label">
-
                                 State
                             </label>
 
@@ -246,7 +245,6 @@
                         <div class="mb-3">
                             <label asp-for="PinCode"
                                    class="form-label">
-
                                 Pin Code
                             </label>
 
@@ -256,6 +254,24 @@
 
                             <span asp-validation-for="PinCode"
                                   class="text-danger"></span>
+                        </div>
+
+
+                        <!-- Images -->
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Device Images
+                            </label>
+
+                            <input type="file"
+                                   name="images"
+                                   class="form-control"
+                                   accept="image/*"
+                                   multiple />
+
+                            <small class="text-muted">
+                                You can select multiple images.
+                            </small>
                         </div>
 
 
@@ -269,6 +285,7 @@
                                    class="form-check-label">
 
                                 Mark as Urgent Sale
+
                                 <small class="text-muted">
                                     (Need to sell/repair within 48 hours)
                                 </small>
@@ -286,16 +303,12 @@
 
                     <button type="submit"
                             class="btn btn-primary">
-
                         Publish Listing
-
                     </button>
 
                     <a asp-action="Index"
                        class="btn btn-secondary">
-
                         Cancel
-
                     </a>
 
                 </div>

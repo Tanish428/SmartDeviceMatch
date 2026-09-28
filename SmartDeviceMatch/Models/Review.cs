@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SmartDeviceMatch.Models
 {
@@ -12,11 +13,15 @@ namespace SmartDeviceMatch.Models
         public Offer? Offer { get; set; }
 
         [Required]
-        public required string ReviewerId { get; set; } 
+        public int ReviewerId { get; set; }
+
+        [ForeignKey(nameof(ReviewerId))]
         public AppUser? Reviewer { get; set; }
 
         [Required]
-        public required string RevieweeId { get; set; }
+        public int RevieweeId { get; set; }
+
+        [ForeignKey(nameof(RevieweeId))]
         public AppUser? Reviewee { get; set; }
 
         [Required, Range(1, 5)] 
