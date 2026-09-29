@@ -110,11 +110,23 @@
                                 @device.City, @device.State
                             </p>
 
+                            <!-- View Details -->
                             <a asp-action="Details"
                                asp-route-id="@device.Id"
-                               class="btn btn-primary w-100">
+                               class="btn btn-primary w-100 mb-2">
                                 View Details
                             </a>
+
+                            <!-- Buyer Purchase Offer -->
+                            @if (User.IsInRole("Buyer"))
+                            {
+                                <a asp-controller="Offer"
+                                   asp-action="CreatePurchase"
+                                   asp-route-deviceId="@device.Id"
+                                   class="btn btn-outline-primary w-100">
+                                    Make Purchase Offer
+                                </a>
+                            }
 
                         </div>
 

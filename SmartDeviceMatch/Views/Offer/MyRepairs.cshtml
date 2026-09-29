@@ -1,0 +1,192 @@
+﻿@model IEnumerable<SmartDeviceMatch.Models.Offer>
+
+@{
+    ViewData["Title"] = "My Repairs";
+}
+
+<div class="container mt-4 mb-5">
+
+    <div class="mb-4">
+
+        <h2>My Repairs</h2>
+
+        <p class="text-muted">
+            View and manage devices currently being repaired.
+        </p>
+
+    </div>
+
+
+    @if (TempData["RepairMessage"] != null)
+    {
+        <div class="alert alert-info">
+            @TempData["RepairMessage"]
+        </div>
+    }
+
+
+    @if (!Model.Any())
+    {
+        <div class="card shadow-sm text-center p-5">
+
+            <h4>No active repairs.</h4>
+
+            <p class="text-muted">
+                When a device owner accepts one of your repair offers,
+                the device will appear here.
+            </p>
+
+            <a asp-controller="Marketplace"
+               asp-action="Broken"
+               class="btn btn-primary">
+
+                Browse Broken Devices
+
+            </a>
+
+        </div>
+    }
+    else
+    {
+        <div class="mb-3">
+
+            <strong>@Model.Count()</strong>
+            active repair(s)
+
+        </div>
+
+
+        <div class="row g-4">
+
+            @foreach (var repair in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+
+                    <div class="card h-100 shadow-sm">
+
+                        <div class="card-body">
+
+                            @if (repair.Device != null)
+                            {
+                                <h5 class="card-title">
+
+                                    @repair.Device.BrandName
+                                    @repair.Device.ModelName
+
+                                </h5>
+
+                                <p class="text-muted mb-3">
+
+                                    @repair.Device.Category?.Name
+
+                                </p>
+
+
+                                <hr />
+
+
+                                <div class="mb-2">
+
+                                    <span class="text-muted">
+                                        Condition:
+                                    </span>
+
+                                    <strong>
+                                        @repair.Device.ConditionGrade
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="mb-2">
+
+                                    <span class="text-muted">
+                                        Damage:
+                                    </span>
+
+                                    @repair.Device.DamageType
+
+                                </div>
+
+
+                                <div class="mb-2">
+
+                                    <span class="text-muted">
+                                        Repair Cost:
+                                    </span>
+
+                                    <strong>
+                                        ₹@repair.OfferAmount.ToString("0.00")
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="mb-3">
+
+                                    <span class="text-muted">
+                                        Device Status:
+                                    </span>
+
+                                    <span class="badge bg-warning text-dark">
+                                        Repairing
+                                    </span>
+
+                                </div>
+
+
+                                @if (!string.IsNullOrWhiteSpace(repair.Message))
+                                {
+                                    <div class="mb-3">
+
+                                        <strong>
+                                            Your Message:
+                                        </strong>
+
+                                        <p class="text-muted mb-0">
+                                            @repair.Message
+                                        </p>
+
+                                    </div>
+                                }
+
+
+                                <!-- Complete Repair -->
+
+                                <form asp-controller="Offer"
+                                      asp-action="CompleteRepair"
+                                      method="post">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="@repair.Id" />
+
+                                    <button type="submit"
+                                            class="btn btn-success w-100">
+
+                                        Complete Repair
+
+                                    </button>
+
+                                </form>
+                            }
+                            else
+                            {
+                                <h5 class="card-title">
+                                    Device unavailable
+                                </h5>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>

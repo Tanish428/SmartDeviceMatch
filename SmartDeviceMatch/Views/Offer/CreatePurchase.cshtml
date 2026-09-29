@@ -1,0 +1,236 @@
+﻿@model SmartDeviceMatch.Models.Offer
+
+@{
+    ViewData["Title"] = "Make Purchase Offer";
+
+    var device = ViewBag.Device as SmartDeviceMatch.Models.Device;
+    var repairShop = ViewBag.RepairShop as SmartDeviceMatch.Models.RepairShop;
+}
+
+<div class="container mt-4 mb-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-md-8">
+
+            <div class="mb-4">
+
+                <h2>Make Purchase Offer</h2>
+
+                <p class="text-muted">
+                    Submit your price to purchase this refurbished device.
+                </p>
+
+            </div>
+
+
+            @if (device != null)
+            {
+                <div class="card shadow-sm mb-4">
+
+                    <div class="card-body">
+
+                        <h4>
+                            @device.BrandName @device.ModelName
+                        </h4>
+
+                        <p class="text-muted mb-3">
+                            @device.Category?.Name
+                        </p>
+
+                        <div class="row">
+
+                            <div class="col-md-6 mb-2">
+
+                                <strong>Condition:</strong>
+
+                                @device.ConditionGrade
+
+                            </div>
+
+                            <div class="col-md-6 mb-2">
+
+                                <strong>Damage:</strong>
+
+                                @device.DamageType
+
+                            </div>
+
+                            <div class="col-md-6 mb-2">
+
+                                <strong>Location:</strong>
+
+                                @device.City, @device.State
+
+                            </div>
+
+                            <div class="col-md-6 mb-2">
+
+                                <strong>Asking Price:</strong>
+
+                                ₹@device.AskingPrice.ToString("0.00")
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+
+            @if (repairShop != null)
+            {
+                <div class="alert alert-light border mb-4">
+
+                    <strong>Seller:</strong>
+
+                    @repairShop.ShopName
+
+                    <br />
+
+                    <span class="text-muted">
+
+                        @repairShop.City, @repairShop.State
+
+                    </span>
+
+                </div>
+            }
+
+
+            <form asp-controller="Offer"
+                  asp-action="CreatePurchase"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       name="deviceId"
+                       value="@device?.Id" />
+
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3">
+                </div>
+
+
+                <div class="card shadow-sm">
+
+                    <div class="card-body">
+
+                        <div class="mb-3">
+
+                            <label for="offerAmount"
+                                   class="form-label">
+
+                                Purchase Offer Amount
+
+                            </label>
+
+                            <div class="input-group">
+
+                                <span class="input-group-text">
+                                    ₹
+                                </span>
+
+                                <input type="number"
+                                       id="offerAmount"
+                                       name="offerAmount"
+                                       class="form-control"
+                                       step="0.01"
+                                       min="0.01"
+                                       placeholder="Enter your offer"
+                                       required />
+
+                            </div>
+
+                            <small class="text-muted">
+
+                                Enter the amount you are willing
+                                to pay for this device.
+
+                            </small>
+
+                            <span class="text-danger">
+                                @Html.ValidationMessage(
+                                    "offerAmount")
+                            </span>
+
+                        </div>
+
+
+                        <div class="mb-4">
+
+                            <label for="message"
+                                   class="form-label">
+
+                                Message (Optional)
+
+                            </label>
+
+                            <textarea id="message"
+                                      name="message"
+                                      class="form-control"
+                                      rows="4"
+                                      maxlength="1000"
+                                      placeholder="Add a message to the seller..."></textarea>
+
+                        </div>
+
+
+                        <div class="alert alert-info">
+
+                            <strong>Offer Information</strong>
+
+                            <ul class="mb-0 mt-2">
+
+                                <li>
+                                    Your offer will be sent to the seller.
+                                </li>
+
+                                <li>
+                                    The offer will remain pending until
+                                    the seller responds.
+                                </li>
+
+                                <li>
+                                    The offer will expire after 7 days.
+                                </li>
+
+                            </ul>
+
+                        </div>
+
+
+                        <div class="d-flex gap-2">
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+
+                                Submit Purchase Offer
+
+                            </button>
+
+                            <a asp-controller="Marketplace"
+                               asp-action="Refurbished"
+                               class="btn btn-outline-secondary">
+
+                                Cancel
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

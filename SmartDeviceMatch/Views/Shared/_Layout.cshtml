@@ -119,14 +119,12 @@
 
                             @if (User.IsInRole("RepairShop"))
                             {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark"
-                                       asp-controller="Marketplace"
-                                       asp-action="BrokenDevices">
-                                        Browse Broken Devices
-                                    </a>
-                                </li>
-
+                                <a class="nav-link text-dark"
+                                   asp-controller="Marketplace"
+                                   asp-action="BrokenDevices">
+                                    Browse Broken Devices
+                                </a>
+                            
                                 <li class="nav-item">
                                     <a class="nav-link text-dark"
                                        asp-controller="Offer"
@@ -134,7 +132,14 @@
                                         My Active Offers
                                     </a>
                                 </li>
-
+                            
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark"
+                                       asp-controller="Offer"
+                                       asp-action="MyRepairs">
+                                        My Repairs
+                                    </a>
+                                </li>
                             }
 
 
@@ -149,6 +154,14 @@
                                        asp-controller="Marketplace"
                                        asp-action="Refurbished">
                                         Browse Refurbished Devices
+                                    </a>
+                                </li>
+                            
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark"
+                                       asp-controller="Offer"
+                                       asp-action="MyPurchaseOffers">
+                                        My Purchase Offers
                                     </a>
                                 </li>
                             }
