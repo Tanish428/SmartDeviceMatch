@@ -1,8 +1,10 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>@ViewData["Title"] - SmartDeviceMatch</title>
 
     <script type="importmap"></script>
@@ -34,6 +36,7 @@
                    asp-action="Index">
                     SmartDeviceMatch
                 </a>
+
 
                 <!-- Mobile Menu Button -->
                 <button class="navbar-toggler"
@@ -78,7 +81,10 @@
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
 
+                            <!-- ==================== -->
                             <!-- Device Owner -->
+                            <!-- ==================== -->
+
                             @if (User.IsInRole("DeviceOwner"))
                             {
                                 <li class="nav-item">
@@ -99,7 +105,10 @@
                             }
 
 
+                            <!-- ==================== -->
                             <!-- Repair Shop -->
+                            <!-- ==================== -->
+
                             @if (User.IsInRole("RepairShop"))
                             {
                                 <li class="nav-item">
@@ -120,7 +129,10 @@
                             }
 
 
+                            <!-- ==================== -->
                             <!-- Buyer -->
+                            <!-- ==================== -->
+
                             @if (User.IsInRole("Buyer"))
                             {
                                 <li class="nav-item">
@@ -133,7 +145,10 @@
                             }
 
 
+                            <!-- ==================== -->
                             <!-- Admin -->
+                            <!-- ==================== -->
+
                             @if (User.IsInRole("Admin"))
                             {
                                 <li class="nav-item">
@@ -162,14 +177,20 @@
     </header>
 
 
+    <!-- Main Content -->
+
     <div class="container">
 
         <main role="main" class="pb-3">
+
             @RenderBody()
+
         </main>
 
     </div>
 
+
+    <!-- Footer -->
 
     <footer class="border-top footer text-muted">
 
@@ -188,6 +209,8 @@
     </footer>
 
 
+    <!-- JavaScript -->
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -198,4 +221,5 @@
     @await RenderSectionAsync("Scripts", required: false)
 
 </body>
+
 </html>

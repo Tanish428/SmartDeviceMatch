@@ -1,0 +1,246 @@
+﻿@model SmartDeviceMatch.Models.Device
+
+@{
+    ViewData["Title"] = "Device Details";
+
+    var images = Model.Images?
+        .OrderBy(i => i.DisplayOrder)
+        .ToList();
+
+    var primaryImage = images?.FirstOrDefault();
+}
+
+<div class="container mt-4 mb-5">
+
+    <!-- Back Button -->
+    <div class="mb-3">
+        <a asp-action="BrokenDevices"
+           class="btn btn-outline-secondary">
+            ← Back to Broken Devices
+        </a>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Images -->
+        <div class="col-lg-6">
+
+            <div class="card shadow-sm">
+
+                @if (primaryImage != null)
+                {
+                    <img src="@primaryImage.ImageUrl"
+                         class="card-img-top"
+                         alt="@Model.BrandName @Model.ModelName"
+                         style="height:400px; object-fit:contain; background:#f8f9fa;" />
+                }
+                else
+                {
+                    <div class="d-flex align-items-center justify-content-center bg-light"
+                         style="height:400px;">
+
+                        <span class="text-muted">
+                            No Image Available
+                        </span>
+
+                    </div>
+                }
+
+                @if (images != null && images.Count > 1)
+                {
+                    <div class="card-body">
+
+                        <div class="row g-2">
+
+                            @foreach (var image in images)
+                            {
+                                <div class="col-3">
+
+                                    <img src="@image.ImageUrl"
+                                         alt="Device image"
+                                         class="img-thumbnail w-100"
+                                         style="height:80px; object-fit:cover;" />
+
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+        <!-- Device Information -->
+        <div class="col-lg-6">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-body p-4">
+
+                    <!-- Title -->
+                    <div class="mb-3">
+
+                        <h2 class="mb-1">
+                            @Model.BrandName @Model.ModelName
+                        </h2>
+
+                        <p class="text-muted mb-0">
+                            @Model.Category?.Name
+                        </p>
+
+                    </div>
+
+                    <!-- Status -->
+                    <div class="mb-4">
+
+                        <span class="badge bg-success">
+                            @Model.Status
+                        </span>
+
+                        @if (Model.IsUrgent)
+                        {
+                            <span class="badge bg-danger">
+                                Urgent
+                            </span>
+                        }
+
+                    </div>
+
+                    <!-- Price -->
+                    <div class="mb-4">
+
+                        <h3 class="text-primary">
+                            ₹@Model.AskingPrice.ToString("0.00")
+                        </h3>
+
+                        @if (Model.EstimatedValue.HasValue)
+                        {
+                            <p class="text-muted mb-0">
+                                Estimated Value:
+                                <strong>
+                                    ₹@Model.EstimatedValue.Value.ToString("0.00")
+                                </strong>
+                            </p>
+                        }
+
+                    </div>
+
+                    <hr />
+
+                    <!-- Device Information -->
+                    <h5 class="mb-3">
+                        Device Information
+                    </h5>
+
+                    <div class="row mb-2">
+
+                        <div class="col-sm-5 text-muted">
+                            Category
+                        </div>
+
+                        <div class="col-sm-7">
+                            @Model.Category?.Name
+                        </div>
+
+                    </div>
+
+                    <div class="row mb-2">
+
+                        <div class="col-sm-5 text-muted">
+                            Condition Grade
+                        </div>
+
+                        <div class="col-sm-7">
+                            <span class="badge bg-warning text-dark">
+                                Grade @Model.ConditionGrade
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <div class="row mb-2">
+
+                        <div class="col-sm-5 text-muted">
+                            Damage Type
+                        </div>
+
+                        <div class="col-sm-7">
+                            @Model.DamageType
+                        </div>
+
+                    </div>
+
+                    <div class="row mb-2">
+
+                        <div class="col-sm-5 text-muted">
+                            Location
+                        </div>
+
+                        <div class="col-sm-7">
+                            @Model.City, @Model.State
+                        </div>
+
+                    </div>
+
+                    <div class="row mb-2">
+
+                        <div class="col-sm-5 text-muted">
+                            Listed On
+                        </div>
+
+                        <div class="col-sm-7">
+                            @Model.CreatedAt.ToShortDateString()
+                        </div>
+
+                    </div>
+
+                    <div class="row mb-3">
+
+                        <div class="col-sm-5 text-muted">
+                            Views
+                        </div>
+
+                        <div class="col-sm-7">
+                            @Model.ViewCount
+                        </div>
+
+                    </div>
+
+                    <hr />
+
+                    <!-- Condition Description -->
+                    <h5 class="mb-3">
+                        Condition Description
+                    </h5>
+
+                    <p class="text-muted">
+                        @Model.ConditionDescription
+                    </p>
+
+                    <hr />
+
+                    <!-- Owner Privacy -->
+                    <div class="alert alert-info">
+
+                        <strong>Owner Privacy</strong>
+
+                        <p class="mb-0 mt-1">
+                            Owner contact information is hidden at this stage.
+                            Contact and offer options will be available through
+                            the appropriate marketplace process.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

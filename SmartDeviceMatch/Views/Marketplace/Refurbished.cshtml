@@ -1,0 +1,129 @@
+﻿@model IEnumerable<SmartDeviceMatch.Models.Device>
+
+@{
+    ViewData["Title"] = "Refurbished Devices";
+}
+
+<div class="container mt-4 mb-5">
+
+    <!-- Page Header -->
+    <div class="mb-4">
+        <h2>Refurbished Devices</h2>
+        <p class="text-muted">
+            Browse devices that have been repaired and refurbished.
+        </p>
+    </div>
+
+    <!-- Device Count -->
+    <div class="mb-3">
+        <strong>@Model.Count()</strong>
+        refurbished device(s) available
+    </div>
+
+    <!-- Devices -->
+    @if (!Model.Any())
+    {
+        <div class="card text-center p-5 shadow-sm">
+
+            <h4>No refurbished devices available.</h4>
+
+            <p class="text-muted">
+                Refurbished devices will appear here after they
+                complete the repair process.
+            </p>
+
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+
+            @foreach (var device in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+
+                    <div class="card h-100 shadow-sm">
+
+                        <!-- Device Image -->
+                        @if (device.Images != null &&
+                             device.Images.Any())
+                        {
+                            var primaryImage = device.Images
+                                .OrderBy(i => i.DisplayOrder)
+                                .First();
+
+                            <img src="@primaryImage.ImageUrl"
+                                 class="card-img-top"
+                                 alt="@device.BrandName @device.ModelName"
+                                 style="height:220px; object-fit:cover;" />
+                        }
+                        else
+                        {
+                            <div class="d-flex align-items-center justify-content-center bg-light"
+                                 style="height:220px;">
+
+                                <span class="text-muted">
+                                    No Image Available
+                                </span>
+
+                            </div>
+                        }
+
+                        <!-- Device Information -->
+                        <div class="card-body">
+
+                            <h5 class="card-title">
+                                @device.BrandName @device.ModelName
+                            </h5>
+
+                            <p class="text-muted mb-2">
+                                @device.Category?.Name
+                            </p>
+
+                            <div class="mb-2">
+
+                                <span class="badge bg-success">
+                                    Refurbished
+                                </span>
+
+                                <span class="badge bg-secondary">
+                                    Grade @device.ConditionGrade
+                                </span>
+
+                            </div>
+
+                            <p class="mb-2">
+                                <strong>Price:</strong>
+                                ₹@device.AskingPrice.ToString("0.00")
+                            </p>
+
+                            @if (device.EstimatedValue.HasValue)
+                            {
+                                <p class="mb-2">
+                                    <strong>Estimated Value:</strong>
+                                    ₹@device.EstimatedValue.Value.ToString("0.00")
+                                </p>
+                            }
+
+                            <p class="text-muted mb-3">
+                                <strong>Location:</strong>
+                                @device.City, @device.State
+                            </p>
+
+                            <a asp-action="Details"
+                               asp-route-id="@device.Id"
+                               class="btn btn-primary w-100">
+                                View Details
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>
