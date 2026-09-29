@@ -21,9 +21,8 @@ namespace SmartDeviceMatch.Controllers
             _userManager = userManager;
         }
 
-
         // ==========================================
-        // GET: Offer/Create/5
+        // GET: Offer/Create
         // RepairShop creates a repair offer
         // ==========================================
 
@@ -39,7 +38,6 @@ namespace SmartDeviceMatch.Controllers
                     "Profile");
             }
 
-
             var device = await _context.Devices
                 .Include(d => d.Category)
                 .FirstOrDefaultAsync(d =>
@@ -47,12 +45,10 @@ namespace SmartDeviceMatch.Controllers
                     d.Status == "Listed" &&
                     !d.IsDeleted);
 
-
             if (device == null)
             {
                 return NotFound();
             }
-
 
             ViewBag.Device = device;
 
@@ -81,21 +77,17 @@ namespace SmartDeviceMatch.Controllers
                     "Profile");
             }
 
-
             var device = await _context.Devices
                 .FirstOrDefaultAsync(d =>
                     d.Id == deviceId &&
                     d.Status == "Listed" &&
                     !d.IsDeleted);
 
-
             if (device == null)
             {
                 return NotFound();
             }
 
-
-            // Validate offer amount
             if (offerAmount <= 0)
             {
                 ModelState.AddModelError(
@@ -107,16 +99,12 @@ namespace SmartDeviceMatch.Controllers
                 return View();
             }
 
-
-            // Check if the RepairShop already
-            // has a pending offer for this device
             var existingOffer = await _context.Offers
                 .AnyAsync(o =>
                     o.DeviceId == deviceId &&
                     o.RepairShopId == repairShop.Id &&
                     o.OfferType == "Repair" &&
                     o.Status == "Pending");
-
 
             if (existingOffer)
             {
@@ -129,37 +117,27 @@ namespace SmartDeviceMatch.Controllers
                 return View();
             }
 
-
-            // Create repair offer
             var offer = new Offer
             {
                 DeviceId = deviceId,
-
                 RepairShopId = repairShop.Id,
-
                 BuyerId = null,
 
                 OfferAmount = offerAmount,
-
                 Message = message,
 
                 Currency = "INR",
-
                 OfferType = "Repair",
-
                 Status = "Pending",
 
                 ExpiresAt = DateTime.UtcNow.AddDays(7)
             };
 
-
             _context.Offers.Add(offer);
 
             await _context.SaveChangesAsync();
 
-
-            return RedirectToAction(
-                nameof(MyOffers));
+            return RedirectToAction(nameof(MyOffers));
         }
 
 
@@ -180,7 +158,6 @@ namespace SmartDeviceMatch.Controllers
                     "Profile");
             }
 
-
             var offers = await _context.Offers
                 .Include(o => o.Device)
                     .ThenInclude(d => d!.Category)
@@ -190,14 +167,13 @@ namespace SmartDeviceMatch.Controllers
                 .OrderByDescending(o => o.Id)
                 .ToListAsync();
 
-
             return View(offers);
         }
 
 
         // ==========================================
         // GET: Offer/Received
-        // DeviceOwner's received repair offers
+        // DeviceOwner receives repair offers
         // ==========================================
 
         [Authorize(Roles = "DeviceOwner")]
@@ -210,12 +186,9 @@ namespace SmartDeviceMatch.Controllers
                 return Challenge();
             }
 
-
-            // Find AppUser
             var appUser = await _context.AppUsers
                 .FirstOrDefaultAsync(u =>
                     u.IdentityUserId == userId);
-
 
             if (appUser == null)
             {
@@ -224,13 +197,10 @@ namespace SmartDeviceMatch.Controllers
                     "Profile");
             }
 
-
-            // Find offers for devices owned
-            // by the current DeviceOwner
             var offers = await _context.Offers
                 .Include(o => o.Device)
+                    .ThenInclude(d => d!.Category)
                 .Include(o => o.RepairShop)
-                    .ThenInclude(r => r!.User)
                 .Where(o =>
                     o.Device != null &&
                     o.Device.OwnerId == appUser.Id &&
@@ -238,56 +208,204 @@ namespace SmartDeviceMatch.Controllers
                 .OrderByDescending(o => o.Id)
                 .ToListAsync();
 
-
             return View(offers);
         }
 
 
         // ==========================================
+        // POST: Offer/Accept
+        // DeviceOwner accepts repair offer
+        // ==========================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "DeviceOwner")]
+        public async Task<IActionResult> Accept(int id)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            if (userId == null)
+            {
+                return Challenge();
+            }
+
+            var appUser = await _context.AppUsers
+                .FirstOrDefaultAsync(u =>
+                    u.IdentityUserId == userId);
+
+            if (appUser == null)
+            {
+                return RedirectToAction(
+                    "Create",
+                    "Profile");
+            }
+
+            var offer = await _context.Offers
+                .Include(o => o.Device)
+                .FirstOrDefaultAsync(o =>
+                    o.Id == id &&
+                    o.OfferType == "Repair");
+
+            if (offer == null || offer.Device == null)
+            {
+                return NotFound();
+            }
+
+            // Make sure this offer belongs to the
+            // logged-in DeviceOwner's device.
+            if (offer.Device.OwnerId != appUser.Id)
+            {
+                return Forbid();
+            }
+
+            // Only pending offers can be accepted.
+            if (offer.Status != "Pending")
+            {
+                TempData["OfferMessage"] =
+                    "This offer is no longer pending.";
+
+                return RedirectToAction(nameof(Received));
+            }
+
+            // Check offer expiry.
+            if (offer.ExpiresAt < DateTime.UtcNow)
+            {
+                offer.Status = "Expired";
+
+                await _context.SaveChangesAsync();
+
+                TempData["OfferMessage"] =
+                    "This offer has expired.";
+
+                return RedirectToAction(nameof(Received));
+            }
+
+            // Accept selected offer.
+            offer.Status = "Accepted";
+
+            // Reject other pending repair offers
+            // for the same device.
+            var otherOffers = await _context.Offers
+                .Where(o =>
+                    o.DeviceId == offer.DeviceId &&
+                    o.Id != offer.Id &&
+                    o.OfferType == "Repair" &&
+                    o.Status == "Pending")
+                .ToListAsync();
+
+            foreach (var otherOffer in otherOffers)
+            {
+                otherOffer.Status = "Rejected";
+            }
+
+            await _context.SaveChangesAsync();
+
+            TempData["OfferMessage"] =
+                "Repair offer accepted successfully.";
+
+            return RedirectToAction(nameof(Received));
+        }
+
+
+        // ==========================================
+        // POST: Offer/Reject
+        // DeviceOwner rejects repair offer
+        // ==========================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "DeviceOwner")]
+        public async Task<IActionResult> Reject(int id)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            if (userId == null)
+            {
+                return Challenge();
+            }
+
+            var appUser = await _context.AppUsers
+                .FirstOrDefaultAsync(u =>
+                    u.IdentityUserId == userId);
+
+            if (appUser == null)
+            {
+                return RedirectToAction(
+                    "Create",
+                    "Profile");
+            }
+
+            var offer = await _context.Offers
+                .Include(o => o.Device)
+                .FirstOrDefaultAsync(o =>
+                    o.Id == id &&
+                    o.OfferType == "Repair");
+
+            if (offer == null || offer.Device == null)
+            {
+                return NotFound();
+            }
+
+            // Make sure this offer belongs to the
+            // logged-in DeviceOwner's device.
+            if (offer.Device.OwnerId != appUser.Id)
+            {
+                return Forbid();
+            }
+
+            // Only pending offers can be rejected.
+            if (offer.Status != "Pending")
+            {
+                TempData["OfferMessage"] =
+                    "This offer is no longer pending.";
+
+                return RedirectToAction(nameof(Received));
+            }
+
+            offer.Status = "Rejected";
+
+            await _context.SaveChangesAsync();
+
+            TempData["OfferMessage"] =
+                "Repair offer rejected.";
+
+            return RedirectToAction(nameof(Received));
+        }
+
+
+        // ==========================================
         // Helper:
-        // Get or create current RepairShop
+        // Get current RepairShop
         // ==========================================
 
         private async Task<RepairShop?> GetCurrentRepairShop()
         {
-            // Get logged-in IdentityUser ID
             var identityUserId =
                 _userManager.GetUserId(User);
-
 
             if (identityUserId == null)
             {
                 return null;
             }
 
-
-            // Find AppUser connected to IdentityUser
             var appUser = await _context.AppUsers
                 .FirstOrDefaultAsync(u =>
                     u.IdentityUserId == identityUserId);
-
 
             if (appUser == null)
             {
                 return null;
             }
 
-
-            // Find RepairShop using AppUser.Id
             var repairShop = await _context.RepairShops
                 .FirstOrDefaultAsync(r =>
                     r.UserId == appUser.Id);
 
-
-            // RepairShop already exists
             if (repairShop != null)
             {
                 return repairShop;
             }
 
-
-            // RepairShop record does not exist.
-            // Create it for the existing AppUser.
             repairShop = new RepairShop
             {
                 UserId = appUser.Id,
@@ -319,11 +437,9 @@ namespace SmartDeviceMatch.Controllers
                 TotalReviews = 0
             };
 
-
             _context.RepairShops.Add(repairShop);
 
             await _context.SaveChangesAsync();
-
 
             return repairShop;
         }

@@ -1,0 +1,287 @@
+﻿@model IEnumerable<SmartDeviceMatch.Models.Offer>
+
+@{
+    ViewData["Title"] = "Received Repair Offers";
+}
+
+<div class="container mt-4 mb-5">
+
+    <div class="mb-4">
+
+        <h2>Received Repair Offers</h2>
+
+        <p class="text-muted">
+            View and manage repair offers received for your devices.
+        </p>
+
+    </div>
+
+
+    @if (TempData["OfferMessage"] != null)
+    {
+        <div class="alert alert-info">
+            @TempData["OfferMessage"]
+        </div>
+    }
+
+
+    @if (!Model.Any())
+    {
+        <div class="card shadow-sm text-center p-5">
+
+            <h4>No repair offers received yet.</h4>
+
+            <p class="text-muted">
+                When a repair shop makes an offer for one of
+                your devices, it will appear here.
+            </p>
+
+            <a asp-controller="Device"
+               asp-action="Index"
+               class="btn btn-primary">
+                View My Devices
+            </a>
+
+        </div>
+    }
+    else
+    {
+        <div class="mb-3">
+
+            <strong>@Model.Count()</strong>
+            repair offer(s) received
+
+        </div>
+
+
+        <div class="row g-4">
+
+            @foreach (var offer in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+
+                    <div class="card h-100 shadow-sm">
+
+                        <div class="card-body">
+
+                            <!-- Device -->
+                            @if (offer.Device != null)
+                            {
+                                <h5 class="card-title">
+
+                                    @offer.Device.BrandName
+                                    @offer.Device.ModelName
+
+                                </h5>
+
+                                <p class="text-muted mb-3">
+
+                                    @offer.Device.Category?.Name
+
+                                </p>
+                            }
+                            else
+                            {
+                                <h5 class="card-title">
+                                    Device unavailable
+                                </h5>
+                            }
+
+
+                            <hr />
+
+
+                            <!-- Repair Shop -->
+
+                            <h6 class="mb-2">
+                                Repair Shop
+                            </h6>
+
+                            @if (offer.RepairShop != null)
+                            {
+                                <p class="mb-1">
+
+                                    <strong>
+                                        @offer.RepairShop.ShopName
+                                    </strong>
+
+                                </p>
+
+                                <p class="text-muted mb-3">
+
+                                    @offer.RepairShop.City,
+                                    @offer.RepairShop.State
+
+                                </p>
+                            }
+
+
+                            <!-- Offer Amount -->
+
+                            <div class="mb-2">
+
+                                <span class="text-muted">
+                                    Repair Cost:
+                                </span>
+
+                                <strong>
+                                    ₹@offer.OfferAmount.ToString("0.00")
+                                </strong>
+
+                            </div>
+
+
+                            <!-- Status -->
+
+                            <div class="mb-2">
+
+                                <span class="text-muted">
+                                    Status:
+                                </span>
+
+                                @if (offer.Status == "Pending")
+                                {
+                                    <span class="badge bg-warning text-dark">
+                                        Pending
+                                    </span>
+                                }
+                                else if (offer.Status == "Accepted")
+                                {
+                                    <span class="badge bg-success">
+                                        Accepted
+                                    </span>
+                                }
+                                else if (offer.Status == "Rejected")
+                                {
+                                    <span class="badge bg-danger">
+                                        Rejected
+                                    </span>
+                                }
+                                else if (offer.Status == "Expired")
+                                {
+                                    <span class="badge bg-secondary">
+                                        Expired
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        @offer.Status
+                                    </span>
+                                }
+
+                            </div>
+
+
+                            <!-- Expiry -->
+
+                            <div class="mb-3">
+
+                                <span class="text-muted">
+                                    Expires:
+                                </span>
+
+                                @offer.ExpiresAt.ToShortDateString()
+
+                            </div>
+
+
+                            <!-- Message -->
+                            @if (!string.IsNullOrWhiteSpace(offer.Message))
+                            {
+                                <div class="mb-3">
+
+                                    <strong>
+                                        Repair Shop Message:
+                                    </strong>
+
+                                    <p class="text-muted mb-0">
+                                        @offer.Message
+                                    </p>
+
+                                </div>
+                            }
+
+
+                            <!-- Accept / Reject -->
+                            @if (offer.Status == "Pending")
+                            {
+                                <div class="d-grid gap-2">
+
+                                    <form asp-controller="Offer"
+                                          asp-action="Accept"
+                                          method="post">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@offer.Id" />
+
+                                        <button type="submit"
+                                                class="btn btn-success w-100">
+
+                                            Accept Offer
+
+                                        </button>
+
+                                    </form>
+
+
+                                    <form asp-controller="Offer"
+                                          asp-action="Reject"
+                                          method="post">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@offer.Id" />
+
+                                        <button type="submit"
+                                                class="btn btn-outline-danger w-100">
+
+                                            Reject Offer
+
+                                        </button>
+
+                                    </form>
+
+                                </div>
+                            }
+                            else if (offer.Status == "Accepted")
+                            {
+                                <div class="alert alert-success mb-0">
+
+                                    This repair offer has been accepted.
+
+                                </div>
+                            }
+                            else if (offer.Status == "Rejected")
+                            {
+                                <div class="alert alert-secondary mb-0">
+
+                                    This repair offer was rejected.
+
+                                </div>
+                            }
+                            else if (offer.Status == "Expired")
+                            {
+                                <div class="alert alert-secondary mb-0">
+
+                                    This repair offer has expired.
+
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>
