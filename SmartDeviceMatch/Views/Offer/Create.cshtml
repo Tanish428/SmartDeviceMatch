@@ -1,0 +1,208 @@
+﻿@model SmartDeviceMatch.Models.Offer
+
+@{
+    ViewData["Title"] = "Make Repair Offer";
+
+    var device = ViewBag.Device as SmartDeviceMatch.Models.Device;
+}
+
+<div class="container mt-4 mb-5">
+
+    <!-- Back -->
+    <div class="mb-3">
+        <a asp-controller="Marketplace"
+           asp-action="BrokenDevices"
+           class="btn btn-outline-secondary">
+            ← Back to Broken Devices
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-7">
+
+            <div class="card shadow-sm">
+
+                <div class="card-body p-4">
+
+                    <h2 class="mb-1">
+                        Make Repair Offer
+                    </h2>
+
+                    <p class="text-muted mb-4">
+                        Submit your repair price for this device.
+                    </p>
+
+
+                    @if (device != null)
+                    {
+                        <!-- Device Information -->
+
+                        <div class="alert alert-light border mb-4">
+
+                            <h5 class="mb-2">
+                                @device.BrandName @device.ModelName
+                            </h5>
+
+                            <p class="mb-1">
+                                <strong>Category:</strong>
+                                @device.Category?.Name
+                            </p>
+
+                            <p class="mb-1">
+                                <strong>Condition:</strong>
+                                Grade @device.ConditionGrade
+                            </p>
+
+                            <p class="mb-1">
+                                <strong>Damage:</strong>
+                                @device.DamageType
+                            </p>
+
+                            <p class="mb-0">
+                                <strong>Location:</strong>
+                                @device.City, @device.State
+                            </p>
+
+                        </div>
+                    }
+
+
+                    <!-- Validation Summary -->
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="text-danger mb-3">
+                    </div>
+
+
+                    <!-- Offer Form -->
+
+                    <form asp-action="Create"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="deviceId"
+                               value="@device?.Id" />
+
+
+                        <!-- Offer Amount -->
+
+                        <div class="mb-3">
+
+                            <label for="offerAmount"
+                                   class="form-label">
+                                Repair Offer Amount
+                            </label>
+
+                            <div class="input-group">
+
+                                <span class="input-group-text">
+                                    ₹
+                                </span>
+
+                                <input type="number"
+                                       id="offerAmount"
+                                       name="offerAmount"
+                                       class="form-control"
+                                       min="1"
+                                       step="0.01"
+                                       placeholder="Enter repair cost"
+                                       required />
+
+                            </div>
+
+                            <div class="form-text">
+                                Enter the amount you will charge
+                                for repairing this device.
+                            </div>
+
+                            <span class="text-danger"
+                                  asp-validation-for="OfferAmount">
+                            </span>
+
+                        </div>
+
+
+                        <!-- Message -->
+
+                        <div class="mb-4">
+
+                            <label for="message"
+                                   class="form-label">
+                                Message
+                            </label>
+
+                            <textarea id="message"
+                                      name="message"
+                                      class="form-control"
+                                      rows="4"
+                                      maxlength="1000"
+                                      placeholder="Describe the repair work or any important information..."></textarea>
+
+                            <div class="form-text">
+                                Optional. Maximum 1000 characters.
+                            </div>
+
+                        </div>
+
+
+                        <!-- Offer Information -->
+
+                        <div class="alert alert-info">
+
+                            <strong>Offer Information</strong>
+
+                            <ul class="mb-0 mt-2">
+
+                                <li>
+                                    This offer will be sent to the device owner.
+                                </li>
+
+                                <li>
+                                    The offer will remain pending until
+                                    the owner accepts or rejects it.
+                                </li>
+
+                                <li>
+                                    The offer will expire after 7 days.
+                                </li>
+
+                            </ul>
+
+                        </div>
+
+
+                        <!-- Buttons -->
+
+                        <div class="d-flex gap-2">
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+                                Submit Repair Offer
+                            </button>
+
+                            <a asp-controller="Marketplace"
+                               asp-action="BrokenDevices"
+                               class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

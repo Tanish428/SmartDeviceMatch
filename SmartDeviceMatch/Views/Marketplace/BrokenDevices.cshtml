@@ -219,11 +219,22 @@
                                 @device.City, @device.State
                             </p>
 
-                            <a asp-action="Details"
-                               asp-route-id="@device.Id"
-                               class="btn btn-primary w-100">
-                                View Details
-                            </a>
+                            <div class="d-grid gap-2">
+
+                                <a asp-action="Details"
+                                   asp-route-id="@device.Id"
+                                   class="btn btn-outline-primary">
+                                    View Details
+                                </a>
+
+                                <a asp-controller="Offer"
+                                   asp-action="Create"
+                                   asp-route-deviceId="@device.Id"
+                                   class="btn btn-primary">
+                                    Make Repair Offer
+                                </a>
+
+                            </div>
 
                         </div>
 

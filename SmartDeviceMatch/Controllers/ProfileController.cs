@@ -26,6 +26,7 @@ namespace SmartDeviceMatch.Controllers
             _signInManager = signInManager;
         }
 
+
         // GET: Profile/Create
         public async Task<IActionResult> Create()
         {
@@ -34,17 +35,52 @@ namespace SmartDeviceMatch.Controllers
             if (userId == null)
                 return Challenge();
 
-            // Check if profile already exists
+
             var existingProfile = await _context.AppUsers
-                .FirstOrDefaultAsync(u => u.IdentityUserId == userId);
+                .FirstOrDefaultAsync(u =>
+                    u.IdentityUserId == userId);
+
 
             if (existingProfile != null)
             {
-                return RedirectToAction("Index", "Home");
+                // Make sure an existing RepairShop user
+                // also has a RepairShop profile.
+                if (existingProfile.UserType == "RepairShop")
+                {
+                    var repairShopExists =
+                        await _context.RepairShops
+                            .AnyAsync(r =>
+                                r.UserId == existingProfile.Id);
+
+                    if (!repairShopExists)
+                    {
+                        var repairShop = new RepairShop
+                        {
+                            UserId = existingProfile.Id,
+                            ShopName = existingProfile.FullName,
+                            City = existingProfile.City ?? "Not Provided",
+                            State = existingProfile.State ?? "Not Provided",
+                            PinCode = existingProfile.PinCode ?? "000000",
+                            YearsOfExperience = 0,
+                            IsVerified = false,
+                            Rating = 0.0,
+                            TotalReviews = 0
+                        };
+
+                        _context.RepairShops.Add(repairShop);
+
+                        await _context.SaveChangesAsync();
+                    }
+                }
+
+                return RedirectToAction(
+                    "Index",
+                    "Home");
             }
 
             return View();
         }
+
 
         // POST: Profile/Create
         [HttpPost]
@@ -58,66 +94,103 @@ namespace SmartDeviceMatch.Controllers
             if (userId == null)
                 return Challenge();
 
-            // Get the Identity user
-            var identityUser = await _userManager.FindByIdAsync(userId);
+
+            var identityUser =
+                await _userManager.FindByIdAsync(userId);
 
             if (identityUser == null)
                 return Challenge();
 
-            // Prevent duplicate AppUser
-            var existingProfile = await _context.AppUsers
-                .AnyAsync(u => u.IdentityUserId == userId);
+
+            var existingProfile =
+                await _context.AppUsers
+                    .AnyAsync(u =>
+                        u.IdentityUserId == userId);
+
 
             if (existingProfile)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction(
+                    "Index",
+                    "Home");
             }
 
-            // Link AppUser with IdentityUser
+
             appUser.IdentityUserId = userId;
 
-            // Set default values
             appUser.CreatedAt = DateTime.UtcNow;
             appUser.IsVerified = false;
             appUser.IsBanned = false;
             appUser.Rating = 0.0;
 
-            // IdentityUserId is assigned manually
             ModelState.Remove("IdentityUserId");
 
-            if (ModelState.IsValid)
-            {
-                // Save AppUser profile
-                _context.AppUsers.Add(appUser);
-                await _context.SaveChangesAsync();
 
-                // Assign selected Identity role
-                var roleResult = await _userManager.AddToRoleAsync(
+            if (!ModelState.IsValid)
+            {
+                return View(appUser);
+            }
+
+
+            // Create AppUser
+            _context.AppUsers.Add(appUser);
+
+            await _context.SaveChangesAsync();
+
+
+            // Assign Identity role
+            var roleResult =
+                await _userManager.AddToRoleAsync(
                     identityUser,
                     appUser.UserType);
 
-                if (!roleResult.Succeeded)
-                {
-                    foreach (var error in roleResult.Errors)
-                    {
-                        ModelState.AddModelError(
-                            string.Empty,
-                            error.Description);
-                    }
 
-                    return View(appUser);
+            if (!roleResult.Succeeded)
+            {
+                foreach (var error in roleResult.Errors)
+                {
+                    ModelState.AddModelError(
+                        string.Empty,
+                        error.Description);
                 }
 
-                // End the temporary login
-                await _signInManager.SignOutAsync();
-
-                // Send user to Login
-                return RedirectToPage(
-                    "/Account/Login",
-                    new { area = "Identity" });
+                return View(appUser);
             }
 
-            return View(appUser);
+
+            // Create RepairShop profile automatically
+            if (appUser.UserType == "RepairShop")
+            {
+                var repairShop = new RepairShop
+                {
+                    UserId = appUser.Id,
+                    ShopName = appUser.FullName,
+                    City = appUser.City ?? "Not Provided",
+                    State = appUser.State ?? "Not Provided",
+                    PinCode = appUser.PinCode ?? "000000",
+                    YearsOfExperience = 0,
+                    IsVerified = false,
+                    Rating = 0.0,
+                    TotalReviews = 0
+                };
+
+                _context.RepairShops.Add(repairShop);
+
+                await _context.SaveChangesAsync();
+            }
+
+
+            // End temporary login
+            await _signInManager.SignOutAsync();
+
+
+            // Send user to Login
+            return RedirectToPage(
+                "/Account/Login",
+                new
+                {
+                    area = "Identity"
+                });
         }
     }
 }
