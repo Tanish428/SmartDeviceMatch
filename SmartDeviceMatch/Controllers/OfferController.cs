@@ -738,6 +738,162 @@ namespace SmartDeviceMatch.Controllers
         }
 
         // ==========================================
+        // GET: Offer/PurchaseReceived
+        // Purchase offers received by RepairShop
+        // ==========================================
+
+        [Authorize(Roles = "RepairShop")]
+        public async Task<IActionResult> PurchaseReceived()
+        {
+            var repairShop = await GetCurrentRepairShop();
+
+            if (repairShop == null)
+            {
+                return RedirectToAction(
+                    "Create",
+                    "Profile");
+            }
+
+            var offers = await _context.Offers
+                .Include(o => o.Device)
+                    .ThenInclude(d => d!.Category)
+                .Include(o => o.Buyer)
+                .Where(o =>
+                    o.RepairShopId == repairShop.Id &&
+                    o.OfferType == "Buy")
+                .OrderByDescending(o => o.Id)
+                .ToListAsync();
+
+            return View(offers);
+        }
+
+        // ==========================================
+        // POST: Offer/AcceptPurchase
+        // RepairShop accepts a buyer purchase offer
+        // ==========================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "RepairShop")]
+        public async Task<IActionResult> AcceptPurchase(int id)
+        {
+            var repairShop = await GetCurrentRepairShop();
+
+            if (repairShop == null)
+            {
+                return RedirectToAction(
+                    "Create",
+                    "Profile");
+            }
+
+            var offer = await _context.Offers
+                .Include(o => o.Device)
+                .FirstOrDefaultAsync(o =>
+                    o.Id == id &&
+                    o.RepairShopId == repairShop.Id &&
+                    o.OfferType == "Buy");
+
+            if (offer == null || offer.Device == null)
+            {
+                return NotFound();
+            }
+
+            if (offer.Status != "Pending")
+            {
+                TempData["PurchaseMessage"] =
+                    "This purchase offer is no longer pending.";
+
+                return RedirectToAction(
+                    nameof(PurchaseReceived));
+            }
+
+            if (offer.Device.Status != "Refurbished")
+            {
+                TempData["PurchaseMessage"] =
+                    "This device is not currently available for purchase.";
+
+                return RedirectToAction(
+                    nameof(PurchaseReceived));
+            }
+
+            // Accept the selected purchase offer
+            offer.Status = "Accepted";
+
+            // Reject all other pending purchase offers
+            var otherOffers = await _context.Offers
+                .Where(o =>
+                    o.DeviceId == offer.DeviceId &&
+                    o.OfferType == "Buy" &&
+                    o.Status == "Pending" &&
+                    o.Id != offer.Id)
+                .ToListAsync();
+
+            foreach (var otherOffer in otherOffers)
+            {
+                otherOffer.Status = "Rejected";
+            }
+
+            await _context.SaveChangesAsync();
+
+            TempData["PurchaseMessage"] =
+                "Purchase offer accepted successfully.";
+
+            return RedirectToAction(
+                nameof(PurchaseReceived));
+        }
+
+        // ==========================================
+        // POST: Offer/RejectPurchase
+        // RepairShop rejects a buyer purchase offer
+        // ==========================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "RepairShop")]
+        public async Task<IActionResult> RejectPurchase(int id)
+        {
+            var repairShop = await GetCurrentRepairShop();
+
+            if (repairShop == null)
+            {
+                return RedirectToAction(
+                    "Create",
+                    "Profile");
+            }
+
+            var offer = await _context.Offers
+                .Include(o => o.Device)
+                .FirstOrDefaultAsync(o =>
+                    o.Id == id &&
+                    o.RepairShopId == repairShop.Id &&
+                    o.OfferType == "Buy");
+
+            if (offer == null || offer.Device == null)
+            {
+                return NotFound();
+            }
+
+            if (offer.Status != "Pending")
+            {
+                TempData["PurchaseMessage"] =
+                    "This purchase offer is no longer pending.";
+
+                return RedirectToAction(
+                    nameof(PurchaseReceived));
+            }
+
+            offer.Status = "Rejected";
+
+            await _context.SaveChangesAsync();
+
+            TempData["PurchaseMessage"] =
+                "Purchase offer rejected.";
+
+            return RedirectToAction(
+                nameof(PurchaseReceived));
+        }
+
+        // ==========================================
         // Helper:
         // Get current RepairShop
         // ==========================================

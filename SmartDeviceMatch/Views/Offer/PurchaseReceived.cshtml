@@ -1,0 +1,198 @@
+﻿@model IEnumerable<SmartDeviceMatch.Models.Offer>
+
+@{
+    ViewData["Title"] = "Received Purchase Offers";
+}
+
+<div class="container mt-4 mb-5">
+
+    <div class="mb-4">
+        <h2>Received Purchase Offers</h2>
+        <p class="text-muted">
+            View purchase offers received for your refurbished devices.
+        </p>
+    </div>
+
+    @if (TempData["PurchaseMessage"] != null)
+    {
+        <div class="alert alert-info">
+            @TempData["PurchaseMessage"]
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="card shadow-sm text-center p-5">
+
+            <h4>No purchase offers received.</h4>
+
+            <p class="text-muted">
+                Purchase offers from buyers will appear here.
+            </p>
+
+        </div>
+    }
+    else
+    {
+        <div class="mb-3">
+            <strong>@Model.Count()</strong>
+            purchase offer(s) received
+        </div>
+
+        <div class="row g-4">
+
+            @foreach (var offer in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+
+                    <div class="card h-100 shadow-sm">
+
+                        <div class="card-body">
+
+                            @if (offer.Device != null)
+                            {
+                                <h5 class="card-title">
+                                    @offer.Device.BrandName
+                                    @offer.Device.ModelName
+                                </h5>
+
+                                <p class="text-muted mb-3">
+                                    @offer.Device.Category?.Name
+                                </p>
+                            }
+
+                            <hr />
+
+                            @if (offer.Buyer != null)
+                            {
+                                <div class="mb-2">
+                                    <span class="text-muted">
+                                        Buyer:
+                                    </span>
+
+                                    <strong>
+                                        @offer.Buyer.FullName
+                                    </strong>
+                                </div>
+                            }
+
+                            <div class="mb-2">
+                                <span class="text-muted">
+                                    Offer Amount:
+                                </span>
+
+                                <strong>
+                                    ₹@offer.OfferAmount.ToString("0.00")
+                                </strong>
+                            </div>
+
+                            <div class="mb-2">
+                                <span class="text-muted">
+                                    Status:
+                                </span>
+
+                                @if (offer.Status == "Pending")
+                                {
+                                    <span class="badge bg-warning text-dark">
+                                        Pending
+                                    </span>
+                                }
+                                else if (offer.Status == "Accepted")
+                                {
+                                    <span class="badge bg-success">
+                                        Accepted
+                                    </span>
+                                }
+                                else if (offer.Status == "Rejected")
+                                {
+                                    <span class="badge bg-danger">
+                                        Rejected
+                                    </span>
+                                }
+                                else if (offer.Status == "Expired")
+                                {
+                                    <span class="badge bg-secondary">
+                                        Expired
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        @offer.Status
+                                    </span>
+                                }
+                            </div>
+
+                            <div class="mb-3">
+                                <span class="text-muted">
+                                    Expires:
+                                </span>
+
+                                @offer.ExpiresAt.ToShortDateString()
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(offer.Message))
+                            {
+                                <div class="mb-3">
+                                    <strong>
+                                        Buyer Message:
+                                    </strong>
+
+                                    <p class="text-muted mb-0">
+                                        @offer.Message
+                                    </p>
+                                </div>
+                            }
+
+                            @if (offer.Status == "Pending")
+                            {
+                                <div class="d-flex gap-2 mt-3">
+
+                                    <form asp-controller="Offer"
+                                          asp-action="AcceptPurchase"
+                                          method="post">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@offer.Id" />
+
+                                        <button type="submit"
+                                                class="btn btn-success">
+                                            Accept
+                                        </button>
+
+                                    </form>
+
+                                    <form asp-controller="Offer"
+                                          asp-action="RejectPurchase"
+                                          method="post">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@offer.Id" />
+
+                                        <button type="submit"
+                                                class="btn btn-danger">
+                                            Reject
+                                        </button>
+
+                                    </form>
+
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>
