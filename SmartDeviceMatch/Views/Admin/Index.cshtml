@@ -374,6 +374,12 @@
                     View Reviews
                 </a>
 
+                <!-- NEW: SHOP VERIFICATION -->
+                <a asp-action="RepairShops"
+                   class="btn btn-outline-success">
+                    Verify Repair Shops
+                </a>
+
             </div>
 
         </div>
@@ -530,6 +536,7 @@
                                 <tr>
 
                                     <td>
+
                                         @if (offer.Device != null)
                                         {
                                             @offer.Device.BrandName
@@ -541,6 +548,7 @@
                                                 Device unavailable
                                             </span>
                                         }
+
                                     </td>
 
                                     <td>
@@ -647,6 +655,7 @@
                                 <tr>
 
                                     <td>
+
                                         @if (review.IsAnonymous)
                                         {
                                             <span>
@@ -657,6 +666,7 @@
                                         {
                                             @review.Reviewer?.FullName
                                         }
+
                                     </td>
 
                                     <td>
@@ -664,6 +674,7 @@
                                     </td>
 
                                     <td>
+
                                         <span class="text-warning">
 
                                             @for (int i = 1; i <= 5; i++)
@@ -679,6 +690,7 @@
                                             }
 
                                         </span>
+
                                     </td>
 
                                     <td>
@@ -700,5 +712,6 @@
         </div>
 
     </div>
+
 
 </div>

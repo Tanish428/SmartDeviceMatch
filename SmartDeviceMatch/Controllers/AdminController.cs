@@ -382,5 +382,16 @@ namespace SmartDeviceMatch.Controllers
 
             return View(reviews);
         }
+
+        public async Task<IActionResult> RepairShops()
+        {
+            var shops = await _context.RepairShops
+                .Include(r => r.User)
+                .OrderBy(r => r.IsVerified)
+                .ThenBy(r => r.ShopName)
+                .ToListAsync();
+
+            return View(shops);
+        }
     }
 }

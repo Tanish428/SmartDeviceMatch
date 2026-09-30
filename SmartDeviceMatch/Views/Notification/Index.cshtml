@@ -1,0 +1,187 @@
+﻿@model IEnumerable<SmartDeviceMatch.Models.Notification>
+
+@{
+    ViewData["Title"] = "Notifications";
+}
+
+<div class="container mt-4 mb-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2>Notifications</h2>
+
+            <p class="text-muted mb-0">
+                View your latest marketplace notifications.
+            </p>
+        </div>
+
+        @if (Model.Any(n => !n.IsRead))
+        {
+            <form asp-action="MarkAllAsRead"
+                  method="post"
+                  id="markAllForm">
+
+                @Html.AntiForgeryToken()
+
+                <button type="submit"
+                        class="btn btn-outline-primary">
+                    Mark All as Read
+                </button>
+
+            </form>
+        }
+
+    </div>
+
+
+    @if (!Model.Any())
+    {
+        <div class="card shadow-sm">
+
+            <div class="card-body text-center p-5">
+
+                <div style="font-size: 40px;">
+                    🔔
+                </div>
+
+                <h4 class="mt-3">
+                    No notifications
+                </h4>
+
+                <p class="text-muted">
+                    You will see marketplace updates here.
+                </p>
+
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+
+            <div class="list-group list-group-flush">
+
+                @foreach (var notification in Model)
+                {
+                    <div class="list-group-item
+                                notification-item
+                                @(notification.IsRead
+                                    ? ""
+                                    : "bg-light")"
+                         data-notification-id="@notification.Id">
+
+                        <div class="d-flex">
+
+                            <div class="me-3"
+                                 style="font-size: 28px;">
+
+                                @if (notification.Type == "NewOffer")
+                                {
+                                    <span>🔔</span>
+                                }
+                                else if (notification.Type == "OfferAccepted")
+                                {
+                                    <span>✅</span>
+                                }
+                                else if (notification.Type == "OfferRejected")
+                                {
+                                    <span>❌</span>
+                                }
+                                else if (notification.Type == "EscrowAlert")
+                                {
+                                    <span>💰</span>
+                                }
+                                else if (notification.Type == "DeviceVerified")
+                                {
+                                    <span>📱</span>
+                                }
+                                else if (notification.Type == "PaymentReleased")
+                                {
+                                    <span>💵</span>
+                                }
+                                else if (notification.Type == "MatchAlert")
+                                {
+                                    <span>🎯</span>
+                                }
+                                else
+                                {
+                                    <span>🔔</span>
+                                }
+
+                            </div>
+
+
+                            <div class="flex-grow-1">
+
+                                <div class="d-flex justify-content-between">
+
+                                    <h6 class="mb-1">
+                                        @notification.Title
+
+                                        @if (!notification.IsRead)
+                                        {
+                                            <span class="badge bg-primary ms-2">
+                                                New
+                                            </span>
+                                        }
+                                    </h6>
+
+                                    <small class="text-muted">
+                                        @notification.CreatedAt.ToLocalTime().ToString(
+                                            "dd MMM yyyy, hh:mm tt")
+                                    </small>
+
+                                </div>
+
+                                <p class="mb-0 text-muted">
+                                    @notification.Message
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+    }
+
+</div>
+
+
+@section Scripts
+{
+    <script>
+        document
+            .getElementById("markAllForm")
+            ?.addEventListener("submit", async function (event) {
+
+                event.preventDefault();
+
+                const form = event.target;
+
+                const token =
+                    form.querySelector(
+                        'input[name="__RequestVerificationToken"]'
+                    ).value;
+
+                const response = await fetch(
+                    '@Url.Action("MarkAllAsRead", "Notification")',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'RequestVerificationToken': token
+                        }
+                    });
+
+                if (response.ok) {
+                    window.location.reload();
+                }
+            });
+    </script>
+}

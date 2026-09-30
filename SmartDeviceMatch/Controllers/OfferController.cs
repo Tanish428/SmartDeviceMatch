@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartDeviceMatch.Data;
 using SmartDeviceMatch.Models;
+using SmartDeviceMatch.Services;
 
 namespace SmartDeviceMatch.Controllers
 {
@@ -13,12 +14,16 @@ namespace SmartDeviceMatch.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
 
+        private readonly INotificationService _notificationService;
+
         public OfferController(
             ApplicationDbContext context,
-            UserManager<IdentityUser> userManager)
+            UserManager<IdentityUser> userManager,
+            INotificationService notificationService)
         {
             _context = context;
             _userManager = userManager;
+            _notificationService = notificationService;
         }
 
         // ==========================================
@@ -136,6 +141,17 @@ namespace SmartDeviceMatch.Controllers
             _context.Offers.Add(offer);
 
             await _context.SaveChangesAsync();
+
+
+            // Notify DeviceOwner
+            await _notificationService.CreateAsync(
+                device.OwnerId,
+                "New Offer Received",
+                $"A repair shop has submitted a repair offer of ₹{offer.OfferAmount:0.00} for your {device.BrandName} {device.ModelName}.",
+                "NewOffer",
+                offer.Id.ToString(),
+                "Offer"
+            );
 
             return RedirectToAction(nameof(MyOffers));
         }
@@ -300,6 +316,53 @@ namespace SmartDeviceMatch.Controllers
 
             await _context.SaveChangesAsync();
 
+
+            // Notify accepted RepairShop
+            if (offer.RepairShopId.HasValue)
+            {
+                var acceptedRepairShop =
+                    await _context.RepairShops
+                        .FirstOrDefaultAsync(r =>
+                            r.Id == offer.RepairShopId.Value);
+
+                if (acceptedRepairShop != null)
+                {
+                    await _notificationService.CreateAsync(
+                        acceptedRepairShop.UserId,
+                        "Offer Accepted",
+                        $"Your repair offer for {offer.Device.BrandName} {offer.Device.ModelName} has been accepted.",
+                        "OfferAccepted",
+                        offer.Id.ToString(),
+                        "Offer"
+                    );
+                }
+            }
+
+
+            // Notify other RepairShops whose offers were rejected
+            foreach (var rejectedOffer in otherOffers)
+            {
+                if (rejectedOffer.RepairShopId.HasValue)
+                {
+                    var rejectedShop =
+                        await _context.RepairShops
+                            .FirstOrDefaultAsync(r =>
+                                r.Id == rejectedOffer.RepairShopId.Value);
+
+                    if (rejectedShop != null)
+                    {
+                        await _notificationService.CreateAsync(
+                            rejectedShop.UserId,
+                            "Offer Rejected",
+                            $"Your repair offer for {offer.Device.BrandName} {offer.Device.ModelName} was not selected.",
+                            "OfferRejected",
+                            rejectedOffer.Id.ToString(),
+                            "Offer"
+                        );
+                    }
+                }
+            }
+
             TempData["OfferMessage"] =
                 "Repair offer accepted. Device is now being repaired.";
 
@@ -362,6 +425,28 @@ namespace SmartDeviceMatch.Controllers
             offer.Status = "Rejected";
 
             await _context.SaveChangesAsync();
+
+
+            // Notify RepairShop
+            if (offer.RepairShopId.HasValue)
+            {
+                var repairShop =
+                    await _context.RepairShops
+                        .FirstOrDefaultAsync(r =>
+                            r.Id == offer.RepairShopId.Value);
+
+                if (repairShop != null)
+                {
+                    await _notificationService.CreateAsync(
+                        repairShop.UserId,
+                        "Offer Rejected",
+                        $"Your repair offer for {offer.Device.BrandName} {offer.Device.ModelName} was rejected.",
+                        "OfferRejected",
+                        offer.Id.ToString(),
+                        "Offer"
+                    );
+                }
+            }
 
             TempData["OfferMessage"] =
                 "Repair offer rejected.";
@@ -744,6 +829,28 @@ namespace SmartDeviceMatch.Controllers
 
             await _context.SaveChangesAsync();
 
+
+            // Notify RepairShop
+            if (completedRepair.RepairShopId.HasValue)
+            {
+                var repairShop =
+                    await _context.RepairShops
+                        .FirstOrDefaultAsync(r =>
+                            r.Id == completedRepair.RepairShopId.Value);
+
+                if (repairShop != null)
+                {
+                    await _notificationService.CreateAsync(
+                        repairShop.UserId,
+                        "New Purchase Offer",
+                        $"A buyer has submitted a purchase offer of ₹{offer.OfferAmount:0.00} for your refurbished {device.BrandName} {device.ModelName}.",
+                        "NewOffer",
+                        offer.Id.ToString(),
+                        "Offer"
+                    );
+                }
+            }
+
             TempData["PurchaseMessage"] =
                 "Purchase offer submitted successfully.";
 
@@ -887,6 +994,37 @@ namespace SmartDeviceMatch.Controllers
             }
 
             await _context.SaveChangesAsync();
+
+
+            // Notify buyer whose offer was accepted
+            if (offer.BuyerId.HasValue)
+            {
+                await _notificationService.CreateAsync(
+                    offer.BuyerId.Value,
+                    "Purchase Offer Accepted",
+                    $"Your purchase offer for {offer.Device.BrandName} {offer.Device.ModelName} has been accepted.",
+                    "OfferAccepted",
+                    offer.Id.ToString(),
+                    "Offer"
+                );
+            }
+
+
+            // Notify buyers whose offers were rejected
+            foreach (var rejectedOffer in otherOffers)
+            {
+                if (rejectedOffer.BuyerId.HasValue)
+                {
+                    await _notificationService.CreateAsync(
+                        rejectedOffer.BuyerId.Value,
+                        "Purchase Offer Rejected",
+                        $"Your purchase offer for {offer.Device.BrandName} {offer.Device.ModelName} was not selected.",
+                        "OfferRejected",
+                        rejectedOffer.Id.ToString(),
+                        "Offer"
+                    );
+                }
+            }
 
             TempData["PurchaseMessage"] =
                 "Purchase offer accepted successfully.";
@@ -1063,6 +1201,39 @@ namespace SmartDeviceMatch.Controllers
 
             await _context.SaveChangesAsync();
 
+
+            // Notify RepairShop
+            if (offer.RepairShopId.HasValue)
+            {
+                var repairShop =
+                    await _context.RepairShops
+                        .FirstOrDefaultAsync(r =>
+                            r.Id == offer.RepairShopId.Value);
+
+                if (repairShop != null)
+                {
+                    await _notificationService.CreateAsync(
+                        repairShop.UserId,
+                        "Payment Escrowed",
+                        $"Payment of ₹{offer.OfferAmount:0.00} has been placed in escrow for {offer.Device.BrandName} {offer.Device.ModelName}.",
+                        "EscrowAlert",
+                        offer.Id.ToString(),
+                        "Offer"
+                    );
+                }
+            }
+
+
+            // Notify Buyer
+            await _notificationService.CreateAsync(
+                buyer.Id,
+                "Payment Escrowed",
+                $"Your payment of ₹{offer.OfferAmount:0.00} has been placed in escrow.",
+                "EscrowAlert",
+                offer.Id.ToString(),
+                "Offer"
+            );
+
             TempData["TransactionMessage"] =
                 "Payment has been placed in escrow successfully.";
 
@@ -1124,6 +1295,39 @@ namespace SmartDeviceMatch.Controllers
 
             await _context.SaveChangesAsync();
 
+
+            // Notify RepairShop
+            if (offer.RepairShopId.HasValue)
+            {
+                var repairShop =
+                    await _context.RepairShops
+                        .FirstOrDefaultAsync(r =>
+                            r.Id == offer.RepairShopId.Value);
+
+                if (repairShop != null)
+                {
+                    await _notificationService.CreateAsync(
+                        repairShop.UserId,
+                        "Device Verified",
+                        $"The buyer has verified the {offer.Device.BrandName} {offer.Device.ModelName}.",
+                        "DeviceVerified",
+                        offer.Id.ToString(),
+                        "Offer"
+                    );
+                }
+            }
+
+
+            // Notify Buyer
+            await _notificationService.CreateAsync(
+                buyer.Id,
+                "Device Verified",
+                $"You successfully verified the {offer.Device.BrandName} {offer.Device.ModelName}.",
+                "DeviceVerified",
+                offer.Id.ToString(),
+                "Offer"
+            );
+
             TempData["TransactionMessage"] =
                 "Device verified successfully.";
 
@@ -1175,6 +1379,20 @@ namespace SmartDeviceMatch.Controllers
             offer.Status = "Completed";
 
             await _context.SaveChangesAsync();
+
+
+            // Notify Buyer
+            if (offer.BuyerId.HasValue)
+            {
+                await _notificationService.CreateAsync(
+                    offer.BuyerId.Value,
+                    "Transaction Completed",
+                    $"Your purchase transaction for {offer.Device.BrandName} {offer.Device.ModelName} has been completed.",
+                    "TransactionCompleted",
+                    offer.Id.ToString(),
+                    "Offer"
+                );
+            }
 
             TempData["TransactionMessage"] =
                 "Transaction completed successfully.";

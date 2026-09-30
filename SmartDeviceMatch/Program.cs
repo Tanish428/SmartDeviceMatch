@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SmartDeviceMatch.Data;
 using SmartDeviceMatch.Filters;
+using SmartDeviceMatch.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+var connectionString =
+    builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException(
         "Connection string 'DefaultConnection' not found.");
 
@@ -25,29 +27,26 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 .AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
+// MVC
 builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add<RequireProfileFilter>();
 });
 
+// SignalR
+builder.Services.AddSignalR();
+
+// Notification service
+builder.Services.AddScoped<INotificationService, NotificationService>();
+
 var app = builder.Build();
 
-
-// ============================================================
-// ROLE + ADMIN SEEDING
-// ============================================================
-
+// --- ROLE SEEDING ---
 using (var scope = app.Services.CreateScope())
 {
-    var services = scope.ServiceProvider;
+    var roleManager = scope.ServiceProvider
+        .GetRequiredService<RoleManager<IdentityRole>>();
 
-    var roleManager =
-        services.GetRequiredService<RoleManager<IdentityRole>>();
-
-    var userManager =
-        services.GetRequiredService<UserManager<IdentityUser>>();
-
-    // Create application roles
     string[] roles =
     {
         "Admin",
@@ -60,102 +59,13 @@ using (var scope = app.Services.CreateScope())
     {
         if (!await roleManager.RoleExistsAsync(role))
         {
-            var roleResult =
-                await roleManager.CreateAsync(
-                    new IdentityRole(role));
-
-            if (!roleResult.Succeeded)
-            {
-                var errors = string.Join(
-                    ", ",
-                    roleResult.Errors.Select(e => e.Description));
-
-                throw new Exception(
-                    $"Failed to create role '{role}': {errors}");
-            }
-        }
-    }
-
-
-    // --------------------------------------------------------
-    // Create the single Admin account
-    // Credentials come from User Secrets.
-    // --------------------------------------------------------
-
-    var adminEmail =
-        builder.Configuration["AdminCredentials:Email"];
-
-    var adminPassword =
-        builder.Configuration["AdminCredentials:Password"];
-
-
-    if (string.IsNullOrWhiteSpace(adminEmail) ||
-        string.IsNullOrWhiteSpace(adminPassword))
-    {
-        throw new InvalidOperationException(
-            "Admin credentials are not configured. " +
-            "Set AdminCredentials:Email and " +
-            "AdminCredentials:Password using User Secrets.");
-    }
-
-
-    // Check whether Admin already exists
-    var adminUser =
-        await userManager.FindByEmailAsync(adminEmail);
-
-    if (adminUser == null)
-    {
-        adminUser = new IdentityUser
-        {
-            UserName = adminEmail,
-            Email = adminEmail,
-            EmailConfirmed = true
-        };
-
-        var createResult =
-            await userManager.CreateAsync(
-                adminUser,
-                adminPassword);
-
-        if (!createResult.Succeeded)
-        {
-            var errors = string.Join(
-                ", ",
-                createResult.Errors.Select(e => e.Description));
-
-            throw new Exception(
-                $"Failed to create Admin user: {errors}");
-        }
-    }
-
-
-    // Make sure the Admin user has the Admin role
-    if (!await userManager.IsInRoleAsync(
-            adminUser,
-            "Admin"))
-    {
-        var roleResult =
-            await userManager.AddToRoleAsync(
-                adminUser,
-                "Admin");
-
-        if (!roleResult.Succeeded)
-        {
-            var errors = string.Join(
-                ", ",
-                roleResult.Errors.Select(e => e.Description));
-
-            throw new Exception(
-                $"Failed to assign Admin role: {errors}");
+            await roleManager.CreateAsync(
+                new IdentityRole(role));
         }
     }
 }
 
-
-// ============================================================
-// Configure the HTTP request pipeline.
-// ============================================================
-
+// Configure HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
@@ -163,8 +73,6 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Home/Error");
-
-    // The default HSTS value is 30 days.
     app.UseHsts();
 }
 
@@ -177,6 +85,10 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
+
+// SignalR Hub
+app.MapHub<SmartDeviceMatch.Hubs.NotificationHub>(
+    "/notificationHub");
 
 app.MapControllerRoute(
     name: "default",

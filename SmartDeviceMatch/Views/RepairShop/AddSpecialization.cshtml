@@ -1,0 +1,175 @@
+﻿@model SmartDeviceMatch.Models.ShopSpecialization
+
+@{
+    ViewData["Title"] = "Add Specialization";
+}
+
+<div class="container mt-4 mb-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-7">
+
+            <div class="mb-4">
+
+                <h2>Add Specialization</h2>
+
+                <p class="text-muted">
+                    Tell customers which devices and brands your shop specializes in.
+                </p>
+
+            </div>
+
+
+            <form asp-action="AddSpecialization"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3">
+                </div>
+
+
+                <div class="card shadow-sm">
+
+                    <div class="card-body">
+
+                        <div class="mb-3">
+
+                            <label asp-for="CategoryId"
+                                   class="form-label">
+                                Device Category
+                            </label>
+
+                            <select asp-for="CategoryId"
+                                    class="form-select"
+                                    asp-items="ViewBag.CategoryId">
+
+                                <option value="">
+                                    -- Select Category --
+                                </option>
+
+                            </select>
+
+                            <span asp-validation-for="CategoryId"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <div class="mb-3">
+
+                            <label asp-for="BrandName"
+                                   class="form-label">
+                                Brand
+                            </label>
+
+                            <input asp-for="BrandName"
+                                   class="form-control"
+                                   placeholder="e.g. Samsung, Apple, Dell" />
+
+                            <small class="text-muted">
+                                Leave empty if your shop works with all brands.
+                            </small>
+
+                            <span asp-validation-for="BrandName"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <div class="mb-3">
+
+                            <label asp-for="ExpertiseLevel"
+                                   class="form-label">
+                                Expertise Level
+                            </label>
+
+                            <select asp-for="ExpertiseLevel"
+                                    class="form-select">
+
+                                <option value="">
+                                    -- Select Expertise --
+                                </option>
+
+                                <option value="1">
+                                    1 - Beginner
+                                </option>
+
+                                <option value="2">
+                                    2 - Basic
+                                </option>
+
+                                <option value="3">
+                                    3 - Intermediate
+                                </option>
+
+                                <option value="4">
+                                    4 - Advanced
+                                </option>
+
+                                <option value="5">
+                                    5 - Expert
+                                </option>
+
+                            </select>
+
+                            <span asp-validation-for="ExpertiseLevel"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <div class="mb-3">
+
+                            <label asp-for="Description"
+                                   class="form-label">
+                                Description
+                            </label>
+
+                            <textarea asp-for="Description"
+                                      class="form-control"
+                                      rows="4"
+                                      placeholder="Describe your expertise...">
+                            </textarea>
+
+                            <span asp-validation-for="Description"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <div class="d-flex justify-content-between">
+
+                            <a asp-action="Specializations"
+                               class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+                                Add Specialization
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
