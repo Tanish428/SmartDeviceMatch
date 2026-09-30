@@ -194,6 +194,24 @@ namespace SmartDeviceMatch.Controllers
             }
 
 
+            // ==========================================
+            // SECURITY:
+            // Admin cannot be selected during
+            // normal profile creation.
+            // ==========================================
+
+            if (appUser.UserType != "DeviceOwner" &&
+                appUser.UserType != "RepairShop" &&
+                appUser.UserType != "Buyer")
+            {
+                ModelState.AddModelError(
+                    "UserType",
+                    "Invalid user type.");
+
+                return View(appUser);
+            }
+
+
             appUser.IdentityUserId = userId;
 
             appUser.CreatedAt = DateTime.UtcNow;

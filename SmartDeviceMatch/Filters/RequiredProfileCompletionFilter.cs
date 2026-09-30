@@ -23,6 +23,21 @@ namespace SmartDeviceMatch.Filters
             ActionExecutingContext context,
             ActionExecutionDelegate next)
         {
+            // ==========================================
+            // Allow Admin users to bypass profile check
+            // ==========================================
+
+            if (context.HttpContext.User.IsInRole("Admin"))
+            {
+                await next();
+                return;
+            }
+
+
+            // ==========================================
+            // Check profile for normal authenticated users
+            // ==========================================
+
             if (context.HttpContext.User.Identity?.IsAuthenticated == true)
             {
                 var userId = _userManager.GetUserId(
@@ -31,23 +46,41 @@ namespace SmartDeviceMatch.Filters
                 if (userId != null)
                 {
                     var hasProfile = await _context.AppUsers
-                        .AnyAsync(x => x.IdentityUserId == userId);
+                        .AnyAsync(x =>
+                            x.IdentityUserId == userId);
 
-                    var controller = context.RouteData.Values["controller"]?.ToString();
-                    var action = context.RouteData.Values["action"]?.ToString();
+
+                    var controller =
+                        context.RouteData.Values["controller"]?.ToString();
+
+                    var action =
+                        context.RouteData.Values["action"]?.ToString();
+
+
+                    // ==========================================
+                    // If profile does not exist, force the user
+                    // to complete Profile/Create
+                    // ==========================================
 
                     if (!hasProfile &&
-                        !(controller == "Profile" && action == "Create"))
+                        !(controller == "Profile" &&
+                          action == "Create"))
                     {
-                        context.Result = new RedirectToActionResult(
-                            "Create",
-                            "Profile",
-                            null);
+                        context.Result =
+                            new RedirectToActionResult(
+                                "Create",
+                                "Profile",
+                                null);
 
                         return;
                     }
                 }
             }
+
+
+            // ==========================================
+            // Continue normally
+            // ==========================================
 
             await next();
         }

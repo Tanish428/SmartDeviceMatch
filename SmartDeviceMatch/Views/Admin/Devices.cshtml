@@ -1,0 +1,108 @@
+﻿@model IEnumerable<SmartDeviceMatch.Models.Device>
+
+@{
+    ViewData["Title"] = "All Devices";
+}
+
+<div class="container mt-4 mb-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2>All Devices</h2>
+            <p class="text-muted">
+                Monitor devices listed on the marketplace.
+            </p>
+        </div>
+
+        <a asp-action="Index"
+           class="btn btn-outline-secondary">
+            Back to Dashboard
+        </a>
+
+    </div>
+
+
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            @if (!Model.Any())
+            {
+                <p class="text-muted">
+                    No devices found.
+                </p>
+            }
+            else
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-hover">
+
+                        <thead>
+
+                            <tr>
+                                <th>Brand</th>
+                                <th>Model</th>
+                                <th>Category</th>
+                                <th>Status</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var device in Model)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @device.BrandName
+                                    </td>
+
+                                    <td>
+                                        @device.ModelName
+                                    </td>
+
+                                    <td>
+                                        @device.Category?.Name
+                                    </td>
+
+                                    <td>
+
+                                        @if (device.Status == "Refurbished")
+                                        {
+                                            <span class="badge bg-success">
+                                                Refurbished
+                                            </span>
+                                        }
+                                        else if (device.Status == "Repairing")
+                                        {
+                                            <span class="badge bg-warning text-dark">
+                                                Repairing
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">
+                                                @device.Status
+                                            </span>
+                                        }
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,704 @@
+﻿@using SmartDeviceMatch.Models
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+
+    var recentUsers =
+        ViewBag.RecentUsers as List<AppUser>
+        ?? new List<AppUser>();
+
+    var recentOffers =
+        ViewBag.RecentOffers as List<Offer>
+        ?? new List<Offer>();
+
+    var recentReviews =
+        ViewBag.RecentReviews as List<Review>
+        ?? new List<Review>();
+
+    double averageRating = ViewBag.AverageRating ?? 0.0;
+}
+
+
+<div class="container mt-4 mb-5">
+
+    <!-- ========================================================= -->
+    <!-- HEADER -->
+    <!-- ========================================================= -->
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2>Admin Dashboard</h2>
+
+            <p class="text-muted mb-0">
+                Manage users, devices, repair shops,
+                transactions and reviews.
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- MESSAGE -->
+    <!-- ========================================================= -->
+
+    @if (TempData["AdminMessage"] != null)
+    {
+        <div class="alert alert-info">
+            @TempData["AdminMessage"]
+        </div>
+    }
+
+
+    <!-- ========================================================= -->
+    <!-- USER STATISTICS -->
+    <!-- ========================================================= -->
+
+    <h5 class="mb-3">
+        User Statistics
+    </h5>
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-muted">
+                        Total Users
+                    </small>
+
+                    <h3 class="mt-2">
+                        @ViewBag.TotalUsers
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-muted">
+                        Device Owners
+                    </small>
+
+                    <h3 class="mt-2">
+                        @ViewBag.DeviceOwners
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-muted">
+                        Repair Shops
+                    </small>
+
+                    <h3 class="mt-2">
+                        @ViewBag.RepairShops
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-muted">
+                        Buyers
+                    </small>
+
+                    <h3 class="mt-2">
+                        @ViewBag.Buyers
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- MARKETPLACE STATISTICS -->
+    <!-- ========================================================= -->
+
+    <h5 class="mb-3">
+        Marketplace Statistics
+    </h5>
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-muted">
+                        Total Devices
+                    </small>
+
+                    <h3 class="mt-2">
+                        @ViewBag.TotalDevices
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-muted">
+                        Devices in Repair
+                    </small>
+
+                    <h3 class="mt-2">
+                        @ViewBag.DevicesInRepair
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-muted">
+                        Refurbished Devices
+                    </small>
+
+                    <h3 class="mt-2">
+                        @ViewBag.RefurbishedDevices
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-muted">
+                        Total Offers
+                    </small>
+
+                    <h3 class="mt-2">
+                        @ViewBag.TotalOffers
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- TRANSACTION STATISTICS -->
+    <!-- ========================================================= -->
+
+    <h5 class="mb-3">
+        Transaction Statistics
+    </h5>
+
+    <div class="row g-3 mb-4">
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-muted">
+                        Pending Offers
+                    </small>
+
+                    <h3 class="mt-2">
+                        @ViewBag.PendingOffers
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-muted">
+                        Accepted Offers
+                    </small>
+
+                    <h3 class="mt-2">
+                        @ViewBag.AcceptedOffers
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-muted">
+                        Escrowed
+                    </small>
+
+                    <h3 class="mt-2">
+                        @ViewBag.EscrowedTransactions
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <small class="text-muted">
+                        Completed
+                    </small>
+
+                    <h3 class="mt-2">
+                        @ViewBag.CompletedTransactions
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- REVIEW STATISTICS -->
+    <!-- ========================================================= -->
+
+    <h5 class="mb-3">
+        Review Statistics
+    </h5>
+
+    <div class="row g-3 mb-5">
+
+        <div class="col-md-6">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Total Reviews
+                    </small>
+
+                    <h3 class="mt-2">
+                        @ViewBag.TotalReviews
+                    </h3>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-6">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <small class="text-muted">
+                        Average Platform Rating
+                    </small>
+
+                    <h3 class="mt-2">
+                        @averageRating.ToString("0.0") / 5
+                    </h3>
+
+                    @if (averageRating > 0)
+                    {
+                        <div class="text-warning">
+
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                if (i <= Math.Round(averageRating))
+                                {
+                                    <span>★</span>
+                                }
+                                else
+                                {
+                                    <span>☆</span>
+                                }
+                            }
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- ADMIN ACTIONS -->
+    <!-- ========================================================= -->
+
+    <div class="card shadow-sm mb-5">
+
+        <div class="card-body">
+
+            <h5 class="mb-3">
+                Administration
+            </h5>
+
+            <div class="d-flex flex-wrap gap-2">
+
+                <a asp-action="Users"
+                   class="btn btn-outline-primary">
+                    Manage Users
+                </a>
+
+                <a asp-action="Devices"
+                   class="btn btn-outline-primary">
+                    View Devices
+                </a>
+
+                <a asp-action="Offers"
+                   class="btn btn-outline-primary">
+                    View Offers
+                </a>
+
+                <a asp-action="Reviews"
+                   class="btn btn-outline-primary">
+                    View Reviews
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- RECENT USERS -->
+    <!-- ========================================================= -->
+
+    <div class="card shadow-sm mb-5">
+
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between mb-3">
+
+                <h5 class="mb-0">
+                    Recent Users
+                </h5>
+
+                <a asp-action="Users"
+                   class="btn btn-sm btn-outline-primary">
+                    View All
+                </a>
+
+            </div>
+
+
+            @if (!recentUsers.Any())
+            {
+                <p class="text-muted">
+                    No users found.
+                </p>
+            }
+            else
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle">
+
+                        <thead>
+
+                            <tr>
+                                <th>Name</th>
+                                <th>Role</th>
+                                <th>City</th>
+                                <th>Status</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var user in recentUsers)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @user.FullName
+                                    </td>
+
+                                    <td>
+                                        <span class="badge bg-secondary">
+                                            @user.UserType
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        @(user.City ?? "Not Provided")
+                                    </td>
+
+                                    <td>
+
+                                        @if (user.IsBanned)
+                                        {
+                                            <span class="badge bg-danger">
+                                                Banned
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-success">
+                                                Active
+                                            </span>
+                                        }
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- RECENT OFFERS -->
+    <!-- ========================================================= -->
+
+    <div class="card shadow-sm mb-5">
+
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between mb-3">
+
+                <h5 class="mb-0">
+                    Recent Offers / Transactions
+                </h5>
+
+                <a asp-action="Offers"
+                   class="btn btn-sm btn-outline-primary">
+                    View All
+                </a>
+
+            </div>
+
+
+            @if (!recentOffers.Any())
+            {
+                <p class="text-muted">
+                    No offers found.
+                </p>
+            }
+            else
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle">
+
+                        <thead>
+
+                            <tr>
+                                <th>Device</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var offer in recentOffers)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @if (offer.Device != null)
+                                        {
+                                            @offer.Device.BrandName
+                                            @offer.Device.ModelName
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                Device unavailable
+                                            </span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @offer.OfferType
+                                    </td>
+
+                                    <td>
+                                        ₹@offer.OfferAmount.ToString("0.00")
+                                    </td>
+
+                                    <td>
+
+                                        @if (offer.Status == "Completed")
+                                        {
+                                            <span class="badge bg-success">
+                                                Completed
+                                            </span>
+                                        }
+                                        else if (offer.Status == "Accepted")
+                                        {
+                                            <span class="badge bg-primary">
+                                                Accepted
+                                            </span>
+                                        }
+                                        else if (offer.Status == "Escrowed")
+                                        {
+                                            <span class="badge bg-info text-dark">
+                                                Escrowed
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">
+                                                @offer.Status
+                                            </span>
+                                        }
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================================= -->
+    <!-- RECENT REVIEWS -->
+    <!-- ========================================================= -->
+
+    <div class="card shadow-sm mb-5">
+
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between mb-3">
+
+                <h5 class="mb-0">
+                    Recent Reviews
+                </h5>
+
+                <a asp-action="Reviews"
+                   class="btn btn-sm btn-outline-primary">
+                    View All
+                </a>
+
+            </div>
+
+
+            @if (!recentReviews.Any())
+            {
+                <p class="text-muted">
+                    No reviews found.
+                </p>
+            }
+            else
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle">
+
+                        <thead>
+
+                            <tr>
+                                <th>Reviewer</th>
+                                <th>Reviewee</th>
+                                <th>Rating</th>
+                                <th>Comment</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var review in recentReviews)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @if (review.IsAnonymous)
+                                        {
+                                            <span>
+                                                Anonymous User
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            @review.Reviewer?.FullName
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @review.Reviewee?.FullName
+                                    </td>
+
+                                    <td>
+                                        <span class="text-warning">
+
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                if (i <= review.Rating)
+                                                {
+                                                    <span>★</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>☆</span>
+                                                }
+                                            }
+
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        @(string.IsNullOrWhiteSpace(review.Comment)
+                                            ? "No comment"
+                                            : review.Comment)
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>
