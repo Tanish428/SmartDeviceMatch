@@ -319,6 +319,18 @@
                     </div>
 
                 </div>
+
+                @if (transaction.Status == "Completed")
+                {
+                    <a asp-controller="Offer"
+                       asp-action="CreateReview"
+                       asp-route-offerId="@transaction.Id"
+                       class="btn btn-outline-primary w-100 mt-3">
+
+                        Write Review
+
+                    </a>
+                }
             }
 
         </div>

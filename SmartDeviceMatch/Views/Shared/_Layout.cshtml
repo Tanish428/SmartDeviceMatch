@@ -2,24 +2,40 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>@ViewData["Title"] - SmartDeviceMatch</title>
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>
+        @ViewData["Title"] - SmartDeviceMatch
+    </title>
 
     <script type="importmap"></script>
 
+
+    <!-- Bootstrap -->
+
     <link rel="stylesheet"
           href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+
+    <!-- Site CSS -->
 
     <link rel="stylesheet"
           href="~/css/site.css"
           asp-append-version="true" />
 
+
+    <!-- Project CSS -->
+
     <link rel="stylesheet"
           href="~/SmartDeviceMatch.styles.css"
           asp-append-version="true" />
+
 </head>
+
 
 <body>
 
@@ -29,16 +45,25 @@
 
             <div class="container-fluid">
 
+
+                <!-- ================================= -->
                 <!-- Logo -->
+                <!-- ================================= -->
+
                 <a class="navbar-brand"
                    asp-area=""
                    asp-controller="Home"
                    asp-action="Index">
+
                     SmartDeviceMatch
+
                 </a>
 
 
+                <!-- ================================= -->
                 <!-- Mobile Menu Button -->
+                <!-- ================================= -->
+
                 <button class="navbar-toggler"
                         type="button"
                         data-bs-toggle="collapse"
@@ -52,157 +77,292 @@
                 </button>
 
 
+                <!-- ================================= -->
+                <!-- Navigation -->
+                <!-- ================================= -->
+
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
 
                     <ul class="navbar-nav flex-grow-1">
 
+
+                        <!-- ================================= -->
                         <!-- Home -->
+                        <!-- ================================= -->
+
                         <li class="nav-item">
+
                             <a class="nav-link text-dark"
                                asp-area=""
                                asp-controller="Home"
                                asp-action="Index">
+
                                 Home
+
                             </a>
+
                         </li>
 
 
+                        <!-- ================================= -->
                         <!-- Privacy -->
+                        <!-- ================================= -->
+
                         <li class="nav-item">
+
                             <a class="nav-link text-dark"
                                asp-area=""
                                asp-controller="Home"
                                asp-action="Privacy">
+
                                 Privacy
+
                             </a>
+
                         </li>
 
 
-                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        <!-- ================================= -->
+                        <!-- Authenticated User Navigation -->
+                        <!-- ================================= -->
+
+                        @if (User.Identity != null &&
+                             User.Identity.IsAuthenticated)
                         {
 
-                            <!-- ==================== -->
+
+                            <!-- ================================= -->
+                            <!-- My Profile -->
+                            <!-- ================================= -->
+
+                            <li class="nav-item">
+
+                                <a class="nav-link text-dark"
+                                   asp-controller="Profile"
+                                   asp-action="Index">
+
+                                    My Profile
+
+                                </a>
+
+                            </li>
+
+
+                            <!-- ================================= -->
                             <!-- Device Owner -->
-                            <!-- ==================== -->
+                            <!-- ================================= -->
 
                             @if (User.IsInRole("DeviceOwner"))
                             {
+
                                 <li class="nav-item">
+
                                     <a class="nav-link text-dark"
                                        asp-controller="Device"
                                        asp-action="Create">
+
                                         List a Device
+
                                     </a>
+
                                 </li>
-                            
+
+
                                 <li class="nav-item">
+
                                     <a class="nav-link text-dark"
                                        asp-controller="Device"
                                        asp-action="Index">
+
                                         My Devices
+
                                     </a>
+
                                 </li>
-                            
+
+
                                 <li class="nav-item">
+
                                     <a class="nav-link text-dark"
                                        asp-controller="Offer"
                                        asp-action="Received">
+
                                         Received Repair Offers
+
                                     </a>
+
                                 </li>
+
                             }
 
 
-                            <!-- ==================== -->
+                            <!-- ================================= -->
                             <!-- Repair Shop -->
-                            <!-- ==================== -->
+                            <!-- ================================= -->
 
                             @if (User.IsInRole("RepairShop"))
                             {
-                                <a class="nav-link text-dark"
-                                   asp-controller="Marketplace"
-                                   asp-action="BrokenDevices">
-                                    Browse Broken Devices
-                                </a>
-                            
+
                                 <li class="nav-item">
+
+                                    <a class="nav-link text-dark"
+                                       asp-controller="Marketplace"
+                                       asp-action="BrokenDevices">
+
+                                        Browse Broken Devices
+
+                                    </a>
+
+                                </li>
+
+
+                                <li class="nav-item">
+
                                     <a class="nav-link text-dark"
                                        asp-controller="Offer"
                                        asp-action="MyOffers">
+
                                         My Active Offers
+
                                     </a>
+
                                 </li>
-                            
+
+
                                 <li class="nav-item">
+
                                     <a class="nav-link text-dark"
                                        asp-controller="Offer"
                                        asp-action="MyRepairs">
+
                                         My Repairs
+
                                     </a>
+
                                 </li>
 
+
                                 <li class="nav-item">
+
                                     <a class="nav-link text-dark"
                                        asp-controller="Offer"
                                        asp-action="PurchaseReceived">
+
                                         Received Purchase Offers
+
                                     </a>
+
                                 </li>
+
+
                                 <li class="nav-item">
+
                                     <a class="nav-link text-dark"
                                        asp-controller="Offer"
                                        asp-action="MySellerTransactions">
+
                                         My Transactions
+
                                     </a>
+
                                 </li>
+
+
+                                <li class="nav-item">
+
+                                    <a class="nav-link"
+                                       asp-controller="Offer"
+                                       asp-action="MyReviews">
+
+                                        My Reviews
+
+                                    </a>
+
+                                </li>
+
                             }
 
 
-                            <!-- ==================== -->
+                            <!-- ================================= -->
                             <!-- Buyer -->
-                            <!-- ==================== -->
+                            <!-- ================================= -->
 
                             @if (User.IsInRole("Buyer"))
                             {
+
                                 <li class="nav-item">
+
                                     <a class="nav-link text-dark"
                                        asp-controller="Marketplace"
                                        asp-action="Refurbished">
+
                                         Browse Refurbished Devices
+
                                     </a>
+
                                 </li>
-                            
+
+
                                 <li class="nav-item">
+
                                     <a class="nav-link text-dark"
                                        asp-controller="Offer"
                                        asp-action="MyPurchaseOffers">
+
                                         My Purchase Offers
+
                                     </a>
+
                                 </li>
 
+
                                 <li class="nav-item">
+
                                     <a class="nav-link text-dark"
                                        asp-controller="Offer"
                                        asp-action="MyBuyerTransactions">
+
                                         My Transactions
+
                                     </a>
+
                                 </li>
+
+
+                                <li class="nav-item">
+
+                                    <a class="nav-link"
+                                       asp-controller="Offer"
+                                       asp-action="MyReviews">
+
+                                        My Reviews
+
+                                    </a>
+
+                                </li>
+
                             }
 
 
-                            <!-- ==================== -->
+                            <!-- ================================= -->
                             <!-- Admin -->
-                            <!-- ==================== -->
+                            <!-- ================================= -->
 
                             @if (User.IsInRole("Admin"))
                             {
+
                                 <li class="nav-item">
+
                                     <a class="nav-link text-dark"
                                        asp-controller="Admin"
                                        asp-action="Index">
+
                                         Admin Dashboard
+
                                     </a>
+
                                 </li>
+
                             }
 
                         }
@@ -210,7 +370,10 @@
                     </ul>
 
 
+                    <!-- ================================= -->
                     <!-- Login / Register / Logout -->
+                    <!-- ================================= -->
+
                     <partial name="_LoginPartial" />
 
                 </div>
@@ -222,11 +385,14 @@
     </header>
 
 
+    <!-- ================================= -->
     <!-- Main Content -->
+    <!-- ================================= -->
 
     <div class="container">
 
-        <main role="main" class="pb-3">
+        <main role="main"
+              class="pb-3">
 
             @RenderBody()
 
@@ -235,7 +401,9 @@
     </div>
 
 
+    <!-- ================================= -->
     <!-- Footer -->
+    <!-- ================================= -->
 
     <footer class="border-top footer text-muted">
 
@@ -246,7 +414,9 @@
             <a asp-area=""
                asp-controller="Home"
                asp-action="Privacy">
+
                 Privacy
+
             </a>
 
         </div>
@@ -254,7 +424,9 @@
     </footer>
 
 
+    <!-- ================================= -->
     <!-- JavaScript -->
+    <!-- ================================= -->
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
@@ -263,7 +435,10 @@
     <script src="~/js/site.js"
             asp-append-version="true"></script>
 
-    @await RenderSectionAsync("Scripts", required: false)
+
+    @await RenderSectionAsync(
+        "Scripts",
+        required: false)
 
 </body>
 

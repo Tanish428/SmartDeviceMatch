@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using SmartDeviceMatch.Data;
 using SmartDeviceMatch.Models;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SmartDeviceMatch.Controllers
@@ -27,13 +28,78 @@ namespace SmartDeviceMatch.Controllers
         }
 
 
+        // ==========================================
+        // GET: Profile/Index
+        // Shows current user's profile and rating
+        // ==========================================
+
+        public async Task<IActionResult> Index()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            if (userId == null)
+            {
+                return Challenge();
+            }
+
+
+            var profile = await _context.AppUsers
+                .FirstOrDefaultAsync(u =>
+                    u.IdentityUserId == userId);
+
+
+            // Profile does not exist yet
+            if (profile == null)
+            {
+                return RedirectToAction(
+                    nameof(Create));
+            }
+
+
+            // ==========================================
+            // Get reviews received by this user
+            // ==========================================
+
+            var reviews = await _context.Reviews
+                .Where(r =>
+                    r.RevieweeId == profile.Id)
+                .ToListAsync();
+
+
+            // ==========================================
+            // Calculate average rating
+            // ==========================================
+
+            double averageRating = reviews.Any()
+                ? reviews.Average(r => r.Rating)
+                : 0;
+
+
+            // ==========================================
+            // Send rating information to View
+            // ==========================================
+
+            ViewBag.AverageRating = averageRating;
+            ViewBag.ReviewCount = reviews.Count;
+
+
+            return View(profile);
+        }
+
+
+        // ==========================================
         // GET: Profile/Create
+        // Creates the user's profile
+        // ==========================================
+
         public async Task<IActionResult> Create()
         {
             var userId = _userManager.GetUserId(User);
 
             if (userId == null)
+            {
                 return Challenge();
+            }
 
 
             var existingProfile = await _context.AppUsers
@@ -51,6 +117,7 @@ namespace SmartDeviceMatch.Controllers
                         await _context.RepairShops
                             .AnyAsync(r =>
                                 r.UserId == existingProfile.Id);
+
 
                     if (!repairShopExists)
                     {
@@ -73,16 +140,22 @@ namespace SmartDeviceMatch.Controllers
                     }
                 }
 
+
                 return RedirectToAction(
                     "Index",
                     "Home");
             }
 
+
             return View();
         }
 
 
+        // ==========================================
         // POST: Profile/Create
+        // Saves the user's profile
+        // ==========================================
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
@@ -92,14 +165,19 @@ namespace SmartDeviceMatch.Controllers
             var userId = _userManager.GetUserId(User);
 
             if (userId == null)
+            {
                 return Challenge();
+            }
 
 
             var identityUser =
                 await _userManager.FindByIdAsync(userId);
 
+
             if (identityUser == null)
+            {
                 return Challenge();
+            }
 
 
             var existingProfile =
@@ -123,6 +201,7 @@ namespace SmartDeviceMatch.Controllers
             appUser.IsBanned = false;
             appUser.Rating = 0.0;
 
+
             ModelState.Remove("IdentityUserId");
 
 
@@ -132,13 +211,19 @@ namespace SmartDeviceMatch.Controllers
             }
 
 
+            // ==========================================
             // Create AppUser
+            // ==========================================
+
             _context.AppUsers.Add(appUser);
 
             await _context.SaveChangesAsync();
 
 
+            // ==========================================
             // Assign Identity role
+            // ==========================================
+
             var roleResult =
                 await _userManager.AddToRoleAsync(
                     identityUser,
@@ -158,7 +243,10 @@ namespace SmartDeviceMatch.Controllers
             }
 
 
+            // ==========================================
             // Create RepairShop profile automatically
+            // ==========================================
+
             if (appUser.UserType == "RepairShop")
             {
                 var repairShop = new RepairShop
@@ -180,11 +268,17 @@ namespace SmartDeviceMatch.Controllers
             }
 
 
+            // ==========================================
             // End temporary login
+            // ==========================================
+
             await _signInManager.SignOutAsync();
 
 
+            // ==========================================
             // Send user to Login
+            // ==========================================
+
             return RedirectToPage(
                 "/Account/Login",
                 new

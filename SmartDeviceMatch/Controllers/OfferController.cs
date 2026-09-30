@@ -1183,6 +1183,301 @@ namespace SmartDeviceMatch.Controllers
                 nameof(MySellerTransactions));
         }
 
+
+        // ==========================================
+        // GET: Offer/CreateReview
+        // Buyer or RepairShop opens review form
+        // after transaction is completed
+        // ==========================================
+
+        [Authorize(Roles = "Buyer,RepairShop")]
+        public async Task<IActionResult> CreateReview(int offerId)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            if (userId == null)
+            {
+                return Challenge();
+            }
+
+            var reviewer = await _context.AppUsers
+                .FirstOrDefaultAsync(u =>
+                    u.IdentityUserId == userId);
+
+            if (reviewer == null)
+            {
+                return RedirectToAction(
+                    "Create",
+                    "Profile");
+            }
+
+            var offer = await _context.Offers
+                .Include(o => o.Device)
+                    .ThenInclude(d => d!.Category)
+                .Include(o => o.RepairShop)
+                .Include(o => o.Buyer)
+                .FirstOrDefaultAsync(o =>
+                    o.Id == offerId &&
+                    o.OfferType == "Buy" &&
+                    o.Status == "Completed");
+
+            if (offer == null || offer.Device == null)
+            {
+                return NotFound();
+            }
+
+            int revieweeId;
+
+            // Buyer is reviewing RepairShop
+            if (offer.BuyerId == reviewer.Id)
+            {
+                if (offer.RepairShop == null)
+                {
+                    return NotFound();
+                }
+
+                revieweeId = offer.RepairShop.UserId;
+            }
+            // RepairShop is reviewing Buyer
+            else if (offer.RepairShop != null &&
+                     offer.RepairShop.UserId == reviewer.Id)
+            {
+                if (!offer.BuyerId.HasValue)
+                {
+                    return NotFound();
+                }
+
+                revieweeId = offer.BuyerId.Value;
+            }
+            else
+            {
+                return Forbid();
+            }
+
+            // Prevent duplicate review
+            var existingReview = await _context.Reviews
+                .AnyAsync(r =>
+                    r.OfferId == offerId &&
+                    r.ReviewerId == reviewer.Id);
+
+            if (existingReview)
+            {
+                TempData["ReviewMessage"] =
+                    "You have already reviewed this transaction.";
+
+                if (reviewer.Id == offer.BuyerId)
+                {
+                    return RedirectToAction(
+                        nameof(MyBuyerTransactions));
+                }
+
+                return RedirectToAction(
+                    nameof(MySellerTransactions));
+            }
+
+            ViewBag.Offer = offer;
+            ViewBag.RevieweeId = revieweeId;
+
+            return View();
+        }
+
+        // ==========================================
+        // POST: Offer/CreateReview
+        // Saves Buyer/RepairShop review
+        // ==========================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Buyer,RepairShop")]
+        public async Task<IActionResult> CreateReview(
+            int offerId,
+            int rating,
+            string? comment,
+            bool isAnonymous)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            if (userId == null)
+            {
+                return Challenge();
+            }
+
+            var reviewer = await _context.AppUsers
+                .FirstOrDefaultAsync(u =>
+                    u.IdentityUserId == userId);
+
+            if (reviewer == null)
+            {
+                return RedirectToAction(
+                    "Create",
+                    "Profile");
+            }
+
+            var offer = await _context.Offers
+                .Include(o => o.Device)
+                    .ThenInclude(d => d!.Category)
+                .Include(o => o.RepairShop)
+                .Include(o => o.Buyer)
+                .FirstOrDefaultAsync(o =>
+                    o.Id == offerId &&
+                    o.OfferType == "Buy" &&
+                    o.Status == "Completed");
+
+            if (offer == null || offer.Device == null)
+            {
+                return NotFound();
+            }
+
+            int revieweeId;
+
+            // Buyer reviews RepairShop
+            if (offer.BuyerId == reviewer.Id)
+            {
+                if (offer.RepairShop == null)
+                {
+                    return NotFound();
+                }
+
+                revieweeId = offer.RepairShop.UserId;
+            }
+            // RepairShop reviews Buyer
+            else if (offer.RepairShop != null &&
+                     offer.RepairShop.UserId == reviewer.Id)
+            {
+                if (!offer.BuyerId.HasValue)
+                {
+                    return NotFound();
+                }
+
+                revieweeId = offer.BuyerId.Value;
+            }
+            else
+            {
+                return Forbid();
+            }
+
+            // Validate rating
+            if (rating < 1 || rating > 5)
+            {
+                ModelState.AddModelError(
+                    "rating",
+                    "Rating must be between 1 and 5.");
+            }
+
+            // Prevent duplicate review
+            var existingReview = await _context.Reviews
+                .AnyAsync(r =>
+                    r.OfferId == offerId &&
+                    r.ReviewerId == reviewer.Id);
+
+            if (existingReview)
+            {
+                TempData["ReviewMessage"] =
+                    "You have already reviewed this transaction.";
+
+                if (reviewer.Id == offer.BuyerId)
+                {
+                    return RedirectToAction(
+                        nameof(MyBuyerTransactions));
+                }
+
+                return RedirectToAction(
+                    nameof(MySellerTransactions));
+            }
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Offer = offer;
+                ViewBag.RevieweeId = revieweeId;
+
+                return View();
+            }
+
+            var review = new Review
+            {
+                OfferId = offer.Id,
+                ReviewerId = reviewer.Id,
+                RevieweeId = revieweeId,
+                Rating = rating,
+                Comment = comment,
+                IsAnonymous = isAnonymous,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Reviews.Add(review);
+
+            await _context.SaveChangesAsync();
+
+            TempData["ReviewMessage"] =
+                "Review submitted successfully.";
+
+            if (reviewer.Id == offer.BuyerId)
+            {
+                return RedirectToAction(
+                    nameof(MyBuyerTransactions));
+            }
+
+            return RedirectToAction(
+                nameof(MySellerTransactions));
+        }
+
+        // ==========================================
+        // GET: Offer/MyReviews
+        // Shows reviews received by current user
+        // and calculates average rating
+        // ==========================================
+
+        [Authorize(Roles = "Buyer,RepairShop")]
+        public async Task<IActionResult> MyReviews()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            if (userId == null)
+            {
+                return Challenge();
+            }
+
+            var currentUser = await _context.AppUsers
+                .FirstOrDefaultAsync(u =>
+                    u.IdentityUserId == userId);
+
+            if (currentUser == null)
+            {
+                return RedirectToAction(
+                    "Create",
+                    "Profile");
+            }
+
+            var reviews = await _context.Reviews
+                .Include(r => r.Offer)
+                    .ThenInclude(o => o!.Device)
+                        .ThenInclude(d => d!.Category)
+                .Include(r => r.Reviewer)
+                .Where(r => r.RevieweeId == currentUser.Id)
+                .OrderByDescending(r => r.CreatedAt)
+                .ToListAsync();
+
+
+            // ==========================================
+            // Calculate average rating
+            // ==========================================
+
+            double averageRating = reviews.Any()
+                ? reviews.Average(r => r.Rating)
+                : 0;
+
+
+            // ==========================================
+            // Send rating information to View
+            // ==========================================
+
+            ViewBag.AverageRating = averageRating;
+            ViewBag.ReviewCount = reviews.Count;
+
+
+            return View(reviews);
+        }
+
         // ==========================================
         // Helper:
         // Get current RepairShop
