@@ -99,15 +99,73 @@
 
                                 @if (transaction.Status == "Accepted")
                                 {
-                                    <span class="badge bg-success">
-                                        Accepted
-                                    </span>
+                                    <div class="mt-3">
+
+                                        <form asp-controller="Offer"
+                                              asp-action="Escrow"
+                                              method="post">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@transaction.Id" />
+
+                                            <button type="submit"
+                                                    class="btn btn-primary w-100">
+                                                Pay &amp; Place in Escrow
+                                            </button>
+
+                                        </form>
+
+                                    </div>
                                 }
                                 else if (transaction.Status == "Escrowed")
                                 {
-                                    <span class="badge bg-primary">
-                                        Escrowed
-                                    </span>
+                                    <div class="alert alert-primary mt-3">
+
+                                        <strong>Payment in Escrow</strong>
+
+                                        <br />
+
+                                        <small>
+                                            Your payment has been placed in escrow.
+                                        </small>
+
+                                    </div>
+
+                                    <form asp-controller="Offer"
+                                          asp-action="VerifyDevice"
+                                          method="post"
+                                          class="mt-3">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="id"
+                                               value="@transaction.Id" />
+
+                                        <button type="submit"
+                                                class="btn btn-success w-100">
+                                            Verify Device
+                                        </button>
+
+                                    </form>
+                                }
+                                else if (transaction.Status == "Verified")
+                                {
+                                    <div class="alert alert-success mt-3 mb-0">
+
+                                        <strong>Device Verified</strong>
+
+                                        <br />
+
+                                        <small>
+                                            You have successfully verified the device.
+                                            Payment can now be released.
+                                        </small>
+
+                                    </div>
                                 }
                                 else
                                 {

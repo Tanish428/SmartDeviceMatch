@@ -867,7 +867,8 @@ namespace SmartDeviceMatch.Controllers
                     o.RepairShopId == repairShop.Id &&
                     o.OfferType == "Buy" &&
                     (o.Status == "Accepted" ||
-                     o.Status == "Escrowed"))
+                     o.Status == "Escrowed" ||
+                     o.Status == "Verified"))
                 .OrderByDescending(o => o.Id)
                 .ToListAsync();
 
@@ -905,9 +906,11 @@ namespace SmartDeviceMatch.Controllers
                     .ThenInclude(d => d!.Category)
                 .Include(o => o.RepairShop)
                 .Where(o =>
-                    o.BuyerId == buyer.Id &&
-                    o.OfferType == "Buy" &&
-                    o.Status == "Accepted")
+                       o.BuyerId == buyer.Id &&
+                       o.OfferType == "Buy" &&
+                       (o.Status == "Accepted" ||
+                        o.Status == "Escrowed" ||
+                        o.Status == "Verified"))
                 .OrderByDescending(o => o.Id)
                 .ToListAsync();
 
@@ -1007,6 +1010,68 @@ namespace SmartDeviceMatch.Controllers
             return RedirectToAction(
                 nameof(MyBuyerTransactions));
         }
+
+        // ==========================================
+        // POST: Offer/VerifyDevice
+        // Buyer verifies the received device
+        // ==========================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Buyer")]
+        public async Task<IActionResult> VerifyDevice(int id)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            if (userId == null)
+            {
+                return Challenge();
+            }
+
+            var buyer = await _context.AppUsers
+                .FirstOrDefaultAsync(u =>
+                    u.IdentityUserId == userId);
+
+            if (buyer == null)
+            {
+                return RedirectToAction(
+                    "Create",
+                    "Profile");
+            }
+
+            var offer = await _context.Offers
+                .Include(o => o.Device)
+                .FirstOrDefaultAsync(o =>
+                    o.Id == id &&
+                    o.BuyerId == buyer.Id &&
+                    o.OfferType == "Buy");
+
+            if (offer == null || offer.Device == null)
+            {
+                return NotFound();
+            }
+
+            if (offer.Status != "Escrowed")
+            {
+                TempData["TransactionMessage"] =
+                    "This transaction is not ready for verification.";
+
+                return RedirectToAction(
+                    nameof(MyBuyerTransactions));
+            }
+
+            offer.Status = "Verified";
+            offer.VerifiedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            TempData["TransactionMessage"] =
+                "Device verified successfully.";
+
+            return RedirectToAction(
+                nameof(MyBuyerTransactions));
+        }
+
 
         // ==========================================
         // Helper:
