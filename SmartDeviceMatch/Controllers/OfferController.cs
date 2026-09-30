@@ -843,14 +843,12 @@ namespace SmartDeviceMatch.Controllers
         }
 
         // ==========================================
-        // POST: Offer/RejectPurchase
-        // RepairShop rejects a buyer purchase offer
+        // GET: Offer/MySellerTransactions
+        // RepairShop views accepted/escrowed purchases
         // ==========================================
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
         [Authorize(Roles = "RepairShop")]
-        public async Task<IActionResult> RejectPurchase(int id)
+        public async Task<IActionResult> MySellerTransactions()
         {
             var repairShop = await GetCurrentRepairShop();
 
@@ -861,11 +859,127 @@ namespace SmartDeviceMatch.Controllers
                     "Profile");
             }
 
+            var transactions = await _context.Offers
+                .Include(o => o.Device)
+                    .ThenInclude(d => d!.Category)
+                .Include(o => o.Buyer)
+                .Where(o =>
+                    o.RepairShopId == repairShop.Id &&
+                    o.OfferType == "Buy" &&
+                    (o.Status == "Accepted" ||
+                     o.Status == "Escrowed"))
+                .OrderByDescending(o => o.Id)
+                .ToListAsync();
+
+            return View(transactions);
+        }
+
+        // ==========================================
+        // GET: Offer/MyTransactions
+        // Buyer's accepted purchase transactions
+        // ==========================================
+
+        [Authorize(Roles = "Buyer")]
+        public async Task<IActionResult> MyBuyerTransactions()
+        {
+            var userId = _userManager.GetUserId(User);
+
+            if (userId == null)
+            {
+                return Challenge();
+            }
+
+            var buyer = await _context.AppUsers
+                .FirstOrDefaultAsync(u =>
+                    u.IdentityUserId == userId);
+
+            if (buyer == null)
+            {
+                return RedirectToAction(
+                    "Create",
+                    "Profile");
+            }
+
+            var transactions = await _context.Offers
+                .Include(o => o.Device)
+                    .ThenInclude(d => d!.Category)
+                .Include(o => o.RepairShop)
+                .Where(o =>
+                    o.BuyerId == buyer.Id &&
+                    o.OfferType == "Buy" &&
+                    o.Status == "Accepted")
+                .OrderByDescending(o => o.Id)
+                .ToListAsync();
+
+            return View(transactions);
+        }
+
+        // ==========================================
+        // GET: Offer/MyTransactions
+        // RepairShop's accepted purchase transactions
+        // ==========================================
+
+        [Authorize(Roles = "RepairShop")]
+        public async Task<IActionResult>   MyTransactions()
+        {
+            var repairShop = await GetCurrentRepairShop();
+
+            if (repairShop == null)
+            {
+                return RedirectToAction(
+                    "Create",
+                    "Profile");
+            }
+
+            var transactions = await _context.Offers
+                .Include(o => o.Device)
+                    .ThenInclude(d => d!.Category)
+                .Include(o => o.Buyer)
+                .Where(o =>
+                    o.RepairShopId == repairShop.Id &&
+                    o.OfferType == "Buy" &&
+                    o.Status == "Accepted")
+                .OrderByDescending(o => o.Id)
+                .ToListAsync();
+
+            return View(transactions);
+        }
+
+
+        // ==========================================
+        // POST: Offer/Escrow
+        // Buyer places accepted purchase transaction
+        // into escrow
+        // ==========================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Buyer")]
+        public async Task<IActionResult> Escrow(int id)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            if (userId == null)
+            {
+                return Challenge();
+            }
+
+            var buyer = await _context.AppUsers
+                .FirstOrDefaultAsync(u =>
+                    u.IdentityUserId == userId);
+
+            if (buyer == null)
+            {
+                return RedirectToAction(
+                    "Create",
+                    "Profile");
+            }
+
             var offer = await _context.Offers
                 .Include(o => o.Device)
                 .FirstOrDefaultAsync(o =>
                     o.Id == id &&
-                    o.RepairShopId == repairShop.Id &&
+                    o.BuyerId == buyer.Id &&
                     o.OfferType == "Buy");
 
             if (offer == null || offer.Device == null)
@@ -873,24 +987,25 @@ namespace SmartDeviceMatch.Controllers
                 return NotFound();
             }
 
-            if (offer.Status != "Pending")
+            if (offer.Status != "Accepted")
             {
-                TempData["PurchaseMessage"] =
-                    "This purchase offer is no longer pending.";
+                TempData["TransactionMessage"] =
+                    "This transaction is not ready for escrow.";
 
                 return RedirectToAction(
-                    nameof(PurchaseReceived));
+                    nameof(MyBuyerTransactions));
             }
 
-            offer.Status = "Rejected";
+            offer.Status = "Escrowed";
+            offer.EscrowedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
 
-            TempData["PurchaseMessage"] =
-                "Purchase offer rejected.";
+            TempData["TransactionMessage"] =
+                "Payment has been placed in escrow successfully.";
 
             return RedirectToAction(
-                nameof(PurchaseReceived));
+                nameof(MyBuyerTransactions));
         }
 
         // ==========================================

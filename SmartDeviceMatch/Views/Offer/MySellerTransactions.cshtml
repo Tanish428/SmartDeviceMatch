@@ -1,0 +1,169 @@
+﻿@model IEnumerable<SmartDeviceMatch.Models.Offer>
+
+@{
+    ViewData["Title"] = "My Transactions";
+}
+
+<div class="container mt-4 mb-5">
+
+    <div class="mb-4">
+        <h2>My Transactions</h2>
+        <p class="text-muted">
+            View purchase transactions for your refurbished devices.
+        </p>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="card shadow-sm text-center p-5">
+
+            <h4>No transactions yet.</h4>
+
+            <p class="text-muted">
+                Accepted purchase offers will appear here.
+            </p>
+
+        </div>
+    }
+    else
+    {
+        <div class="mb-3">
+            <strong>@Model.Count()</strong>
+            transaction(s)
+        </div>
+
+        <div class="row g-4">
+
+            @foreach (var transaction in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+
+                    <div class="card h-100 shadow-sm">
+
+                        <div class="card-body">
+
+                            @if (transaction.Device != null)
+                            {
+                                <h5 class="card-title">
+                                    @transaction.Device.BrandName
+                                    @transaction.Device.ModelName
+                                </h5>
+
+                                <p class="text-muted">
+                                    @transaction.Device.Category?.Name
+                                </p>
+                            }
+
+                            <hr />
+
+                            @if (transaction.Buyer != null)
+                            {
+                                <div class="mb-2">
+                                    <span class="text-muted">
+                                        Buyer:
+                                    </span>
+
+                                    <strong>
+                                        @transaction.Buyer.FullName
+                                    </strong>
+                                </div>
+                            }
+
+                            <div class="mb-2">
+                                <span class="text-muted">
+                                    Amount:
+                                </span>
+
+                                <strong>
+                                    ₹@transaction.OfferAmount.ToString("0.00")
+                                </strong>
+                            </div>
+
+                            <div class="mb-2">
+                                <span class="text-muted">
+                                    Transaction Status:
+                                </span>
+
+                                @if (transaction.Status == "Accepted")
+                                {
+                                    <span class="badge bg-success">
+                                        Accepted
+                                    </span>
+                                }
+                                else if (transaction.Status == "Escrowed")
+                                {
+                                    <span class="badge bg-primary">
+                                        Escrowed
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">
+                                        @transaction.Status
+                                    </span>
+                                }
+                            </div>
+
+                            <div class="mb-2">
+                                <span class="text-muted">
+                                    Offer Type:
+                                </span>
+
+                                @transaction.OfferType
+                            </div>
+
+                            <div class="mb-3">
+                                <span class="text-muted">
+                                    Offer Expiry:
+                                </span>
+
+                                @transaction.ExpiresAt.ToShortDateString()
+                            </div>
+
+                            @if (transaction.EscrowedAt.HasValue)
+                            {
+                                <div class="mb-3">
+                                    <span class="text-muted">
+                                        Escrowed On:
+                                    </span>
+
+                                    @transaction.EscrowedAt.Value.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+                                </div>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(transaction.Message))
+                            {
+                                <div>
+                                    <strong>
+                                        Buyer Message:
+                                    </strong>
+
+                                    <p class="text-muted mb-0">
+                                        @transaction.Message
+                                    </p>
+                                </div>
+                            }
+
+                            @if (transaction.Status == "Escrowed")
+                            {
+                                <div class="alert alert-primary mt-3 mb-0">
+                                    <strong>Payment in Escrow</strong>
+                                    <br />
+                                    <small>
+                                        The buyer's payment has been placed
+                                        in escrow.
+                                    </small>
+                                </div>
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>
