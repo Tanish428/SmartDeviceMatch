@@ -6,13 +6,26 @@
 
 <div class="container mt-4 mb-5">
 
+    <!-- Page Header -->
     <div class="mb-4">
         <h2>My Transactions</h2>
+
         <p class="text-muted">
             View purchase transactions for your refurbished devices.
         </p>
     </div>
 
+
+    <!-- Transaction Message -->
+    @if (TempData["TransactionMessage"] != null)
+    {
+        <div class="alert alert-info">
+            @TempData["TransactionMessage"]
+        </div>
+    }
+
+
+    <!-- No Transactions -->
     @if (!Model.Any())
     {
         <div class="card shadow-sm text-center p-5">
@@ -25,7 +38,10 @@
 
         </div>
     }
-    else
+
+
+    <!-- Transactions -->
+    @if (Model.Any())
     {
         <div class="mb-3">
             <strong>@Model.Count()</strong>
@@ -42,6 +58,10 @@
 
                         <div class="card-body">
 
+
+                            <!-- ============================= -->
+                            <!-- DEVICE INFORMATION -->
+                            <!-- ============================= -->
                             @if (transaction.Device != null)
                             {
                                 <h5 class="card-title">
@@ -54,11 +74,17 @@
                                 </p>
                             }
 
+
                             <hr />
 
+
+                            <!-- ============================= -->
+                            <!-- BUYER -->
+                            <!-- ============================= -->
                             @if (transaction.Buyer != null)
                             {
                                 <div class="mb-2">
+
                                     <span class="text-muted">
                                         Buyer:
                                     </span>
@@ -66,10 +92,17 @@
                                     <strong>
                                         @transaction.Buyer.FullName
                                     </strong>
+
                                 </div>
                             }
 
+
+                            <!-- ============================= -->
+                            <!-- AMOUNT -->
+                            <!-- ============================= -->
+
                             <div class="mb-2">
+
                                 <span class="text-muted">
                                     Amount:
                                 </span>
@@ -77,12 +110,20 @@
                                 <strong>
                                     ₹@transaction.OfferAmount.ToString("0.00")
                                 </strong>
+
                             </div>
 
+
+                            <!-- ============================= -->
+                            <!-- TRANSACTION STATUS -->
+                            <!-- ============================= -->
+
                             <div class="mb-2">
+
                                 <span class="text-muted">
                                     Transaction Status:
                                 </span>
+
 
                                 @if (transaction.Status == "Accepted")
                                 {
@@ -90,56 +131,130 @@
                                         Accepted
                                     </span>
                                 }
-                                else if (transaction.Status == "Escrowed")
+
+
+                                @if (transaction.Status == "Escrowed")
                                 {
                                     <span class="badge bg-primary">
                                         Escrowed
                                     </span>
                                 }
-                                else if (transaction.Status == "Verified")
+
+
+                                @if (transaction.Status == "Verified")
                                 {
                                     <span class="badge bg-success">
                                         Verified
                                     </span>
                                 }
-                                else
+
+
+                                @if (transaction.Status == "Released")
                                 {
-                                    <span class="badge bg-secondary">
-                                        @transaction.Status
+                                    <span class="badge bg-info text-dark">
+                                        Released
                                     </span>
                                 }
+
+
+                                @if (transaction.Status == "Completed")
+                                {
+                                    <span class="badge bg-success">
+                                        Completed
+                                    </span>
+                                }
+
                             </div>
 
+
+                            <!-- ============================= -->
+                            <!-- OFFER TYPE -->
+                            <!-- ============================= -->
+
                             <div class="mb-2">
+
                                 <span class="text-muted">
                                     Offer Type:
                                 </span>
 
                                 @transaction.OfferType
+
                             </div>
 
+
+                            <!-- ============================= -->
+                            <!-- OFFER EXPIRY -->
+                            <!-- ============================= -->
+
                             <div class="mb-3">
+
                                 <span class="text-muted">
                                     Offer Expiry:
                                 </span>
 
                                 @transaction.ExpiresAt.ToShortDateString()
+
                             </div>
 
+
+                            <!-- ============================= -->
+                            <!-- ESCROW DATE -->
+                            <!-- ============================= -->
                             @if (transaction.EscrowedAt.HasValue)
                             {
                                 <div class="mb-3">
+
                                     <span class="text-muted">
                                         Escrowed On:
                                     </span>
 
                                     @transaction.EscrowedAt.Value.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+
                                 </div>
                             }
 
+
+                            <!-- ============================= -->
+                            <!-- VERIFIED DATE -->
+                            <!-- ============================= -->
+                            @if (transaction.VerifiedAt.HasValue)
+                            {
+                                <div class="mb-3">
+
+                                    <span class="text-muted">
+                                        Verified On:
+                                    </span>
+
+                                    @transaction.VerifiedAt.Value.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+
+                                </div>
+                            }
+
+
+                            <!-- ============================= -->
+                            <!-- RELEASED DATE -->
+                            <!-- ============================= -->
+                            @if (transaction.ReleasedAt.HasValue)
+                            {
+                                <div class="mb-3">
+
+                                    <span class="text-muted">
+                                        Released On:
+                                    </span>
+
+                                    @transaction.ReleasedAt.Value.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+
+                                </div>
+                            }
+
+
+                            <!-- ============================= -->
+                            <!-- BUYER MESSAGE -->
+                            <!-- ============================= -->
                             @if (!string.IsNullOrWhiteSpace(transaction.Message))
                             {
-                                <div>
+                                <div class="mb-3">
+
                                     <strong>
                                         Buyer Message:
                                     </strong>
@@ -147,20 +262,140 @@
                                     <p class="text-muted mb-0">
                                         @transaction.Message
                                     </p>
+
                                 </div>
                             }
 
+
+                            <!-- ================================================= -->
+                            <!-- ESCROWED STATUS -->
+                            <!-- ================================================= -->
                             @if (transaction.Status == "Escrowed")
                             {
                                 <div class="alert alert-primary mt-3 mb-0">
-                                    <strong>Payment in Escrow</strong>
+
+                                    <strong>
+                                        Payment in Escrow
+                                    </strong>
+
                                     <br />
+
                                     <small>
-                                        The buyer's payment has been placed
-                                        in escrow.
+                                        The buyer's payment has been
+                                        placed in escrow.
                                     </small>
+
                                 </div>
                             }
+
+
+                            <!-- ================================================= -->
+                            <!-- VERIFIED STATUS -->
+                            <!-- ================================================= -->
+                            @if (transaction.Status == "Verified")
+                            {
+                                <div class="alert alert-success mt-3">
+
+                                    <strong>
+                                        Device Verified
+                                    </strong>
+
+                                    <br />
+
+                                    <small>
+                                        The buyer has successfully
+                                        verified the device.
+                                    </small>
+
+                                </div>
+
+
+                                <!-- Release Payment Button -->
+
+                                <form asp-controller="Offer"
+                                      asp-action="ReleasePayment"
+                                      method="post"
+                                      class="mt-3">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="@transaction.Id" />
+
+                                    <button type="submit"
+                                            class="btn btn-primary w-100">
+                                        Release Payment
+                                    </button>
+
+                                </form>
+                            }
+
+
+                            <!-- ================================================= -->
+                            <!-- RELEASED STATUS -->
+                            <!-- ================================================= -->
+                            @if (transaction.Status == "Released")
+                            {
+                                <div class="alert alert-info mt-3">
+
+                                    <strong>
+                                        Payment Released
+                                    </strong>
+
+                                    <br />
+
+                                    <small>
+                                        Payment has been released
+                                        successfully.
+                                    </small>
+
+                                </div>
+
+
+                                <!-- Complete Transaction Button -->
+
+                                <form asp-controller="Offer"
+                                      asp-action="CompleteTransaction"
+                                      method="post"
+                                      class="mt-3">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="@transaction.Id" />
+
+                                    <button type="submit"
+                                            class="btn btn-success w-100">
+                                        Complete Transaction
+                                    </button>
+
+                                </form>
+                            }
+
+
+                            <!-- ================================================= -->
+                            <!-- COMPLETED STATUS -->
+                            <!-- ================================================= -->
+                            @if (transaction.Status == "Completed")
+                            {
+                                <div class="alert alert-success mt-3 mb-0">
+
+                                    <strong>
+                                        Transaction Completed
+                                    </strong>
+
+                                    <br />
+
+                                    <small>
+                                        This transaction has been
+                                        successfully completed.
+                                    </small>
+
+                                </div>
+                            }
+
 
                         </div>
 

@@ -99,73 +99,33 @@
 
                                 @if (transaction.Status == "Accepted")
                                 {
-                                    <div class="mt-3">
-
-                                        <form asp-controller="Offer"
-                                              asp-action="Escrow"
-                                              method="post">
-
-                                            @Html.AntiForgeryToken()
-
-                                            <input type="hidden"
-                                                   name="id"
-                                                   value="@transaction.Id" />
-
-                                            <button type="submit"
-                                                    class="btn btn-primary w-100">
-                                                Pay &amp; Place in Escrow
-                                            </button>
-
-                                        </form>
-
-                                    </div>
+                                    <span class="badge bg-success">
+                                        Accepted
+                                    </span>
                                 }
                                 else if (transaction.Status == "Escrowed")
                                 {
-                                    <div class="alert alert-primary mt-3">
-
-                                        <strong>Payment in Escrow</strong>
-
-                                        <br />
-
-                                        <small>
-                                            Your payment has been placed in escrow.
-                                        </small>
-
-                                    </div>
-
-                                    <form asp-controller="Offer"
-                                          asp-action="VerifyDevice"
-                                          method="post"
-                                          class="mt-3">
-
-                                        @Html.AntiForgeryToken()
-
-                                        <input type="hidden"
-                                               name="id"
-                                               value="@transaction.Id" />
-
-                                        <button type="submit"
-                                                class="btn btn-success w-100">
-                                            Verify Device
-                                        </button>
-
-                                    </form>
+                                    <span class="badge bg-primary">
+                                        Escrowed
+                                    </span>
                                 }
                                 else if (transaction.Status == "Verified")
                                 {
-                                    <div class="alert alert-success mt-3 mb-0">
-
-                                        <strong>Device Verified</strong>
-
-                                        <br />
-
-                                        <small>
-                                            You have successfully verified the device.
-                                            Payment can now be released.
-                                        </small>
-
-                                    </div>
+                                    <span class="badge bg-success">
+                                        Verified
+                                    </span>
+                                }
+                                else if (transaction.Status == "Released")
+                                {
+                                    <span class="badge bg-info text-dark">
+                                        Released
+                                    </span>
+                                }
+                                else if (transaction.Status == "Completed")
+                                {
+                                    <span class="badge bg-success">
+                                        Completed
+                                    </span>
                                 }
                                 else
                                 {
@@ -190,6 +150,45 @@
 
                                 @transaction.ExpiresAt.ToShortDateString()
                             </div>
+
+                            @if (transaction.EscrowedAt.HasValue)
+                            {
+                                <div class="mb-3">
+                                    <span class="text-muted">
+                                        Escrowed On:
+                                    </span>
+
+                                    @transaction.EscrowedAt.Value
+                                    .ToLocalTime()
+                                    .ToString("dd MMM yyyy, hh:mm tt")
+                                </div>
+                            }
+
+                            @if (transaction.VerifiedAt.HasValue)
+                            {
+                                <div class="mb-3">
+                                    <span class="text-muted">
+                                        Verified On:
+                                    </span>
+
+                                    @transaction.VerifiedAt.Value
+                                    .ToLocalTime()
+                                    .ToString("dd MMM yyyy, hh:mm tt")
+                                </div>
+                            }
+
+                            @if (transaction.ReleasedAt.HasValue)
+                            {
+                                <div class="mb-3">
+                                    <span class="text-muted">
+                                        Released On:
+                                    </span>
+
+                                    @transaction.ReleasedAt.Value
+                                    .ToLocalTime()
+                                    .ToString("dd MMM yyyy, hh:mm tt")
+                                </div>
+                            }
 
                             @if (!string.IsNullOrWhiteSpace(transaction.Message))
                             {
@@ -229,13 +228,89 @@
                             }
                             else if (transaction.Status == "Escrowed")
                             {
-                                <div class="alert alert-primary mt-3 mb-0">
-                                    <strong>Payment in Escrow</strong>
+                                <div class="alert alert-primary mt-3">
+
+                                    <strong>
+                                        Payment in Escrow
+                                    </strong>
+
                                     <br />
+
                                     <small>
-                                        Your payment has been placed in
-                                        escrow successfully.
+                                        Your payment has been placed
+                                        in escrow.
                                     </small>
+
+                                </div>
+
+                                <form asp-controller="Offer"
+                                      asp-action="VerifyDevice"
+                                      method="post"
+                                      class="mt-3">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <input type="hidden"
+                                           name="id"
+                                           value="@transaction.Id" />
+
+                                    <button type="submit"
+                                            class="btn btn-success w-100">
+                                        Verify Device
+                                    </button>
+
+                                </form>
+                            }
+                            else if (transaction.Status == "Verified")
+                            {
+                                <div class="alert alert-success mt-3 mb-0">
+
+                                    <strong>
+                                        Device Verified
+                                    </strong>
+
+                                    <br />
+
+                                    <small>
+                                        You have successfully verified
+                                        the device. Payment can now be
+                                        released.
+                                    </small>
+
+                                </div>
+                            }
+                            else if (transaction.Status == "Released")
+                            {
+                                <div class="alert alert-info mt-3 mb-0">
+
+                                    <strong>
+                                        Payment Released
+                                    </strong>
+
+                                    <br />
+
+                                    <small>
+                                        The payment has been released
+                                        to the seller.
+                                    </small>
+
+                                </div>
+                            }
+                            else if (transaction.Status == "Completed")
+                            {
+                                <div class="alert alert-success mt-3 mb-0">
+
+                                    <strong>
+                                        Transaction Completed
+                                    </strong>
+
+                                    <br />
+
+                                    <small>
+                                        This transaction has been
+                                        successfully completed.
+                                    </small>
+
                                 </div>
                             }
 
@@ -249,4 +324,4 @@
         </div>
     }
 
-</div>
+</div>  

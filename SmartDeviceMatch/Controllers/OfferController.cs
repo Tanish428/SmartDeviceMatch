@@ -371,6 +371,59 @@ namespace SmartDeviceMatch.Controllers
 
 
         // ==========================================
+        // GET: /Offer/ReleasePayment
+        // RepairShop's ReleasePayment action for accepted purchase transactions
+        // ==========================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "RepairShop")]
+        public async Task<IActionResult> ReleasePayment(int id)
+        {
+            var repairShop = await GetCurrentRepairShop();
+
+            if (repairShop == null)
+            {
+                return RedirectToAction(
+                    "Create",
+                    "Profile");
+            }
+
+            var offer = await _context.Offers
+                .Include(o => o.Device)
+                .FirstOrDefaultAsync(o =>
+                    o.Id == id &&
+                    o.RepairShopId == repairShop.Id &&
+                    o.OfferType == "Buy");
+
+            if (offer == null || offer.Device == null)
+            {
+                return NotFound();
+            }
+
+            if (offer.Status != "Verified")
+            {
+                TempData["TransactionMessage"] =
+                    "This transaction is not ready for payment release.";
+
+                return RedirectToAction(
+                    nameof(MySellerTransactions));
+            }
+
+            offer.Status = "Released";
+            offer.ReleasedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            TempData["TransactionMessage"] =
+                "Payment released successfully.";
+
+            return RedirectToAction(
+                nameof(MySellerTransactions));
+        }
+
+
+        // ==========================================
         // GET: Offer/MyRepairs
         // RepairShop's active repairs
         // ==========================================
@@ -866,9 +919,13 @@ namespace SmartDeviceMatch.Controllers
                 .Where(o =>
                     o.RepairShopId == repairShop.Id &&
                     o.OfferType == "Buy" &&
-                    (o.Status == "Accepted" ||
-                     o.Status == "Escrowed" ||
-                     o.Status == "Verified"))
+                    (
+                        o.Status == "Accepted" ||
+                        o.Status == "Escrowed" ||
+                        o.Status == "Verified" ||
+                        o.Status == "Released" ||
+                        o.Status == "Completed"
+                    ))
                 .OrderByDescending(o => o.Id)
                 .ToListAsync();
 
@@ -910,7 +967,9 @@ namespace SmartDeviceMatch.Controllers
                        o.OfferType == "Buy" &&
                        (o.Status == "Accepted" ||
                         o.Status == "Escrowed" ||
-                        o.Status == "Verified"))
+                        o.Status == "Verified" ||
+                        o.Status == "Released" ||
+                        o.Status == "Completed"))
                 .OrderByDescending(o => o.Id)
                 .ToListAsync();
 
@@ -1072,6 +1131,57 @@ namespace SmartDeviceMatch.Controllers
                 nameof(MyBuyerTransactions));
         }
 
+        // ==========================================
+        // POST: Offer/CompleteTransaction
+        // RepairShop completes the transaction
+        // after payment has been released
+        // ==========================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "RepairShop")]
+        public async Task<IActionResult> CompleteTransaction(int id)
+        {
+            var repairShop = await GetCurrentRepairShop();
+
+            if (repairShop == null)
+            {
+                return RedirectToAction(
+                    "Create",
+                    "Profile");
+            }
+
+            var offer = await _context.Offers
+                .Include(o => o.Device)
+                .FirstOrDefaultAsync(o =>
+                    o.Id == id &&
+                    o.RepairShopId == repairShop.Id &&
+                    o.OfferType == "Buy");
+
+            if (offer == null || offer.Device == null)
+            {
+                return NotFound();
+            }
+
+            if (offer.Status != "Released")
+            {
+                TempData["TransactionMessage"] =
+                    "This transaction is not ready for completion.";
+
+                return RedirectToAction(
+                    nameof(MySellerTransactions));
+            }
+
+            offer.Status = "Completed";
+
+            await _context.SaveChangesAsync();
+
+            TempData["TransactionMessage"] =
+                "Transaction completed successfully.";
+
+            return RedirectToAction(
+                nameof(MySellerTransactions));
+        }
 
         // ==========================================
         // Helper:
