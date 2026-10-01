@@ -43,5 +43,7 @@ namespace SmartDeviceMatch.Models
 
         public double Rating { get; set; } = 0.0;
         public int TotalReviews { get; set; } = 0;
+        public ICollection<ShopSpecialization> ShopSpecializations { get; set; }
+    = new List<ShopSpecialization>();
     }
 }

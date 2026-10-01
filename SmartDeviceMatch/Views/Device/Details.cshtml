@@ -1,0 +1,438 @@
+﻿@model SmartDeviceMatch.Models.Device
+
+@{
+    ViewData["Title"] = "Device Details";
+}
+
+<div class="container mt-4 mb-5">
+
+    <!-- Page Header -->
+    <div class="mb-4">
+        <h2>Device Details</h2>
+        <p class="text-muted">
+            View complete information about this device.
+        </p>
+    </div>
+
+    <div class="row">
+
+        <!-- Device Information -->
+        <div class="col-md-8">
+
+            <div class="card shadow-sm mb-4">
+
+                <div class="card-body">
+
+                    <!-- Device Name -->
+                    <h3 class="mb-1">
+                        @Model.BrandName @Model.ModelName
+                    </h3>
+
+                    @if (Model.Category != null)
+                    {
+                        <p class="text-muted mb-4">
+                            @Model.Category.Name
+                        </p>
+                    }
+
+                    <hr />
+
+                    <!-- Device Information -->
+                    <h5 class="mb-3">
+                        Device Information
+                    </h5>
+
+                    <div class="row">
+
+                        <!-- Brand -->
+                        <div class="col-md-6 mb-3">
+                            <span class="text-muted">
+                                Brand
+                            </span>
+
+                            <div>
+                                <strong>
+                                    @Model.BrandName
+                                </strong>
+                            </div>
+                        </div>
+
+                        <!-- Model -->
+                        <div class="col-md-6 mb-3">
+                            <span class="text-muted">
+                                Model
+                            </span>
+
+                            <div>
+                                <strong>
+                                    @Model.ModelName
+                                </strong>
+                            </div>
+                        </div>
+
+                        <!-- Category -->
+                        <div class="col-md-6 mb-3">
+                            <span class="text-muted">
+                                Category
+                            </span>
+
+                            <div>
+                                <strong>
+                                    @(Model.Category?.Name ?? "Not specified")
+                                </strong>
+                            </div>
+                        </div>
+
+                        <!-- Condition -->
+                        <div class="col-md-6 mb-3">
+                            <span class="text-muted">
+                                Condition Grade
+                            </span>
+
+                            <div>
+                                <strong>
+                                    @Model.ConditionGrade
+                                </strong>
+                            </div>
+                        </div>
+
+                        <!-- Damage -->
+                        <div class="col-md-6 mb-3">
+                            <span class="text-muted">
+                                Damage Type
+                            </span>
+
+                            <div>
+                                <strong>
+                                    @Model.DamageType
+                                </strong>
+                            </div>
+                        </div>
+
+                        <!-- Asking Price -->
+                        <div class="col-md-6 mb-3">
+                            <span class="text-muted">
+                                Asking Price
+                            </span>
+
+                            <div>
+                                <strong>
+                                    ₹@Model.AskingPrice.ToString("0.00")
+                                </strong>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <hr />
+
+                    <!-- Condition Description -->
+                    <h5 class="mb-3">
+                        Condition Details
+                    </h5>
+
+                    <p class="text-muted">
+                        @Model.ConditionDescription
+                    </p>
+
+                    <hr />
+
+                    <!-- Location -->
+                    <h5 class="mb-3">
+                        Location
+                    </h5>
+
+                    <div class="row">
+
+                        <div class="col-md-4 mb-3">
+                            <span class="text-muted">
+                                City
+                            </span>
+
+                            <div>
+                                <strong>
+                                    @Model.City
+                                </strong>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <span class="text-muted">
+                                State
+                            </span>
+
+                            <div>
+                                <strong>
+                                    @Model.State
+                                </strong>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <span class="text-muted">
+                                Pin Code
+                            </span>
+
+                            <div>
+                                <strong>
+                                    @Model.PinCode
+                                </strong>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Matching Section -->
+            @if (User.IsInRole("DeviceOwner"))
+            {
+                <div class="card shadow-sm mb-4">
+
+                    <div class="card-body">
+
+                        <h5 class="mb-2">
+                            🤖 Find Matching Repair Shops
+                        </h5>
+
+                        <p class="text-muted mb-3">
+                            Find suitable repair shops for this device
+                            based on category, brand, location,
+                            expertise and shop rating.
+                        </p>
+
+                        <a asp-controller="Match"
+                           asp-action="Index"
+                           asp-route-deviceId="@Model.Id"
+                           class="btn btn-primary">
+                            🤖 Find Matching Repair Shops
+                        </a>
+
+                    </div>
+
+                </div>
+            }
+
+
+            <!-- Navigation / Actions -->
+            <div class="d-flex gap-2 flex-wrap">
+
+                <a asp-controller="Device"
+                   asp-action="Index"
+                   class="btn btn-outline-secondary">
+                    ← Back to My Devices
+                </a>
+
+                @if (User.IsInRole("DeviceOwner"))
+                {
+                    <a asp-controller="Device"
+                       asp-action="Edit"
+                       asp-route-id="@Model.Id"
+                       class="btn btn-outline-primary">
+                        Edit Device
+                    </a>
+                }
+
+            </div>
+
+        </div>
+
+
+        <!-- Right Side Summary -->
+        <div class="col-md-4">
+
+            <div class="card shadow-sm mb-4">
+
+                <div class="card-body">
+
+                    <h5 class="mb-3">
+                        Listing Summary
+                    </h5>
+
+                    <!-- Status -->
+                    <div class="mb-3">
+
+                        <span class="text-muted">
+                            Status
+                        </span>
+
+                        <div class="mt-1">
+
+                            @if (Model.Status == "Listed")
+                            {
+                                <span class="badge bg-success">
+                                    Listed
+                                </span>
+                            }
+                            else if (Model.Status == "Matched")
+                            {
+                                <span class="badge bg-primary">
+                                    Matched
+                                </span>
+                            }
+                            else if (Model.Status == "OfferAccepted")
+                            {
+                                <span class="badge bg-warning text-dark">
+                                    Offer Accepted
+                                </span>
+                            }
+                            else if (Model.Status == "Sold")
+                            {
+                                <span class="badge bg-secondary">
+                                    Sold
+                                </span>
+                            }
+                            else if (Model.Status == "Withdrawn")
+                            {
+                                <span class="badge bg-danger">
+                                    Withdrawn
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">
+                                    @Model.Status
+                                </span>
+                            }
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Urgent -->
+                    <div class="mb-3">
+
+                        <span class="text-muted">
+                            Priority
+                        </span>
+
+                        <div class="mt-1">
+
+                            @if (Model.IsUrgent)
+                            {
+                                <span class="badge bg-danger">
+                                    🔴 Urgent
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-light text-dark">
+                                    Normal
+                                </span>
+                            }
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Views -->
+                    <div class="mb-3">
+
+                        <span class="text-muted">
+                            Views
+                        </span>
+
+                        <div>
+                            <strong>
+                                @Model.ViewCount
+                            </strong>
+                        </div>
+
+                    </div>
+
+
+                    <!-- Price -->
+                    <div class="mb-3">
+
+                        <span class="text-muted">
+                            Asking Price
+                        </span>
+
+                        <div>
+                            <strong class="fs-5">
+                                ₹@Model.AskingPrice.ToString("0.00")
+                            </strong>
+                        </div>
+
+                    </div>
+
+
+                    <!-- Estimated Value -->
+                    @if (Model.EstimatedValue.HasValue)
+                    {
+                        <div class="mb-3">
+
+                            <span class="text-muted">
+                                Estimated Value
+                            </span>
+
+                            <div>
+                                <strong>
+                                    ₹@Model.EstimatedValue.Value.ToString("0.00")
+                                </strong>
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+
+            <!-- Matching Explanation -->
+            @if (User.IsInRole("DeviceOwner"))
+            {
+                <div class="card shadow-sm">
+
+                    <div class="card-body">
+
+                        <h6 class="mb-3">
+                            How Matching Works
+                        </h6>
+
+                        <ul class="text-muted mb-0 ps-3">
+
+                            <li class="mb-2">
+                                Category Match — 30 points
+                            </li>
+
+                            <li class="mb-2">
+                                Brand / Model Match — 25 points
+                            </li>
+
+                            <li class="mb-2">
+                                Proximity — 20 points
+                            </li>
+
+                            <li class="mb-2">
+                                Expertise — 15 points
+                            </li>
+
+                            <li>
+                                Shop Rating — 10 points
+                            </li>
+
+                        </ul>
+
+                        <div class="alert alert-info mt-3 mb-0">
+                            Shops with a compatibility score of
+                            <strong>60 or more</strong> are shown as
+                            suitable matches.
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>

@@ -19,6 +19,8 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddScoped<RequireProfileFilter>();
 
+builder.Services.AddScoped<IMatchingService, MatchingService>();
+
 // Identity + Roles
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 {

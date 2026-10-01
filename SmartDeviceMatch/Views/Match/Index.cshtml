@@ -1,0 +1,218 @@
+﻿@model IEnumerable<SmartDeviceMatch.ViewModels.MatchViewModel>
+
+@{
+    ViewData["Title"] = "Matched Repair Shops";
+}
+
+<div class="container mt-4 mb-5">
+
+    <div class="mb-4">
+        <h2>🤖 Matched Repair Shops</h2>
+
+        <p class="text-muted">
+            Repair shops matched with your device based on
+            category, brand, location, expertise and rating.
+        </p>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="card shadow-sm p-5 text-center">
+
+            <h4>No suitable repair shops found.</h4>
+
+            <p class="text-muted mb-0">
+                No verified repair shop currently meets the
+                minimum matching score of 60.
+            </p>
+
+        </div>
+    }
+    else
+    {
+        <div class="mb-3">
+            <strong>@Model.Count()</strong>
+            suitable repair shop(s) found.
+        </div>
+
+        <div class="row g-4">
+
+            @foreach (var match in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+
+                    <div class="card h-100 shadow-sm">
+
+                        <div class="card-body">
+
+                            <!-- Shop Header -->
+                            <div class="d-flex justify-content-between
+                                align-items-start mb-3">
+
+                                <div>
+                                    <h5 class="card-title mb-1">
+                                        @match.ShopName
+                                    </h5>
+
+                                    <p class="text-muted mb-0">
+                                        @match.City, @match.State
+                                    </p>
+                                </div>
+
+                                <span class="badge bg-success fs-6">
+                                    @match.CompatibilityScore%
+                                </span>
+
+                            </div>
+
+                            <hr />
+
+                            <!-- Distance -->
+                            <div class="mb-2">
+                                <span class="text-muted">
+                                    Distance:
+                                </span>
+
+                                <strong>
+                                    @match.DistanceKm.ToString("0.00") km
+                                </strong>
+                            </div>
+
+                            <!-- Rating -->
+                            <div class="mb-2">
+                                <span class="text-muted">
+                                    Shop Rating:
+                                </span>
+
+                                <strong>
+                                    ⭐ @match.Rating.ToString("0.0") / 5
+                                </strong>
+                            </div>
+
+                            <!-- Experience -->
+                            <div class="mb-3">
+                                <span class="text-muted">
+                                    Experience:
+                                </span>
+
+                                <strong>
+                                    @match.YearsOfExperience years
+                                </strong>
+                            </div>
+
+                            <!-- Score Breakdown -->
+                            <h6 class="mb-3">
+                                Compatibility Breakdown
+                            </h6>
+
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between">
+                                    <span>Category</span>
+                                    <strong>
+                                        @match.CategoryScore / 30
+                                    </strong>
+                                </div>
+
+                                <div class="progress">
+                                    <div class="progress-bar"
+                                         role="progressbar"
+                                         style="width:@((match.CategoryScore / 30.0) * 100)%">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between">
+                                    <span>Brand / Model</span>
+                                    <strong>
+                                        @match.BrandScore / 25
+                                    </strong>
+                                </div>
+
+                                <div class="progress">
+                                    <div class="progress-bar"
+                                         role="progressbar"
+                                         style="width:@((match.BrandScore / 25.0) * 100)%">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between">
+                                    <span>Proximity</span>
+                                    <strong>
+                                        @match.ProximityScore / 20
+                                    </strong>
+                                </div>
+
+                                <div class="progress">
+                                    <div class="progress-bar"
+                                         role="progressbar"
+                                         style="width:@((match.ProximityScore / 20.0) * 100)%">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between">
+                                    <span>Expertise</span>
+                                    <strong>
+                                        @match.ExpertiseScore / 15
+                                    </strong>
+                                </div>
+
+                                <div class="progress">
+                                    <div class="progress-bar"
+                                         role="progressbar"
+                                         style="width:@((match.ExpertiseScore / 15.0) * 100)%">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Shop Rating</span>
+                                    <strong>
+                                        @match.RatingScore / 10
+                                    </strong>
+                                </div>
+
+                                <div class="progress">
+                                    <div class="progress-bar"
+                                         role="progressbar"
+                                         style="width:@((match.RatingScore / 10.0) * 100)%">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Total -->
+                            <div class="alert alert-success text-center">
+
+                                <strong>
+                                    Total Match Score:
+                                    @match.CompatibilityScore / 100
+                                </strong>
+
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="d-grid gap-2">
+
+                                <a asp-controller="Device"
+                                   asp-action="Details"
+                                   asp-route-id="@match.DeviceId"
+                                   class="btn btn-outline-primary">
+                                    View Device
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+        </div>
+    }
+</div>

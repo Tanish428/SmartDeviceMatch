@@ -51,6 +51,8 @@ namespace SmartDeviceMatch.Data
 
         public DbSet<ChatMessage> ChatMessages { get; set; }
 
+        public DbSet<Match> Matches { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -153,6 +155,23 @@ namespace SmartDeviceMatch.Data
                 .HasForeignKey(c => c.DeviceId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<Match>()
+                 .HasOne(m => m.Device)
+                 .WithMany()
+                 .HasForeignKey(m => m.DeviceId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Match>()
+                .HasOne(m => m.Shop)
+                .WithMany()
+                .HasForeignKey(m => m.ShopId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ShopSpecialization>()
+                .HasOne(s => s.Shop)
+                .WithMany(r => r.ShopSpecializations)
+                .HasForeignKey(s => s.ShopId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // ==========================================
             // Prevent cascade paths
