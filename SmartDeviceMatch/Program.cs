@@ -90,6 +90,9 @@ app.MapStaticAssets();
 app.MapHub<SmartDeviceMatch.Hubs.NotificationHub>(
     "/notificationHub");
 
+app.MapHub<SmartDeviceMatch.Hubs.ChatHub>(
+    "/chatHub");
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")

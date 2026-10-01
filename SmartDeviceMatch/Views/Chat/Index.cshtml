@@ -1,0 +1,130 @@
+﻿@model IEnumerable<SmartDeviceMatch.ViewModels.ChatConversationViewModel>
+
+@{
+    ViewData["Title"] = "My Chats";
+}
+
+<div class="container mt-4 mb-5">
+
+    <div class="mb-4">
+        <h2>My Chats</h2>
+
+        <p class="text-muted">
+            Chat with buyers, device owners and repair shops.
+        </p>
+    </div>
+
+
+    @if (!Model.Any())
+    {
+        <div class="card shadow-sm text-center p-5">
+
+            <div style="font-size: 45px;">
+                💬
+            </div>
+
+            <h4 class="mt-3">
+                No conversations yet
+            </h4>
+
+            <p class="text-muted">
+                Your conversations related to marketplace
+                offers will appear here.
+            </p>
+
+        </div>
+    }
+    else
+    {
+        <div class="row g-3">
+
+            @foreach (var chat in Model)
+            {
+                <div class="col-md-6">
+
+                    <div class="card shadow-sm">
+
+                        <div class="card-body">
+
+                            <div class="d-flex justify-content-between">
+
+                                <div>
+
+                                    <h5 class="mb-1">
+                                        @chat.OtherUserName
+                                    </h5>
+
+                                    <div class="text-muted small">
+                                        Device:
+                                        @chat.DeviceName
+                                    </div>
+
+                                </div>
+
+
+                                @if (chat.UnreadCount > 0)
+                                {
+                                    <span class="badge bg-danger align-self-start">
+                                        @chat.UnreadCount
+                                    </span>
+                                }
+
+                            </div>
+
+
+                            <hr />
+
+
+                            @if (!string.IsNullOrWhiteSpace(chat.LastMessage))
+                            {
+                                <p class="text-muted mb-2">
+
+                                    @(
+                                        chat.LastMessage.Length > 100
+                                            ? chat.LastMessage[..100] + "..."
+                                            : chat.LastMessage
+                                    )
+
+                                </p>
+
+                                <small class="text-secondary">
+
+                                    @chat.LastMessageAt?
+                                        .ToLocalTime()
+                                        .ToString(
+                                            "dd MMM yyyy, hh:mm tt")
+
+                                </small>
+                            }
+                            else
+                            {
+                                <p class="text-muted">
+                                    No messages yet.
+                                </p>
+                            }
+
+
+                            <div class="mt-3">
+
+                                <a asp-action="Conversation"
+                                   asp-route-deviceId="@chat.DeviceId"
+                                   asp-route-otherUserId="@chat.OtherUserId"
+                                   class="btn btn-primary">
+
+                                    Open Chat
+
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>

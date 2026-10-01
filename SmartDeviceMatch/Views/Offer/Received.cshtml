@@ -7,15 +7,11 @@
 <div class="container mt-4 mb-5">
 
     <div class="mb-4">
-
         <h2>Received Repair Offers</h2>
-
         <p class="text-muted">
             View and manage repair offers received for your devices.
         </p>
-
     </div>
-
 
     @if (TempData["OfferMessage"] != null)
     {
@@ -23,7 +19,6 @@
             @TempData["OfferMessage"]
         </div>
     }
-
 
     @if (!Model.Any())
     {
@@ -47,12 +42,9 @@
     else
     {
         <div class="mb-3">
-
             <strong>@Model.Count()</strong>
             repair offer(s) received
-
         </div>
-
 
         <div class="row g-4">
 
@@ -68,16 +60,12 @@
                             @if (offer.Device != null)
                             {
                                 <h5 class="card-title">
-
                                     @offer.Device.BrandName
                                     @offer.Device.ModelName
-
                                 </h5>
 
                                 <p class="text-muted mb-3">
-
                                     @offer.Device.Category?.Name
-
                                 </p>
                             }
                             else
@@ -87,12 +75,9 @@
                                 </h5>
                             }
 
-
                             <hr />
 
-
                             <!-- Repair Shop -->
-
                             <h6 class="mb-2">
                                 Repair Shop
                             </h6>
@@ -100,24 +85,18 @@
                             @if (offer.RepairShop != null)
                             {
                                 <p class="mb-1">
-
                                     <strong>
                                         @offer.RepairShop.ShopName
                                     </strong>
-
                                 </p>
 
                                 <p class="text-muted mb-3">
-
                                     @offer.RepairShop.City,
                                     @offer.RepairShop.State
-
                                 </p>
                             }
 
-
                             <!-- Offer Amount -->
-
                             <div class="mb-2">
 
                                 <span class="text-muted">
@@ -130,9 +109,7 @@
 
                             </div>
 
-
                             <!-- Status -->
-
                             <div class="mb-2">
 
                                 <span class="text-muted">
@@ -172,9 +149,7 @@
 
                             </div>
 
-
                             <!-- Expiry -->
-
                             <div class="mb-3">
 
                                 <span class="text-muted">
@@ -184,7 +159,6 @@
                                 @offer.ExpiresAt.ToShortDateString()
 
                             </div>
-
 
                             <!-- Message -->
                             @if (!string.IsNullOrWhiteSpace(offer.Message))
@@ -202,12 +176,29 @@
                                 </div>
                             }
 
+                            <!-- Chat with Repair Shop -->
+                            @if (offer.RepairShop != null)
+                            {
+                                <div class="mb-3">
+
+                                    <a asp-controller="Chat"
+                                       asp-action="Start"
+                                       asp-route-offerId="@offer.Id"
+                                       class="btn btn-outline-primary w-100">
+
+                                        💬 Chat with Repair Shop
+
+                                    </a>
+
+                                </div>
+                            }
 
                             <!-- Accept / Reject -->
                             @if (offer.Status == "Pending")
                             {
                                 <div class="d-grid gap-2">
 
+                                    <!-- Accept -->
                                     <form asp-controller="Offer"
                                           asp-action="Accept"
                                           method="post">
@@ -227,7 +218,7 @@
 
                                     </form>
 
-
+                                    <!-- Reject -->
                                     <form asp-controller="Offer"
                                           asp-action="Reject"
                                           method="post">
