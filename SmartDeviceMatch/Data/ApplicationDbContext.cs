@@ -52,7 +52,7 @@ namespace SmartDeviceMatch.Data
         public DbSet<ChatMessage> ChatMessages { get; set; }
 
         public DbSet<Match> Matches { get; set; }
-
+        public DbSet<Dispute> Disputes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -171,6 +171,27 @@ namespace SmartDeviceMatch.Data
                 .HasOne(s => s.Shop)
                 .WithMany(r => r.ShopSpecializations)
                 .HasForeignKey(s => s.ShopId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // ==========================================
+            // Dispute -> Offer
+            // ==========================================
+
+            builder.Entity<Dispute>()
+                .HasOne(d => d.Offer)
+                .WithMany()
+                .HasForeignKey(d => d.OfferId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+            // ==========================================
+            // Dispute -> Reporting AppUser
+            // ==========================================
+
+            builder.Entity<Dispute>()
+                .HasOne(d => d.RaisedByUser)
+                .WithMany()
+                .HasForeignKey(d => d.RaisedByUserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // ==========================================

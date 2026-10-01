@@ -1753,5 +1753,152 @@ namespace SmartDeviceMatch.Controllers
 
             return repairShop;
         }
+
+        // ==========================================
+        // GET: Offer/ReportDispute
+        // ==========================================
+
+        public async Task<IActionResult> ReportDispute(int offerId)
+        {
+            var identityUserId = _userManager.GetUserId(User);
+
+            if (identityUserId == null)
+            {
+                return Challenge();
+            }
+
+            var appUser = await _context.AppUsers
+                .FirstOrDefaultAsync(u =>
+                    u.IdentityUserId == identityUserId);
+
+            if (appUser == null)
+            {
+                return RedirectToAction("Create", "Profile");
+            }
+
+            var offer = await _context.Offers
+                .Include(o => o.Device)
+                .Include(o => o.RepairShop)
+                .FirstOrDefaultAsync(o => o.Id == offerId);
+
+            if (offer == null || offer.Device == null)
+            {
+                return NotFound();
+            }
+
+            bool isParticipant =
+                offer.Device.OwnerId == appUser.Id ||
+                offer.BuyerId == appUser.Id ||
+                offer.RepairShop?.UserId == appUser.Id;
+
+            if (!isParticipant)
+            {
+                return Forbid();
+            }
+
+            ViewBag.OfferId = offer.Id;
+            ViewBag.DeviceName =
+                $"{offer.Device.BrandName} {offer.Device.ModelName}";
+
+            return View();
+        }
+
+        // ==========================================
+        // POST: Offer/ReportDispute
+        // ==========================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReportDispute(
+            int offerId,
+            string reason)
+        {
+            var identityUserId = _userManager.GetUserId(User);
+
+            if (identityUserId == null)
+            {
+                return Challenge();
+            }
+
+            var appUser = await _context.AppUsers
+                .FirstOrDefaultAsync(u =>
+                    u.IdentityUserId == identityUserId);
+
+            if (appUser == null)
+            {
+                return RedirectToAction("Create", "Profile");
+            }
+
+            var offer = await _context.Offers
+                .Include(o => o.Device)
+                .Include(o => o.RepairShop)
+                .FirstOrDefaultAsync(o => o.Id == offerId);
+
+            if (offer == null || offer.Device == null)
+            {
+                return NotFound();
+            }
+
+            bool isParticipant =
+                offer.Device.OwnerId == appUser.Id ||
+                offer.BuyerId == appUser.Id ||
+                offer.RepairShop?.UserId == appUser.Id;
+
+            if (!isParticipant)
+            {
+                return Forbid();
+            }
+
+            if (string.IsNullOrWhiteSpace(reason) ||
+                reason.Trim().Length > 1000)
+            {
+                ModelState.AddModelError(
+                    "reason",
+                    "Enter a reason between 1 and 1000 characters.");
+
+                ViewBag.OfferId = offer.Id;
+                ViewBag.DeviceName =
+                    $"{offer.Device.BrandName} {offer.Device.ModelName}";
+
+                return View();
+            }
+
+            // Prevent multiple open disputes for the same offer
+            bool existingDispute = await _context.Disputes
+                .AnyAsync(d =>
+                    d.OfferId == offerId &&
+                    (d.Status == "Open" ||
+                     d.Status == "UnderReview"));
+
+            if (existingDispute)
+            {
+                TempData["DisputeMessage"] =
+                    "An open dispute already exists for this offer.";
+
+                return RedirectToAction(
+                    "MyOffers",
+                    "Offer");
+            }
+
+            var dispute = new Dispute
+            {
+                OfferId = offerId,
+                RaisedByUserId = appUser.Id,
+                Reason = reason.Trim(),
+                Status = "Open",
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Disputes.Add(dispute);
+
+            await _context.SaveChangesAsync();
+
+            TempData["DisputeMessage"] =
+                "Your dispute has been submitted successfully.";
+
+            return RedirectToAction(
+                "MyOffers",
+                "Offer");
+        }
     }
 }

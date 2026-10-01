@@ -448,5 +448,89 @@ namespace SmartDeviceMatch.Controllers
 
             return View(shops);
         }
+
+        // ==========================================
+        // ADMIN: VIEW DISPUTES
+        // ==========================================
+
+        public async Task<IActionResult> Disputes()
+        {
+            var disputes = await _context.Disputes
+                .Include(d => d.Offer)
+                    .ThenInclude(o => o!.Device)
+                .Include(d => d.RaisedByUser)
+                .OrderBy(d => d.Status == "Open" ? 0 :
+                              d.Status == "UnderReview" ? 1 : 2)
+                .ThenByDescending(d => d.CreatedAt)
+                .ToListAsync();
+
+            return View(disputes);
+        }
+
+        // ==========================================
+        // ADMIN: RESOLVE DISPUTE
+        // ==========================================
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResolveDispute(
+            int id,
+            string status,
+            string? adminResolution)
+        {
+            var dispute = await _context.Disputes
+                .FirstOrDefaultAsync(d => d.Id == id);
+
+            if (dispute == null)
+            {
+                return NotFound();
+            }
+
+            var allowedStatuses = new[]
+            {
+        "UnderReview",
+        "Resolved",
+        "Rejected"
+    };
+
+            if (!allowedStatuses.Contains(status))
+            {
+                TempData["AdminMessage"] =
+                    "Invalid dispute status.";
+
+                return RedirectToAction(nameof(Disputes));
+            }
+
+            if ((status == "Resolved" || status == "Rejected") &&
+                string.IsNullOrWhiteSpace(adminResolution))
+            {
+                TempData["AdminMessage"] =
+                    "A resolution note is required to close a dispute.";
+
+                return RedirectToAction(nameof(Disputes));
+            }
+
+            dispute.Status = status;
+            dispute.AdminResolution =
+                string.IsNullOrWhiteSpace(adminResolution)
+                    ? null
+                    : adminResolution.Trim();
+
+            if (status == "Resolved" || status == "Rejected")
+            {
+                dispute.ResolvedAt = DateTime.UtcNow;
+            }
+            else
+            {
+                dispute.ResolvedAt = null;
+            }
+
+            await _context.SaveChangesAsync();
+
+            TempData["AdminMessage"] =
+                "Dispute updated successfully.";
+
+            return RedirectToAction(nameof(Disputes));
+        }
     }
 }

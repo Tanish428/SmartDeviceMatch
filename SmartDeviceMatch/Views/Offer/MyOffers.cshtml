@@ -25,6 +25,22 @@
 
     </div>
 
+    <!-- Success / Information Message -->
+    @if (TempData["DisputeMessage"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show"
+             role="alert">
+
+            @TempData["DisputeMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close">
+            </button>
+
+        </div>
+    }
 
     @if (!Model.Any())
     {
@@ -63,7 +79,6 @@
 
         </div>
 
-
         <!-- Offers -->
 
         <div class="row g-4">
@@ -94,21 +109,16 @@
 
                             </h5>
 
-
                             <!-- Category -->
 
                             @if (offer.Device?.Category != null)
                             {
                                 <p class="text-muted mb-3">
-
                                     @offer.Device.Category.Name
-
                                 </p>
                             }
 
-
                             <hr />
-
 
                             <!-- Offer Amount -->
 
@@ -123,7 +133,6 @@
                                 </strong>
 
                             </div>
-
 
                             <!-- Offer Status -->
 
@@ -160,7 +169,6 @@
 
                             </div>
 
-
                             <!-- Offer Date -->
 
                             <div class="mb-2">
@@ -172,7 +180,6 @@
                                 @offer.ExpiresAt.ToShortDateString()
 
                             </div>
-
 
                             <!-- Message -->
 
@@ -191,7 +198,6 @@
                                 </div>
                             }
 
-
                             <!-- Device Location -->
 
                             @if (offer.Device != null)
@@ -207,6 +213,24 @@
                                 </div>
                             }
 
+                            <hr />
+
+                            <!-- Report Dispute -->
+
+                            <div class="d-grid">
+
+                                <a asp-controller="Offer"
+                                   asp-action="ReportDispute"
+                                   asp-route-offerId="@offer.Id"
+                                   class="btn btn-outline-danger btn-sm">
+
+                                    <i class="bi bi-flag me-1"></i>
+                                    Report Issue
+
+                                </a>
+
+                            </div>
+
                         </div>
 
                     </div>
@@ -218,3 +242,4 @@
     }
 
 </div>
+

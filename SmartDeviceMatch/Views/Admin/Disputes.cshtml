@@ -1,0 +1,199 @@
+﻿@model IEnumerable<SmartDeviceMatch.Models.Dispute>
+
+@{
+    ViewData["Title"] = "Dispute Management";
+}
+
+<div class="container-fluid mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h2>Dispute Management</h2>
+            <p class="text-muted">
+                Review and manage reported marketplace issues.
+            </p>
+        </div>
+
+        <a asp-controller="Admin"
+           asp-action="Index"
+           class="btn btn-outline-secondary">
+            Back to Dashboard
+        </a>
+
+    </div>
+
+    @if (TempData["AdminMessage"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show">
+            @TempData["AdminMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+        </div>
+    }
+
+    <div class="card border-0 shadow-sm">
+
+        <div class="card-body">
+
+            @if (!Model.Any())
+            {
+                <div class="text-center py-5">
+                    <h5>No disputes found</h5>
+                    <p class="text-muted">
+                        Reported issues will appear here.
+                    </p>
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle">
+
+                        <thead class="table-light">
+                            <tr>
+                                <th>Dispute</th>
+                                <th>Offer / Device</th>
+                                <th>Reported By</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                <th>Reported At</th>
+                                <th>Admin Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var dispute in Model)
+                            {
+                                <tr>
+
+                                    <td>
+                                        #@dispute.Id
+                                    </td>
+
+                                    <td>
+                                        <strong>
+                                            Offer #@dispute.OfferId
+                                        </strong>
+
+                                        <br />
+
+                                        <small class="text-muted">
+                                            @(dispute.Offer?.Device?.BrandName)
+                                            @(dispute.Offer?.Device?.ModelName)
+                                        </small>
+                                    </td>
+
+                                    <td>
+                                        @(dispute.RaisedByUser?.FullName
+                                            ?? "Unknown User")
+                                    </td>
+
+                                    <td style="min-width: 200px; max-width: 300px;">
+                                        @dispute.Reason
+                                    </td>
+
+                                    <td>
+                                        @if (dispute.Status == "Open")
+                                        {
+                                            <span class="badge bg-danger">
+                                                Open
+                                            </span>
+                                        }
+                                        else if (dispute.Status == "UnderReview")
+                                        {
+                                            <span class="badge bg-warning text-dark">
+                                                Under Review
+                                            </span>
+                                        }
+                                        else if (dispute.Status == "Resolved")
+                                        {
+                                            <span class="badge bg-success">
+                                                Resolved
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">
+                                                Rejected
+                                            </span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @dispute.CreatedAt.ToLocalTime()
+                                        .ToString("dd MMM yyyy")
+                                    </td>
+
+                                    <td style="min-width: 260px;">
+
+                                        <form asp-controller="Admin"
+                                              asp-action="ResolveDispute"
+                                              method="post">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@dispute.Id" />
+
+                                            <select name="status"
+                                                    class="form-select form-select-sm mb-2"
+                                                    required>
+
+                                                <option value="UnderReview"
+                                                        selected="@(dispute.Status == "UnderReview")">
+                                                    Under Review
+                                                </option>
+
+                                                <option value="Resolved">
+                                                    Resolved
+                                                </option>
+
+                                                <option value="Rejected">
+                                                    Rejected
+                                                </option>
+
+                                            </select>
+
+                                            <textarea name="adminResolution"
+                                                      class="form-control form-control-sm mb-2"
+                                                      rows="3"
+                                                      maxlength="1500"
+                                                      placeholder="Enter decision or resolution note...">@dispute.AdminResolution</textarea>
+
+                                            <button type="submit"
+                                                    class="btn btn-primary btn-sm">
+                                                Update Case
+                                            </button>
+
+                                        </form>
+
+                                        @if (!string.IsNullOrWhiteSpace(dispute.AdminResolution))
+                                        {
+                                            <div class="mt-2 small text-muted">
+                                                <strong>Previous note:</strong>
+                                                @dispute.AdminResolution
+                                            </div>
+                                        }
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
