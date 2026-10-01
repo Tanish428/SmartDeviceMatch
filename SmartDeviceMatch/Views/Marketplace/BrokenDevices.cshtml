@@ -14,17 +14,41 @@
         </p>
     </div>
 
-    <!-- Filters -->
+   
+    <!-- Advanced Search and Filters -->
     <div class="card shadow-sm mb-4">
+
         <div class="card-body">
 
-            <form asp-action="BrokenDevices"
+            <h5 class="mb-3">
+                <i class="bi bi-search"></i>
+                Search and Filter Devices
+            </h5>
+
+            <form asp-controller="Marketplace"
+                  asp-action="BrokenDevices"
                   method="get">
 
                 <div class="row g-3">
 
+                    <!-- General Search -->
+                    <div class="col-md-6">
+
+                        <label class="form-label">
+                            Search Device
+                        </label>
+
+                        <input type="text"
+                               name="searchTerm"
+                               value="@ViewBag.SearchTerm"
+                               class="form-control"
+                               placeholder="Search brand, model, damage, or description" />
+
+                    </div>
+
                     <!-- Category -->
-                    <div class="col-md-4">
+                    <div class="col-md-6">
+
                         <label class="form-label">
                             Category
                         </label>
@@ -38,10 +62,46 @@
                             </option>
 
                         </select>
+
+                    </div>
+
+                    <!-- Brand -->
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            Brand
+                        </label>
+
+                        <select name="brand"
+                                class="form-select"
+                                asp-items="ViewBag.Brands">
+
+                            <option value="">
+                                All Brands
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- City / Location -->
+                    <div class="col-md-4">
+
+                        <label class="form-label">
+                            City / State / PIN Code
+                        </label>
+
+                        <input type="text"
+                               name="city"
+                               value="@ViewBag.SelectedCity"
+                               class="form-control"
+                               placeholder="Enter city, state, or PIN code" />
+
                     </div>
 
                     <!-- Condition -->
-                    <div class="col-md-3">
+                    <div class="col-md-4">
+
                         <label class="form-label">
                             Condition Grade
                         </label>
@@ -53,8 +113,7 @@
                                 All Conditions
                             </option>
 
-                            @foreach (var grade in
-                                ViewBag.ConditionGrades)
+                            @foreach (var grade in ViewBag.ConditionGrades)
                             {
                                 <option value="@grade"
                                         selected="@(ViewBag.SelectedConditionGrade == grade)">
@@ -63,10 +122,12 @@
                             }
 
                         </select>
+
                     </div>
 
                     <!-- Damage Type -->
-                    <div class="col-md-3">
+                    <div class="col-md-6">
+
                         <label class="form-label">
                             Damage Type
                         </label>
@@ -78,8 +139,7 @@
                                 All Damage Types
                             </option>
 
-                            @foreach (var damage in
-                                ViewBag.DamageTypes)
+                            @foreach (var damage in ViewBag.DamageTypes)
                             {
                                 <option value="@damage"
                                         selected="@(ViewBag.SelectedDamageType == damage)">
@@ -88,21 +148,28 @@
                             }
 
                         </select>
+
                     </div>
 
                     <!-- Buttons -->
-                    <div class="col-md-2 d-flex align-items-end">
+                    <div class="col-md-6 d-flex align-items-end">
 
-                        <div class="w-100">
+                        <div class="d-flex gap-2 w-100">
 
                             <button type="submit"
-                                    class="btn btn-primary w-100">
-                                Filter
+                                    class="btn btn-primary flex-fill">
+
+                                <i class="bi bi-search"></i>
+                                Search
+
                             </button>
 
-                            <a asp-action="BrokenDevices"
-                               class="btn btn-outline-secondary w-100 mt-2">
-                                Clear
+                            <a asp-controller="Marketplace"
+                               asp-action="BrokenDevices"
+                               class="btn btn-outline-secondary flex-fill">
+
+                                Clear Filters
+
                             </a>
 
                         </div>
@@ -114,6 +181,7 @@
             </form>
 
         </div>
+
     </div>
 
     <!-- Device Count -->

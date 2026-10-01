@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartDeviceMatch.Data;
 using SmartDeviceMatch.Models;
+using SmartDeviceMatch.ViewModels;
 
 namespace SmartDeviceMatch.Controllers
 {
@@ -26,145 +27,199 @@ namespace SmartDeviceMatch.Controllers
         // ADMIN DASHBOARD
         // ============================================================
 
+
         public async Task<IActionResult> Index()
         {
-            // --------------------------------------------------------
-            // User statistics
-            // --------------------------------------------------------
+            var now = DateTime.UtcNow;
 
-            var totalUsers = await _context.AppUsers.CountAsync();
+            // First month of the six-month reporting period
+            var firstMonth = new DateTime(now.Year, now.Month, 1)
+                .AddMonths(-5);
 
-            var deviceOwners = await _context.AppUsers
-                .CountAsync(u => u.UserType == "DeviceOwner");
+            var model = new AdminDashboardViewModel
+            {
+                // ==========================================
+                // USER STATISTICS
+                // ==========================================
 
-            var repairShops = await _context.AppUsers
-                .CountAsync(u => u.UserType == "RepairShop");
+                TotalUsers = await _context.AppUsers.CountAsync(),
 
-            var buyers = await _context.AppUsers
-                .CountAsync(u => u.UserType == "Buyer");
+                DeviceOwners = await _context.AppUsers
+                    .CountAsync(u => u.UserType == "DeviceOwner"),
 
-            var bannedUsers = await _context.AppUsers
-                .CountAsync(u => u.IsBanned);
+                RepairShopUsers = await _context.AppUsers
+                    .CountAsync(u => u.UserType == "RepairShop"),
 
+                Buyers = await _context.AppUsers
+                    .CountAsync(u => u.UserType == "Buyer"),
 
-            // --------------------------------------------------------
-            // Device statistics
-            // --------------------------------------------------------
+                BannedUsers = await _context.AppUsers
+                    .CountAsync(u => u.IsBanned),
 
-            var totalDevices = await _context.Devices
-                .CountAsync();
+                // ==========================================
+                // REPAIR SHOP STATISTICS
+                // ==========================================
 
-            var devicesInRepair = await _context.Devices
-                .CountAsync(d => d.Status == "Repairing");
+                TotalRepairShops = await _context.RepairShops.CountAsync(),
 
-            var refurbishedDevices = await _context.Devices
-                .CountAsync(d => d.Status == "Refurbished");
+                VerifiedRepairShops = await _context.RepairShops
+                    .CountAsync(r => r.IsVerified),
 
+                PendingRepairShops = await _context.RepairShops
+                    .CountAsync(r => !r.IsVerified),
 
-            // --------------------------------------------------------
-            // Offer / transaction statistics
-            // --------------------------------------------------------
+                // ==========================================
+                // DEVICE STATISTICS
+                // ==========================================
 
-            var totalOffers = await _context.Offers
-                .CountAsync();
+                TotalDevices = await _context.Devices
+                    .CountAsync(),
 
-            var pendingOffers = await _context.Offers
-                .CountAsync(o => o.Status == "Pending");
+                ActiveListings = await _context.Devices
+                    .CountAsync(d => !d.IsDeleted && d.Status == "Listed"),
 
-            var acceptedOffers = await _context.Offers
-                .CountAsync(o => o.Status == "Accepted");
+                DeletedDevices = await _context.Devices
+                    .CountAsync(d => d.IsDeleted),
 
-            var completedTransactions = await _context.Offers
-                .CountAsync(o =>
-                    o.OfferType == "Buy" &&
-                    o.Status == "Completed");
+                UrgentListings = await _context.Devices
+                    .CountAsync(d => !d.IsDeleted && d.IsUrgent),
 
-            var escrowedTransactions = await _context.Offers
-                .CountAsync(o =>
-                    o.OfferType == "Buy" &&
-                    o.Status == "Escrowed");
+                DevicesInRepair = await _context.Devices
+                    .CountAsync(d => !d.IsDeleted && d.Status == "Repairing"),
 
+                RefurbishedDevices = await _context.Devices
+                    .CountAsync(d => !d.IsDeleted && d.Status == "Refurbished"),
 
-            // --------------------------------------------------------
-            // Review statistics
-            // --------------------------------------------------------
+                // ==========================================
+                // OFFER STATISTICS
+                // ==========================================
 
-            var totalReviews = await _context.Reviews
-                .CountAsync();
+                TotalOffers = await _context.Offers.CountAsync(),
 
-            double averageRating = totalReviews > 0
-                ? await _context.Reviews
-                    .AverageAsync(r => (double)r.Rating)
-                : 0;
+                PendingOffers = await _context.Offers
+                    .CountAsync(o => o.Status == "Pending"),
 
+                AcceptedOffers = await _context.Offers
+                    .CountAsync(o => o.Status == "Accepted"),
 
-            // --------------------------------------------------------
-            // Recent users
-            // --------------------------------------------------------
+                // ==========================================
+                // TRANSACTION STATISTICS
+                // ==========================================
 
-            var recentUsers = await _context.AppUsers
-                .OrderByDescending(u => u.CreatedAt)
-                .Take(10)
+                CompletedTransactions = await _context.Offers
+                    .CountAsync(o =>
+                        o.OfferType == "Buy" &&
+                        o.Status == "Completed"),
+
+                EscrowedTransactions = await _context.Offers
+                    .CountAsync(o =>
+                        o.OfferType == "Buy" &&
+                        o.Status == "Escrowed"),
+
+                // ==========================================
+                // MATCH STATISTICS
+                // ==========================================
+
+                TotalMatches = await _context.Matches.CountAsync(),
+
+                ActiveMatches = await _context.Matches
+                    .CountAsync(m => m.Status == "Active"),
+
+                // ==========================================
+                // REVIEW STATISTICS
+                // ==========================================
+
+                TotalReviews = await _context.Reviews.CountAsync(),
+
+                AverageRating = await _context.Reviews.AnyAsync()
+                    ? await _context.Reviews
+                        .AverageAsync(r => (double)r.Rating)
+                    : 0.0,
+
+                // ==========================================
+                // RECENT USERS
+                // ==========================================
+
+                RecentUsers = await _context.AppUsers
+                    .AsNoTracking()
+                    .OrderByDescending(u => u.CreatedAt)
+                    .Take(8)
+                    .ToListAsync(),
+
+                // ==========================================
+                // RECENT OFFERS
+                // ==========================================
+
+                RecentOffers = await _context.Offers
+                    .AsNoTracking()
+                    .Include(o => o.Device)
+                    .Include(o => o.Buyer)
+                    .Include(o => o.RepairShop)
+                        .ThenInclude(r => r!.User)
+                    .OrderByDescending(o => o.Id)
+                    .Take(8)
+                    .ToListAsync(),
+
+                // ==========================================
+                // RECENT REVIEWS
+                // ==========================================
+
+                RecentReviews = await _context.Reviews
+                    .AsNoTracking()
+                    .Include(r => r.Reviewer)
+                    .Include(r => r.Reviewee)
+                    .Include(r => r.Offer)
+                        .ThenInclude(o => o!.Device)
+                    .OrderByDescending(r => r.CreatedAt)
+                    .Take(8)
+                    .ToListAsync()
+            };
+
+            // ==========================================
+            // SIX-MONTH LISTING TREND
+            // ==========================================
+
+            var listingDates = await _context.Devices
+                .AsNoTracking()
+                .Where(d =>
+                    !d.IsDeleted &&
+                    d.CreatedAt >= firstMonth &&
+                    d.CreatedAt < now)
+                .Select(d => d.CreatedAt)
                 .ToListAsync();
 
+            for (int i = 0; i < 6; i++)
+            {
+                var monthStart = firstMonth.AddMonths(i);
+                var monthEnd = monthStart.AddMonths(1);
 
-            // --------------------------------------------------------
-            // Recent offers
-            // --------------------------------------------------------
+                model.MonthlyListings.Add(new MonthlyCountViewModel
+                {
+                    Month = monthStart.ToString("MMM yyyy"),
 
-            var recentOffers = await _context.Offers
-                .Include(o => o.Device)
-                .Include(o => o.Buyer)
-                .Include(o => o.RepairShop)
-                    .ThenInclude(r => r!.User)
-                .OrderByDescending(o => o.Id)
-                .Take(10)
+                    Count = listingDates.Count(date =>
+                        date >= monthStart &&
+                        date < monthEnd)
+                });
+            }
+
+            // ==========================================
+            // DEVICE STATUS BREAKDOWN
+            // ==========================================
+
+            model.DeviceStatuses = await _context.Devices
+                .AsNoTracking()
+                .Where(d => !d.IsDeleted)
+                .GroupBy(d => d.Status)
+                .Select(group => new StatusCountViewModel
+                {
+                    Status = group.Key,
+                    Count = group.Count()
+                })
+                .OrderByDescending(item => item.Count)
                 .ToListAsync();
 
-
-            // --------------------------------------------------------
-            // Recent reviews
-            // --------------------------------------------------------
-
-            var recentReviews = await _context.Reviews
-                .Include(r => r.Reviewer)
-                .Include(r => r.Reviewee)
-                .Include(r => r.Offer)
-                    .ThenInclude(o => o!.Device)
-                .OrderByDescending(r => r.CreatedAt)
-                .Take(10)
-                .ToListAsync();
-
-
-            // --------------------------------------------------------
-            // Dashboard ViewBag
-            // --------------------------------------------------------
-
-            ViewBag.TotalUsers = totalUsers;
-            ViewBag.DeviceOwners = deviceOwners;
-            ViewBag.RepairShops = repairShops;
-            ViewBag.Buyers = buyers;
-            ViewBag.BannedUsers = bannedUsers;
-
-            ViewBag.TotalDevices = totalDevices;
-            ViewBag.DevicesInRepair = devicesInRepair;
-            ViewBag.RefurbishedDevices = refurbishedDevices;
-
-            ViewBag.TotalOffers = totalOffers;
-            ViewBag.PendingOffers = pendingOffers;
-            ViewBag.AcceptedOffers = acceptedOffers;
-            ViewBag.CompletedTransactions = completedTransactions;
-            ViewBag.EscrowedTransactions = escrowedTransactions;
-
-            ViewBag.TotalReviews = totalReviews;
-            ViewBag.AverageRating = averageRating;
-
-            ViewBag.RecentUsers = recentUsers;
-            ViewBag.RecentOffers = recentOffers;
-            ViewBag.RecentReviews = recentReviews;
-
-
-            return View();
+            return View(model);
         }
 
 
