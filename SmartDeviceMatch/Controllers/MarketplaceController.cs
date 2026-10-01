@@ -1,5 +1,4 @@
-﻿
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +27,6 @@ namespace SmartDeviceMatch.Controllers
             string? conditionGrade,
             string? damageType)
         {
-            // Base query: only active, non-deleted devices
             var query = _context.Devices
                 .AsNoTracking()
                 .Include(d => d.Category)
@@ -37,7 +35,7 @@ namespace SmartDeviceMatch.Controllers
                     d.Status == "Listed" &&
                     !d.IsDeleted);
 
-            // General search across device information
+            // General search
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 searchTerm = searchTerm.Trim();
@@ -87,14 +85,13 @@ namespace SmartDeviceMatch.Controllers
                     d.ConditionGrade == conditionGrade);
             }
 
-            // Damage type filter
+            // Damage filter
             if (!string.IsNullOrWhiteSpace(damageType))
             {
                 query = query.Where(d =>
                     d.DamageType == damageType);
             }
 
-            // Execute filtered query
             var devices = await query
                 .OrderByDescending(d => d.CreatedAt)
                 .ToListAsync();
@@ -109,20 +106,20 @@ namespace SmartDeviceMatch.Controllers
                 "Name",
                 categoryId);
 
-            // Available brands
-            ViewBag.Brands = new SelectList(
-                await _context.Devices
-                    .AsNoTracking()
-                    .Where(d =>
-                        d.Status == "Listed" &&
-                        !d.IsDeleted)
-                    .Select(d => d.BrandName)
-                    .Distinct()
-                    .OrderBy(b => b)
-                    .ToListAsync(),
-                brand);
+            // Brand dropdown
+            var brands = await _context.Devices
+                .AsNoTracking()
+                .Where(d =>
+                    d.Status == "Listed" &&
+                    !d.IsDeleted)
+                .Select(d => d.BrandName)
+                .Distinct()
+                .OrderBy(b => b)
+                .ToListAsync();
 
-            // Available condition grades
+            ViewBag.Brands = new SelectList(brands, brand);
+
+            // Condition options
             ViewBag.ConditionGrades = await _context.Devices
                 .AsNoTracking()
                 .Where(d =>
@@ -133,7 +130,7 @@ namespace SmartDeviceMatch.Controllers
                 .OrderBy(x => x)
                 .ToListAsync();
 
-            // Available damage types
+            // Damage options
             ViewBag.DamageTypes = await _context.Devices
                 .AsNoTracking()
                 .Where(d =>
@@ -144,7 +141,7 @@ namespace SmartDeviceMatch.Controllers
                 .OrderBy(x => x)
                 .ToListAsync();
 
-            // Preserve selected filter values
+            // Preserve filter values
             ViewBag.SearchTerm = searchTerm;
             ViewBag.SelectedBrand = brand;
             ViewBag.SelectedCity = city;
@@ -154,48 +151,118 @@ namespace SmartDeviceMatch.Controllers
             return View(devices);
         }
 
-        // GET: Marketplace/Details/5
+        // GET: Marketplace/Details/12
+        [HttpGet]
         [Authorize(Roles = "RepairShop,Buyer")]
         public async Task<IActionResult> Details(int id)
         {
+            if (id <= 0)
+            {
+                return NotFound();
+            }
+
             var device = await _context.Devices
+                .AsNoTracking()
                 .Include(d => d.Category)
                 .Include(d => d.Images)
                 .FirstOrDefaultAsync(d =>
                     d.Id == id &&
-                    d.Status == "Listed" &&
-                    !d.IsDeleted);
+                    !d.IsDeleted &&
+                    (d.Status == "Listed" ||
+                     d.Status == "Refurbished"));
 
             if (device == null)
             {
                 return NotFound();
             }
 
-            device.ViewCount++;
-
-            await _context.SaveChangesAsync();
+            // Increment view count separately
+            await _context.Devices
+                .Where(d => d.Id == id)
+                .ExecuteUpdateAsync(setters =>
+                    setters.SetProperty(
+                        d => d.ViewCount,
+                        d => d.ViewCount + 1));
 
             return View(device);
         }
 
         // GET: Marketplace/Refurbished
+        [HttpGet]
         [Authorize(Roles = "Buyer")]
         public async Task<IActionResult> Refurbished(
             int? categoryId,
             string? conditionGrade,
             string? damageType)
         {
-            // Existing refurbished workflow
-            var devices = await _context.Devices
+            var query = _context.Devices
+                .AsNoTracking()
                 .Include(d => d.Category)
                 .Include(d => d.Images)
                 .Where(d =>
                     d.Status == "Refurbished" &&
-                    !d.IsDeleted)
+                    !d.IsDeleted);
+
+            // Category filter
+            if (categoryId.HasValue)
+            {
+                query = query.Where(d =>
+                    d.CategoryId == categoryId.Value);
+            }
+
+            // Condition filter
+            if (!string.IsNullOrWhiteSpace(conditionGrade))
+            {
+                query = query.Where(d =>
+                    d.ConditionGrade == conditionGrade);
+            }
+
+            // Damage filter
+            if (!string.IsNullOrWhiteSpace(damageType))
+            {
+                query = query.Where(d =>
+                    d.DamageType == damageType);
+            }
+
+            var devices = await query
                 .OrderByDescending(d => d.CreatedAt)
                 .ToListAsync();
+
+            ViewBag.Categories = new SelectList(
+                await _context.DeviceCategories
+                    .AsNoTracking()
+                    .OrderBy(c => c.Name)
+                    .ToListAsync(),
+                "Id",
+                "Name",
+                categoryId);
+
+            ViewBag.ConditionGrades = await _context.Devices
+                .AsNoTracking()
+                .Where(d =>
+                    d.Status == "Refurbished" &&
+                    !d.IsDeleted)
+                .Select(d => d.ConditionGrade)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToListAsync();
+
+            ViewBag.DamageTypes = await _context.Devices
+                .AsNoTracking()
+                .Where(d =>
+                    d.Status == "Refurbished" &&
+                    !d.IsDeleted)
+                .Select(d => d.DamageType)
+                .Distinct()
+                .OrderBy(x => x)
+                .ToListAsync();
+
+            ViewBag.SelectedCategoryId = categoryId;
+            ViewBag.SelectedConditionGrade = conditionGrade;
+            ViewBag.SelectedDamageType = damageType;
 
             return View(devices);
         }
     }
 }
+
