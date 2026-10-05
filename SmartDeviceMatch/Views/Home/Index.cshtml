@@ -1,8 +1,465 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+@inject SmartDeviceMatch.Data.ApplicationDbContext DbContext
+
+@{
+    ViewData["Title"] = "Dashboard";
+
+    // Dynamic metrics with graceful fallbacks to mockup defaults
+    string userFirstName = "there";
+    int deviceCount = 12;
+    int activeOffersCount = 5;
+    int unreadMessagesCount = 8;
+    string ratingDisplay = "4.6";
+
+    if (User.Identity != null && User.Identity.IsAuthenticated)
+    {
+        var identityId = UserManager.GetUserId(User);
+        if (!string.IsNullOrEmpty(identityId))
+        {
+            var appUser = DbContext.AppUsers.FirstOrDefault(u => u.IdentityUserId == identityId);
+            if (appUser != null)
+            {
+                if (!string.IsNullOrWhiteSpace(appUser.FullName))
+                {
+                    userFirstName = appUser.FullName.Split(' ', StringSplitOptions.RemoveEmptyEntries)[0];
+                }
+
+                int realDevices = DbContext.Devices.Count(d => d.OwnerId == appUser.Id);
+                if (realDevices > 0 || User.IsInRole("DeviceOwner"))
+                {
+                    deviceCount = realDevices;
+                }
+
+                int realOffers = DbContext.Offers.Count(o => (o.BuyerId == appUser.Id || o.Device!.OwnerId == appUser.Id) && o.Status == "Pending");
+                if (realOffers > 0)
+                {
+                    activeOffersCount = realOffers;
+                }
+
+                int realUnread = DbContext.ChatMessages.Count(m => m.ReceiverId == appUser.Id && !m.IsRead);
+                if (realUnread > 0)
+                {
+                    unreadMessagesCount = realUnread;
+                }
+
+                if (appUser.Rating > 0)
+                {
+                    ratingDisplay = appUser.Rating.ToString("0.0");
+                }
+            }
+        }
+    }
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="d-flex flex-column gap-4">
+
+    <!-- ========================================== -->
+    <!-- 1. HERO WELCOME CARD                       -->
+    <!-- ========================================== -->
+    <div class="card border-0 shadow-sm overflow-hidden" 
+         style="background: linear-gradient(135deg, #FFF8F4 0%, #FAEDE4 100%); border-radius: 20px; border: 1px solid #F3E4DA !important;">
+        <div class="card-body p-4 p-md-5">
+            <div class="row align-items-center g-4">
+                
+                <!-- Left text content -->
+                <div class="col-lg-6 z-1">
+                    <span class="text-secondary fw-semibold fs-5 d-block mb-1">
+                        Welcome back,
+                    </span>
+                    <h1 class="display-5 fw-bold text-dark mb-3" style="letter-spacing: -0.02em;">
+                        @(userFirstName)!
+                    </h1>
+                    <p class="text-muted fs-6 mb-4" style="max-width: 440px; line-height: 1.5;">
+                        Buy, sell, or repair devices sustainably.<br />
+                        Give your devices a second life.
+                    </p>
+
+                    @if (User.IsInRole("RepairShop"))
+                    {
+                        <a asp-controller="Marketplace" asp-action="BrokenDevices" class="btn btn-terracotta d-inline-flex align-items-center gap-2 px-4 py-2 fs-6">
+                            <span>Browse Devices</span>
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    }
+                    else if (User.IsInRole("Buyer"))
+                    {
+                        <a asp-controller="Marketplace" asp-action="Refurbished" class="btn btn-terracotta d-inline-flex align-items-center gap-2 px-4 py-2 fs-6">
+                            <span>Browse Devices</span>
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-controller="Marketplace" asp-action="BrokenDevices" class="btn btn-terracotta d-inline-flex align-items-center gap-2 px-4 py-2 fs-6">
+                            <span>Browse Devices</span>
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    }
+                </div>
+
+                <!-- Right visual graphic matching mockup device lineup -->
+                <div class="col-lg-6 text-center text-lg-end">
+                    <div class="position-relative d-inline-block">
+                        <!-- Decorative warm backdrop blob -->
+                        <div class="position-absolute top-50 start-50 translate-middle rounded-circle"
+                             style="width: 320px; height: 320px; background: rgba(224, 130, 99, 0.16); filter: blur(24px); z-index: 0;"></div>
+
+                        <!-- SVG Device Composition Illustration -->
+                        <svg class="position-relative z-1" width="100%" height="auto" viewBox="0 0 460 250" fill="none" xmlns="http://www.w3.org/2000/svg" style="max-width: 440px;">
+                            <defs>
+                                <linearGradient id="laptopGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#2D3748" />
+                                    <stop offset="50%" stop-color="#4A5568" />
+                                    <stop offset="100%" stop-color="#1A202C" />
+                                </linearGradient>
+                                <linearGradient id="screenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#2B3945" />
+                                    <stop offset="50%" stop-color="#803B32" />
+                                    <stop offset="100%" stop-color="#D97757" />
+                                </linearGradient>
+                                <linearGradient id="tabletGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#1A202C" />
+                                    <stop offset="100%" stop-color="#2D3748" />
+                                </linearGradient>
+                                <linearGradient id="phoneGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#2D3748" />
+                                    <stop offset="100%" stop-color="#111827" />
+                                </linearGradient>
+                                <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
+                                    <feDropShadow dx="0" dy="8" stdDeviation="10" flood-opacity="0.18" flood-color="#552219" />
+                                </filter>
+                            </defs>
+
+                            <!-- Plant sprout decoration on left -->
+                            <ellipse cx="60" cy="215" rx="16" ry="7" fill="#E2D4C8" opacity="0.6" />
+                            <path d="M60 215 C60 185 45 170 30 170 C30 195 50 215 60 215 Z" fill="#8C6D58" />
+                            <path d="M60 205 C60 175 75 160 90 160 C90 185 70 205 60 205 Z" fill="#A88B74" />
+                            <path d="M52 215 L68 215 L64 235 L56 235 Z" fill="#EFE5DB" stroke="#D8C7B8" stroke-width="1.5" />
+
+                            <!-- Laptop (center-left) -->
+                            <g filter="url(#softShadow)">
+                                <!-- Screen Lid -->
+                                <rect x="90" y="45" width="200" height="130" rx="8" fill="url(#laptopGrad)" stroke="#718096" stroke-width="2" />
+                                <!-- Screen Bezel Inner -->
+                                <rect x="98" y="52" width="184" height="116" rx="4" fill="url(#screenGrad)" />
+                                <!-- Camera notch dot -->
+                                <circle cx="190" cy="48" r="1.5" fill="#E2E8F0" />
+                                <!-- Base / Keyboard deck -->
+                                <path d="M70 175 L310 175 L300 190 L80 190 Z" fill="#CBD5E0" stroke="#A0AEC0" stroke-width="1" />
+                                <!-- Trackpad -->
+                                <rect x="165" y="177" width="50" height="10" rx="2" fill="#E2E8F0" stroke="#CBD5E0" stroke-width="0.5" />
+                            </g>
+
+                            <!-- Tablet (right) -->
+                            <g filter="url(#softShadow)">
+                                <rect x="260" y="25" width="120" height="175" rx="12" fill="url(#tabletGrad)" stroke="#4A5568" stroke-width="2" />
+                                <rect x="266" y="31" width="108" height="163" rx="8" fill="#1A202C" />
+                                <!-- Camera dot -->
+                                <circle cx="320" cy="28" r="1.5" fill="#718096" />
+                            </g>
+
+                            <!-- Smartphone (foreground center-right) -->
+                            <g filter="url(#softShadow)">
+                                <rect x="235" y="80" width="75" height="140" rx="14" fill="url(#phoneGrad)" stroke="#718096" stroke-width="2" />
+                                <rect x="238" y="83" width="69" height="134" rx="12" fill="#1E293B" />
+                                <!-- Dynamic Island / Speaker notch -->
+                                <rect x="260" y="86" width="25" height="4" rx="2" fill="#0F172A" />
+                                <!-- Screen wallpaper gradient -->
+                                <rect x="240" y="93" width="65" height="120" rx="9" fill="url(#screenGrad)" opacity="0.6" />
+                            </g>
+
+                            <!-- Earbuds Case (front right) -->
+                            <g filter="url(#softShadow)">
+                                <rect x="305" y="160" width="55" height="42" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5" />
+                                <line x1="305" y1="174" x2="360" y2="174" stroke="#E2E8F0" stroke-width="1" />
+                                <circle cx="332" cy="182" r="2" fill="#10B981" />
+                            </g>
+
+                            <!-- Sparks / Accent ticks top right -->
+                            <path d="M380 45 L390 35 M400 48 L412 45 M395 62 L408 68" stroke="#E06443" stroke-width="2.5" stroke-linecap="round" />
+                            <path d="M140 30 L145 22 M156 32 L163 26" stroke="#E06443" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 2. STAT CARDS (4 IN A ROW)                 -->
+    <!-- ========================================== -->
+    <div class="row g-3 g-md-4">
+        
+        <!-- Card 1: My Devices (Coral/Red) -->
+        <div class="col-sm-6 col-xl-3">
+            <a asp-controller="Device" asp-action="Index" class="text-decoration-none">
+                <div class="card h-100 border-0 p-3 p-xl-4 sdm-card-hover"
+                     style="background: #FDF2F0; border: 1px solid #FCE1DC !important; border-radius: 18px;">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                 style="width: 52px; height: 52px; background: #FCE1DC; color: #BA3C2A; font-size: 22px;">
+                                <i class="bi bi-phone"></i>
+                            </div>
+                            <div>
+                                <div class="fs-3 fw-bold text-dark lh-1 mb-1">
+                                    @deviceCount
+                                </div>
+                                <div class="small fw-semibold text-muted">
+                                    My Devices
+                                </div>
+                            </div>
+                        </div>
+                        <div class="rounded-circle d-flex align-items-center justify-content-center"
+                             style="width: 28px; height: 28px; color: #BA3C2A;">
+                            <i class="bi bi-chevron-right fs-6"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Card 2: Active Offers (Blue) -->
+        <div class="col-sm-6 col-xl-3">
+            @if (User.IsInRole("RepairShop"))
+            {
+                <a asp-controller="Offer" asp-action="MyOffers" class="text-decoration-none">
+                    <div class="card h-100 border-0 p-3 p-xl-4 sdm-card-hover"
+                         style="background: #EFF6FF; border: 1px solid #DBEAFE !important; border-radius: 18px;">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                     style="width: 52px; height: 52px; background: #DBEAFE; color: #2563EB; font-size: 22px;">
+                                    <i class="bi bi-tag"></i>
+                                </div>
+                                <div>
+                                    <div class="fs-3 fw-bold text-dark lh-1 mb-1">
+                                        @activeOffersCount
+                                    </div>
+                                    <div class="small fw-semibold text-muted">
+                                        Active Offers
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                 style="width: 28px; height: 28px; color: #2563EB;">
+                                <i class="bi bi-chevron-right fs-6"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            }
+            else if (User.IsInRole("Buyer"))
+            {
+                <a asp-controller="Offer" asp-action="MyPurchaseOffers" class="text-decoration-none">
+                    <div class="card h-100 border-0 p-3 p-xl-4 sdm-card-hover"
+                         style="background: #EFF6FF; border: 1px solid #DBEAFE !important; border-radius: 18px;">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                     style="width: 52px; height: 52px; background: #DBEAFE; color: #2563EB; font-size: 22px;">
+                                    <i class="bi bi-tag"></i>
+                                </div>
+                                <div>
+                                    <div class="fs-3 fw-bold text-dark lh-1 mb-1">
+                                        @activeOffersCount
+                                    </div>
+                                    <div class="small fw-semibold text-muted">
+                                        Active Offers
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                 style="width: 28px; height: 28px; color: #2563EB;">
+                                <i class="bi bi-chevron-right fs-6"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            }
+            else
+            {
+                <a asp-controller="Offer" asp-action="Received" class="text-decoration-none">
+                    <div class="card h-100 border-0 p-3 p-xl-4 sdm-card-hover"
+                         style="background: #EFF6FF; border: 1px solid #DBEAFE !important; border-radius: 18px;">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                     style="width: 52px; height: 52px; background: #DBEAFE; color: #2563EB; font-size: 22px;">
+                                    <i class="bi bi-tag"></i>
+                                </div>
+                                <div>
+                                    <div class="fs-3 fw-bold text-dark lh-1 mb-1">
+                                        @activeOffersCount
+                                    </div>
+                                    <div class="small fw-semibold text-muted">
+                                        Active Offers
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                 style="width: 28px; height: 28px; color: #2563EB;">
+                                <i class="bi bi-chevron-right fs-6"></i>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            }
+        </div>
+
+        <!-- Card 3: Unread Messages (Green) -->
+        <div class="col-sm-6 col-xl-3">
+            <a asp-controller="Chat" asp-action="Index" class="text-decoration-none">
+                <div class="card h-100 border-0 p-3 p-xl-4 sdm-card-hover"
+                     style="background: #F0FDF4; border: 1px solid #DCFCE7 !important; border-radius: 18px;">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                 style="width: 52px; height: 52px; background: #DCFCE7; color: #16A34A; font-size: 22px;">
+                                <i class="bi bi-chat-square-text"></i>
+                            </div>
+                            <div>
+                                <div class="fs-3 fw-bold text-dark lh-1 mb-1">
+                                    @unreadMessagesCount
+                                </div>
+                                <div class="small fw-semibold text-muted">
+                                    Unread Messages
+                                </div>
+                            </div>
+                        </div>
+                        <div class="rounded-circle d-flex align-items-center justify-content-center"
+                             style="width: 28px; height: 28px; color: #16A34A;">
+                            <i class="bi bi-chevron-right fs-6"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Card 4: My Rating (Amber) -->
+        <div class="col-sm-6 col-xl-3">
+            <a asp-controller="Profile" asp-action="Index" class="text-decoration-none">
+                <div class="card h-100 border-0 p-3 p-xl-4 sdm-card-hover"
+                     style="background: #FEFCE8; border: 1px solid #FEF3C7 !important; border-radius: 18px;">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                 style="width: 52px; height: 52px; background: #FEF3C7; color: #D97706; font-size: 22px;">
+                                <i class="bi bi-star"></i>
+                            </div>
+                            <div>
+                                <div class="fs-3 fw-bold text-dark lh-1 mb-1">
+                                    @ratingDisplay
+                                </div>
+                                <div class="small fw-semibold text-muted">
+                                    My Rating
+                                </div>
+                            </div>
+                        </div>
+                        <div class="rounded-circle d-flex align-items-center justify-content-center"
+                             style="width: 28px; height: 28px; color: #D97706;">
+                            <i class="bi bi-chevron-right fs-6"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- 3. RECENT ACTIVITY CARD                    -->
+    <!-- ========================================== -->
+    <div class="card border-0 shadow-sm" style="background: #FFFFFF; border: 1px solid var(--sdm-border) !important; border-radius: 20px;">
+        <div class="card-body p-4 p-md-4">
+            
+            <!-- Card Header -->
+            <div class="d-flex align-items-center justify-content-between mb-3 pb-2">
+                <h5 class="fw-bold text-dark mb-0">
+                    Recent Activity
+                </h5>
+                <a asp-controller="Notification" asp-action="Index" class="fw-semibold text-decoration-none d-inline-flex align-items-center gap-1"
+                   style="color: var(--sdm-primary);">
+                    <span>View All</span>
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+
+            <!-- Activity Items List -->
+            <div class="d-flex flex-column">
+
+                <!-- Activity 1: New offer received -->
+                <div class="d-flex align-items-center justify-content-between py-3 border-bottom" style="border-color: #F3EFE9 !important;">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center"
+                             style="width: 40px; height: 40px; background: #E8F8F0; color: #10B981; font-size: 18px;">
+                            <i class="bi bi-cart3"></i>
+                        </div>
+                        <span class="text-dark fw-medium fs-6">
+                            New offer received on iPhone 12
+                        </span>
+                    </div>
+                    <span class="text-muted small">
+                        2 hours ago
+                    </span>
+                </div>
+
+                <!-- Activity 2: New message -->
+                <div class="d-flex align-items-center justify-content-between py-3 border-bottom" style="border-color: #F3EFE9 !important;">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center"
+                             style="width: 40px; height: 40px; background: #EBF3FE; color: #2563EB; font-size: 18px;">
+                            <i class="bi bi-chat-dots-fill"></i>
+                        </div>
+                        <span class="text-dark fw-medium fs-6">
+                            New message from RepairTech Solutions
+                        </span>
+                    </div>
+                    <span class="text-muted small">
+                        5 hours ago
+                    </span>
+                </div>
+
+                <!-- Activity 3: Device listed -->
+                <div class="d-flex align-items-center justify-content-between py-3 border-bottom" style="border-color: #F3EFE9 !important;">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center"
+                             style="width: 40px; height: 40px; background: #FFF9E6; color: #F59E0B; font-size: 18px;">
+                            <i class="bi bi-star-fill"></i>
+                        </div>
+                        <span class="text-dark fw-medium fs-6">
+                            Your device has been listed successfully
+                        </span>
+                    </div>
+                    <span class="text-muted small">
+                        1 day ago
+                    </span>
+                </div>
+
+                <!-- Activity 4: Profile updated -->
+                <div class="d-flex align-items-center justify-content-between py-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center"
+                             style="width: 40px; height: 40px; background: #FDEEEB; color: #EF4444; font-size: 18px;">
+                            <i class="bi bi-gear-wide-connected"></i>
+                        </div>
+                        <span class="text-dark fw-medium fs-6">
+                            Profile updated
+                        </span>
+                    </div>
+                    <span class="text-muted small">
+                        2 days ago
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
 </div>

@@ -1,316 +1,169 @@
-﻿@model IEnumerable<SmartDeviceMatch.Models.Device>
+@model IEnumerable<SmartDeviceMatch.Models.Device>
 
 @{
-    ViewData["Title"] = "Broken Devices";
+    ViewData["Title"] = "Broken Devices Marketplace";
 }
 
-<div class="container mt-4">
+<div class="d-flex flex-column gap-4">
 
     <!-- Page Header -->
-    <div class="mb-4">
-        <h2>Broken Devices</h2>
-        <p class="text-muted">
-            Browse devices listed by owners that may require repair.
-        </p>
-    </div>
-
-   
-    <!-- Advanced Search and Filters -->
-    <div class="card shadow-sm mb-4">
-
-        <div class="card-body">
-
-            <h5 class="mb-3">
-                <i class="bi bi-search"></i>
-                Search and Filter Devices
-            </h5>
-
-            <form asp-controller="Marketplace"
-                  asp-action="BrokenDevices"
-                  method="get">
-
-                <div class="row g-3">
-
-                    <!-- General Search -->
-                    <div class="col-md-6">
-
-                        <label class="form-label">
-                            Search Device
-                        </label>
-
-                        <input type="text"
-                               name="searchTerm"
-                               value="@ViewBag.SearchTerm"
-                               class="form-control"
-                               placeholder="Search brand, model, damage, or description" />
-
-                    </div>
-
-                    <!-- Category -->
-                    <div class="col-md-6">
-
-                        <label class="form-label">
-                            Category
-                        </label>
-
-                        <select name="categoryId"
-                                class="form-select"
-                                asp-items="ViewBag.Categories">
-
-                            <option value="">
-                                All Categories
-                            </option>
-
-                        </select>
-
-                    </div>
-
-                    <!-- Brand -->
-                    <div class="col-md-4">
-
-                        <label class="form-label">
-                            Brand
-                        </label>
-
-                        <select name="brand"
-                                class="form-select"
-                                asp-items="ViewBag.Brands">
-
-                            <option value="">
-                                All Brands
-                            </option>
-
-                        </select>
-
-                    </div>
-
-                    <!-- City / Location -->
-                    <div class="col-md-4">
-
-                        <label class="form-label">
-                            City / State / PIN Code
-                        </label>
-
-                        <input type="text"
-                               name="city"
-                               value="@ViewBag.SelectedCity"
-                               class="form-control"
-                               placeholder="Enter city, state, or PIN code" />
-
-                    </div>
-
-                    <!-- Condition -->
-                    <div class="col-md-4">
-
-                        <label class="form-label">
-                            Condition Grade
-                        </label>
-
-                        <select name="conditionGrade"
-                                class="form-select">
-
-                            <option value="">
-                                All Conditions
-                            </option>
-
-                            @foreach (var grade in ViewBag.ConditionGrades)
-                            {
-                                <option value="@grade"
-                                        selected="@(ViewBag.SelectedConditionGrade == grade)">
-                                    Grade @grade
-                                </option>
-                            }
-
-                        </select>
-
-                    </div>
-
-                    <!-- Damage Type -->
-                    <div class="col-md-6">
-
-                        <label class="form-label">
-                            Damage Type
-                        </label>
-
-                        <select name="damageType"
-                                class="form-select">
-
-                            <option value="">
-                                All Damage Types
-                            </option>
-
-                            @foreach (var damage in ViewBag.DamageTypes)
-                            {
-                                <option value="@damage"
-                                        selected="@(ViewBag.SelectedDamageType == damage)">
-                                    @damage
-                                </option>
-                            }
-
-                        </select>
-
-                    </div>
-
-                    <!-- Buttons -->
-                    <div class="col-md-6 d-flex align-items-end">
-
-                        <div class="d-flex gap-2 w-100">
-
-                            <button type="submit"
-                                    class="btn btn-primary flex-fill">
-
-                                <i class="bi bi-search"></i>
-                                Search
-
-                            </button>
-
-                            <a asp-controller="Marketplace"
-                               asp-action="BrokenDevices"
-                               class="btn btn-outline-secondary flex-fill">
-
-                                Clear Filters
-
-                            </a>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </form>
-
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Broken & Used Devices</h2>
+            <p class="text-muted mb-0">
+                Browse repairable devices listed by owners looking for repairs or selling as-is.
+            </p>
         </div>
 
+        <span class="badge rounded-pill px-3 py-2 bg-white text-secondary border shadow-sm">
+            <i class="bi bi-cpu me-1 text-primary"></i> <strong>@Model.Count()</strong> device(s) listed
+        </span>
     </div>
 
-    <!-- Device Count -->
-    <div class="mb-3">
-        <strong>
-            @Model.Count()
-        </strong>
-        device(s) available
+    <!-- Search & Filter Card -->
+    <div class="card border-0 shadow-sm" style="border-radius: 20px; border: 1px solid var(--sdm-border) !important;">
+        <div class="card-body p-4">
+            <form asp-controller="Marketplace" asp-action="BrokenDevices" method="get">
+                <div class="row g-3 align-items-end">
+                    <!-- Keyword search -->
+                    <div class="col-md-6 col-lg-5">
+                        <label class="form-label fw-semibold text-dark small">Search Keyword</label>
+                        <div class="sdm-search-input-wrap">
+                            <i class="bi bi-search"></i>
+                            <input type="text" name="searchTerm" value="@ViewBag.SearchTerm" class="sdm-search-input"
+                                   placeholder="Search brand, model, damage, or specs..." />
+                        </div>
+                    </div>
+
+                    <!-- Category filter -->
+                    <div class="col-md-3 col-lg-4">
+                        <label class="form-label fw-semibold text-dark small">Category</label>
+                        <select name="categoryId" class="form-select rounded-pill" asp-items="ViewBag.Categories">
+                            <option value="">All Categories</option>
+                        </select>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="col-md-3 col-lg-3">
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-terracotta rounded-pill flex-fill">
+                                <i class="bi bi-filter me-1"></i> Filter
+                            </button>
+                            <a asp-controller="Marketplace" asp-action="BrokenDevices" class="btn btn-outline-secondary rounded-pill flex-fill">
+                                Reset
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <!-- Devices -->
+    <!-- Devices Grid -->
     @if (!Model.Any())
     {
-        <div class="card text-center p-5">
-
-            <h4>No broken devices found.</h4>
-
-            <p class="text-muted">
-                There are currently no devices matching your filters.
+        <div class="card border-0 shadow-sm text-center p-5" style="border-radius: 20px; border: 1px dashed var(--sdm-border) !important;">
+            <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3"
+                 style="width: 72px; height: 72px; background: var(--sdm-primary-light); color: var(--sdm-primary); font-size: 30px;">
+                <i class="bi bi-search"></i>
+            </div>
+            <h4 class="fw-bold text-dark mb-2">No matching devices found</h4>
+            <p class="text-muted mx-auto mb-4" style="max-width: 420px;">
+                Try adjusting your search criteria or clear filters to view all listed broken devices.
             </p>
-
-            <a asp-action="BrokenDevices"
-               class="btn btn-outline-primary">
-                View All Devices
-            </a>
-
+            <div>
+                <a asp-action="BrokenDevices" class="btn btn-terracotta rounded-pill px-4 py-2">
+                    View All Devices
+                </a>
+            </div>
         </div>
     }
     else
     {
         <div class="row g-4">
-
             @foreach (var device in Model)
             {
                 <div class="col-md-6 col-lg-4">
-
-                    <div class="card h-100 shadow-sm">
+                    <div class="card h-100 border-0 shadow-sm sdm-card-hover overflow-hidden"
+                         style="border-radius: 20px; border: 1px solid var(--sdm-border) !important;">
 
                         <!-- Device Image -->
-                        @if (device.Images != null &&
-                             device.Images.Any())
-                        {
-                            var primaryImage =
-                                device.Images
-                                    .OrderBy(i => i.DisplayOrder)
-                                    .First();
-
-                            <img src="@primaryImage.ImageUrl"
-                                 class="card-img-top"
-                                 alt="@device.BrandName @device.ModelName"
-                                 style="height:220px; object-fit:cover;" />
-                        }
-                        else
-                        {
-                            <div class="d-flex align-items-center justify-content-center bg-light"
-                                 style="height:220px;">
-
-                                <span class="text-muted">
-                                    No Image Available
-                                </span>
-
-                            </div>
-                        }
-
-                        <!-- Device Information -->
-                        <div class="card-body">
-
-                            <h5 class="card-title">
-                                @device.BrandName @device.ModelName
-                            </h5>
-
-                            <p class="text-muted mb-2">
-                                @device.Category?.Name
-                            </p>
-
-                            <div class="mb-2">
-
-                                <span class="badge bg-warning text-dark">
-                                    Grade @device.ConditionGrade
-                                </span>
-
-                                <span class="badge bg-secondary">
-                                    @device.DamageType
-                                </span>
-
-                            </div>
-
-                            <p class="mb-2">
-                                <strong>Asking Price:</strong>
-                                ₹@device.AskingPrice.ToString("0.00")
-                            </p>
-
-                            @if (device.EstimatedValue.HasValue)
+                        <div class="position-relative" style="height: 200px; background: #F8F6F2;">
+                            @if (device.Images != null && device.Images.Any())
                             {
-                                <p class="mb-2">
-                                    <strong>Estimated Value:</strong>
-                                    ₹@device.EstimatedValue.Value.ToString("0.00")
-                                </p>
+                                var primaryImage = device.Images.OrderBy(i => i.DisplayOrder).First();
+                                <img src="@primaryImage.ImageUrl" alt="@device.BrandName @device.ModelName"
+                                     class="w-100 h-100" style="object-fit: cover;" />
+                            }
+                            else
+                            {
+                                <div class="w-100 h-100 d-flex flex-column align-items-center justify-content-center text-muted">
+                                    <i class="bi bi-phone fs-1 opacity-50 mb-1"></i>
+                                    <span class="small">No Photo Available</span>
+                                </div>
                             }
 
-                            <p class="text-muted mb-3">
-                                <strong>Location:</strong>
-                                @device.City, @device.State
-                            </p>
+                            <!-- Badges over photo -->
+                            <div class="position-absolute top-0 start-0 m-3 d-flex flex-column gap-1">
+                                <span class="badge rounded-pill bg-light text-dark border shadow-sm fw-semibold">
+                                    Grade @device.ConditionGrade
+                                </span>
+                            </div>
 
-                            <div class="d-grid gap-2">
+                            @if (device.IsUrgent)
+                            {
+                                <div class="position-absolute top-0 end-0 m-3">
+                                    <span class="badge rounded-pill bg-danger shadow-sm">
+                                        Urgent
+                                    </span>
+                                </div>
+                            }
+                        </div>
 
-                                <a asp-action="Details"
-                                   asp-route-id="@device.Id"
-                                   class="btn btn-outline-primary">
+                        <!-- Card Body -->
+                        <div class="card-body p-4 d-flex flex-column justify-content-between">
+                            <div>
+                                <span class="badge rounded-pill px-2 py-1 bg-light text-secondary border small mb-2">
+                                    @(device.Category?.Name ?? "Device")
+                                </span>
+
+                                <h5 class="fw-bold text-dark mb-1 text-truncate">
+                                    @device.BrandName @device.ModelName
+                                </h5>
+
+                                <p class="text-danger small fw-semibold mb-2">
+                                    <i class="bi bi-wrench me-1"></i> Issue: @device.DamageType
+                                </p>
+
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        <small class="text-muted d-block">Asking Price</small>
+                                        <span class="fs-5 fw-bold text-dark" style="color: var(--sdm-primary) !important;">
+                                            ₹@device.AskingPrice.ToString("N2")
+                                        </span>
+                                    </div>
+                                    <span class="small text-muted text-end">
+                                        <i class="bi bi-geo-alt"></i> @(device.City ?? "Local"), @(device.State ?? "")
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Buttons -->
+                            <div class="d-grid gap-2 pt-2 border-top">
+                                <a asp-action="Details" asp-route-id="@device.Id" class="btn btn-outline-secondary rounded-pill btn-sm">
                                     View Details
                                 </a>
 
-                                <a asp-controller="Offer"
-                                   asp-action="Create"
-                                   asp-route-deviceId="@device.Id"
-                                   class="btn btn-primary">
+                                <a asp-controller="Offer" asp-action="Create" asp-route-deviceId="@device.Id" class="btn btn-terracotta rounded-pill btn-sm">
                                     Make Repair Offer
                                 </a>
-
                             </div>
 
                         </div>
 
                     </div>
-
                 </div>
             }
-
         </div>
     }
 

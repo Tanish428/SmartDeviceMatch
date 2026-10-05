@@ -1,108 +1,133 @@
-﻿@model IEnumerable<SmartDeviceMatch.Models.Device>
+@model IEnumerable<SmartDeviceMatch.Models.Device>
 
 @{
     ViewData["Title"] = "All Devices";
 }
 
-<div class="container mt-4 mb-5">
+<div class="container-fluid px-0">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
         <div>
-            <h2>All Devices</h2>
-            <p class="text-muted">
-                Monitor devices listed on the marketplace.
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge rounded-pill" style="background: rgba(186, 60, 42, 0.1); color: var(--sdm-primary); font-weight: 600;">
+                    <i class="bi bi-shield-lock me-1"></i> Admin Console
+                </span>
+            </div>
+            <h2 class="fw-bold text-dark mb-1">All Devices</h2>
+            <p class="text-muted small mb-0">
+                Audit, track, and monitor devices cataloged across the SmartDeviceMatch marketplace.
             </p>
         </div>
 
-        <a asp-action="Index"
-           class="btn btn-outline-secondary">
-            Back to Dashboard
+        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
         </a>
-
     </div>
 
+    <!-- Devices Card Table -->
+    <div class="card sdm-card border-0 shadow-sm overflow-hidden">
+        <div class="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+            <span class="fw-bold text-dark">
+                <i class="bi bi-phone me-2 text-muted"></i>Cataloged Devices
+            </span>
+            <span class="badge rounded-pill bg-light text-secondary border px-3 py-2">
+                Total: @Model.Count()
+            </span>
+        </div>
 
-    <div class="card shadow-sm">
-
-        <div class="card-body">
-
+        <div class="card-body p-0">
             @if (!Model.Any())
             {
-                <p class="text-muted">
-                    No devices found.
-                </p>
+                <div class="text-center py-5">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                         style="width: 64px; height: 64px; background: #F8F6F2; color: #8C827A;">
+                        <i class="bi bi-phone" style="font-size: 28px;"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-1">No devices found</h5>
+                    <p class="text-muted small mb-0">There are currently no devices listed in the database.</p>
+                </div>
             }
             else
             {
                 <div class="table-responsive">
-
-                    <table class="table table-hover">
-
-                        <thead>
-
+                    <table class="table table-hover align-middle mb-0">
+                        <thead style="background: #FAF8F5; font-size: 0.85rem;" class="text-uppercase text-muted border-bottom">
                             <tr>
-                                <th>Brand</th>
-                                <th>Model</th>
-                                <th>Category</th>
-                                <th>Status</th>
+                                <th class="ps-4 py-3">Device</th>
+                                <th class="py-3">Category</th>
+                                <th class="py-3">Listed By / ID</th>
+                                <th class="py-3">Status</th>
+                                <th class="pe-4 py-3 text-end">Action</th>
                             </tr>
-
                         </thead>
-
                         <tbody>
-
                             @foreach (var device in Model)
                             {
                                 <tr>
-
-                                    <td>
-                                        @device.BrandName
+                                    <td class="ps-4 py-3">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="rounded-3 d-flex align-items-center justify-content-center text-muted"
+                                                 style="width: 44px; height: 44px; background: #F4F1EA; font-size: 20px;">
+                                                <i class="bi bi-phone"></i>
+                                            </div>
+                                            <div>
+                                                <div class="fw-bold text-dark">@device.BrandName @device.ModelName</div>
+                                                <small class="text-muted">Device #@device.Id</small>
+                                            </div>
+                                        </div>
                                     </td>
 
-                                    <td>
-                                        @device.ModelName
+                                    <td class="py-3">
+                                        <span class="badge rounded-pill bg-light text-secondary border px-3 py-1">
+                                            <i class="bi bi-tag me-1"></i>@(device.Category?.Name ?? "Uncategorized")
+                                        </span>
                                     </td>
 
-                                    <td>
-                                        @device.Category?.Name
+                                    <td class="py-3">
+                                        <span class="small text-muted font-monospace">#@device.Id</span>
                                     </td>
 
-                                    <td>
-
+                                    <td class="py-3">
                                         @if (device.Status == "Refurbished")
                                         {
-                                            <span class="badge bg-success">
-                                                Refurbished
+                                            <span class="badge rounded-pill" style="background: rgba(16, 185, 129, 0.12); color: #059669; font-weight: 600;">
+                                                <i class="bi bi-check-circle me-1"></i>Refurbished
                                             </span>
                                         }
                                         else if (device.Status == "Repairing")
                                         {
-                                            <span class="badge bg-warning text-dark">
-                                                Repairing
+                                            <span class="badge rounded-pill" style="background: rgba(245, 158, 11, 0.15); color: #D97706; font-weight: 600;">
+                                                <i class="bi bi-tools me-1"></i>Repairing
+                                            </span>
+                                        }
+                                        else if (device.Status == "Sold")
+                                        {
+                                            <span class="badge rounded-pill bg-light text-muted border">
+                                                <i class="bi bi-bag-check me-1"></i>Sold
                                             </span>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-secondary">
+                                            <span class="badge rounded-pill" style="background: rgba(186, 60, 42, 0.1); color: var(--sdm-primary); font-weight: 600;">
                                                 @device.Status
                                             </span>
                                         }
-
                                     </td>
 
+                                    <td class="pe-4 py-3 text-end">
+                                        <a asp-controller="Device" asp-action="Details" asp-route-id="@device.Id" 
+                                           class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                                            View Details
+                                        </a>
+                                    </td>
                                 </tr>
                             }
-
                         </tbody>
-
                     </table>
-
                 </div>
             }
-
         </div>
-
     </div>
 
 </div>

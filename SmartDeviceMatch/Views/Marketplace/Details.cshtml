@@ -1,7 +1,7 @@
-﻿@model SmartDeviceMatch.Models.Device
+@model SmartDeviceMatch.Models.Device
 
 @{
-    ViewData["Title"] = "Device Details";
+    ViewData["Title"] = $"{Model.BrandName} {Model.ModelName} - Marketplace Details";
 
     var images = Model.Images?
         .OrderBy(i => i.DisplayOrder)
@@ -10,235 +10,168 @@
     var primaryImage = images?.FirstOrDefault();
 }
 
-<div class="container mt-4 mb-5">
+<div class="d-flex flex-column gap-4">
 
-    <!-- Back Button -->
-    <div class="mb-3">
-        <a asp-action="BrokenDevices"
-           class="btn btn-outline-secondary">
-            ← Back to Broken Devices
+    <!-- Top Breadcrumb / Navigation -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <a asp-action="BrokenDevices" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1">
+            <i class="bi bi-arrow-left me-1"></i> Back to Marketplace
         </a>
+
+        @if (User.IsInRole("RepairShop") && Model.Status == "Listed")
+        {
+            <a asp-controller="Offer" asp-action="Create" asp-route-deviceId="@Model.Id" class="btn btn-sm btn-terracotta rounded-pill px-4 py-1">
+                <i class="bi bi-tag me-1"></i> Make Repair Offer
+            </a>
+        }
+        else if (User.IsInRole("Buyer") && Model.Status == "Listed")
+        {
+            <a asp-controller="Offer" asp-action="CreatePurchase" asp-route-deviceId="@Model.Id" class="btn btn-sm btn-terracotta rounded-pill px-4 py-1">
+                <i class="bi bi-bag-check me-1"></i> Make Purchase Offer
+            </a>
+        }
     </div>
 
+    <!-- Product Details Main Grid -->
     <div class="row g-4">
 
-        <!-- Images -->
+        <!-- Left Column: Gallery -->
         <div class="col-lg-6">
-
-            <div class="card shadow-sm">
-
-                @if (primaryImage != null)
-                {
-                    <img src="@primaryImage.ImageUrl"
-                         class="card-img-top"
-                         alt="@Model.BrandName @Model.ModelName"
-                         style="height:400px; object-fit:contain; background:#f8f9fa;" />
-                }
-                else
-                {
-                    <div class="d-flex align-items-center justify-content-center bg-light"
-                         style="height:400px;">
-
-                        <span class="text-muted">
-                            No Image Available
-                        </span>
-
-                    </div>
-                }
+            <div class="card border-0 shadow-sm overflow-hidden p-3" style="border-radius: 20px; border: 1px solid var(--sdm-border) !important;">
+                <div class="rounded-3 overflow-hidden d-flex align-items-center justify-content-center"
+                     style="height: 380px; background: #F8F6F2;">
+                    @if (primaryImage != null)
+                    {
+                        <img src="@primaryImage.ImageUrl"
+                             class="w-100 h-100"
+                             alt="@Model.BrandName @Model.ModelName"
+                             style="object-fit: contain;" />
+                    }
+                    else
+                    {
+                        <div class="text-center text-muted">
+                            <i class="bi bi-camera fs-1 opacity-50 mb-2 d-block"></i>
+                            <span>No Image Available</span>
+                        </div>
+                    }
+                </div>
 
                 @if (images != null && images.Count > 1)
                 {
-                    <div class="card-body">
-
+                    <div class="mt-3">
                         <div class="row g-2">
-
                             @foreach (var image in images)
                             {
                                 <div class="col-3">
-
                                     <img src="@image.ImageUrl"
-                                         alt="Device image"
-                                         class="img-thumbnail w-100"
-                                         style="height:80px; object-fit:cover;" />
-
+                                         alt="Device view"
+                                         class="img-fluid rounded-3 border"
+                                         style="height: 75px; width: 100%; object-fit: cover; cursor: pointer;" />
                                 </div>
                             }
-
                         </div>
-
                     </div>
                 }
-
             </div>
-
         </div>
 
-        <!-- Device Information -->
+        <!-- Right Column: Information & Pricing -->
         <div class="col-lg-6">
+            <div class="card border-0 shadow-sm p-4 p-md-5" style="border-radius: 20px; border: 1px solid var(--sdm-border) !important;">
 
-            <div class="card shadow-sm h-100">
-
-                <div class="card-body p-4">
-
-                    <!-- Title -->
-                    <div class="mb-3">
-
-                        <h2 class="mb-1">
-                            @Model.BrandName @Model.ModelName
-                        </h2>
-
-                        <p class="text-muted mb-0">
-                            @Model.Category?.Name
-                        </p>
-
-                    </div>
-
-                    <!-- Status -->
-                    <div class="mb-4">
-
-                        <span class="badge bg-success">
-                            @Model.Status
+                <!-- Title & Tags -->
+                <div class="mb-3">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge rounded-pill bg-light text-secondary border px-3 py-1">
+                            @(Model.Category?.Name ?? "General")
                         </span>
-
                         @if (Model.IsUrgent)
                         {
-                            <span class="badge bg-danger">
-                                Urgent
+                            <span class="badge rounded-pill px-3 py-1 bg-danger">
+                                <i class="bi bi-fire me-1"></i> Urgent
                             </span>
                         }
-
                     </div>
 
-                    <!-- Price -->
-                    <div class="mb-4">
+                    <h2 class="fw-bold text-dark mb-1">
+                        @Model.BrandName @Model.ModelName
+                    </h2>
+                    <span class="text-muted small">
+                        <i class="bi bi-clock me-1"></i> Listed on @Model.CreatedAt.ToString("MMM dd, yyyy") &bull; @Model.ViewCount views
+                    </span>
+                </div>
 
-                        <h3 class="text-primary">
-                            ₹@Model.AskingPrice.ToString("0.00")
-                        </h3>
-
+                <!-- Price Box -->
+                <div class="p-3 rounded-3 mb-4" style="background: #FFF8F5; border: 1px solid #FCE4DB;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-muted d-block">Asking Price</small>
+                            <span class="display-6 fw-bold" style="color: var(--sdm-primary);">
+                                ₹@Model.AskingPrice.ToString("N2")
+                            </span>
+                        </div>
                         @if (Model.EstimatedValue.HasValue)
                         {
-                            <p class="text-muted mb-0">
-                                Estimated Value:
-                                <strong>
-                                    ₹@Model.EstimatedValue.Value.ToString("0.00")
-                                </strong>
-                            </p>
+                            <div class="text-end">
+                                <small class="text-muted d-block">Estimated Market Value</small>
+                                <span class="fw-bold text-dark fs-6">
+                                    ₹@Model.EstimatedValue.Value.ToString("N2")
+                                </span>
+                            </div>
                         }
+                    </div>
+                </div>
 
+                <!-- Specs Grid -->
+                <h6 class="fw-bold text-dark mb-3">Device Specifications</h6>
+                <div class="d-flex flex-column gap-2 mb-4">
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="text-muted">Condition Grade</span>
+                        <span class="badge rounded-pill bg-light text-dark border px-3 py-1 fw-bold">
+                            Grade @Model.ConditionGrade
+                        </span>
                     </div>
 
-                    <hr />
-
-                    <!-- Device Information -->
-                    <h5 class="mb-3">
-                        Device Information
-                    </h5>
-
-                    <div class="row mb-2">
-
-                        <div class="col-sm-5 text-muted">
-                            Category
-                        </div>
-
-                        <div class="col-sm-7">
-                            @Model.Category?.Name
-                        </div>
-
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="text-muted">Damage Type</span>
+                        <span class="fw-semibold text-danger">@Model.DamageType</span>
                     </div>
 
-                    <div class="row mb-2">
-
-                        <div class="col-sm-5 text-muted">
-                            Condition Grade
-                        </div>
-
-                        <div class="col-sm-7">
-                            <span class="badge bg-warning text-dark">
-                                Grade @Model.ConditionGrade
-                            </span>
-                        </div>
-
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="text-muted">Location</span>
+                        <span class="fw-semibold text-dark">@Model.City, @Model.State</span>
                     </div>
 
-                    <div class="row mb-2">
-
-                        <div class="col-sm-5 text-muted">
-                            Damage Type
-                        </div>
-
-                        <div class="col-sm-7">
-                            @Model.DamageType
-                        </div>
-
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="text-muted">Marketplace Status</span>
+                        <span class="badge rounded-pill px-3 py-1" style="background: #E8F8F0; color: #10B981; font-weight: 600;">
+                            @Model.Status
+                        </span>
                     </div>
+                </div>
 
-                    <div class="row mb-2">
-
-                        <div class="col-sm-5 text-muted">
-                            Location
-                        </div>
-
-                        <div class="col-sm-7">
-                            @Model.City, @Model.State
-                        </div>
-
-                    </div>
-
-                    <div class="row mb-2">
-
-                        <div class="col-sm-5 text-muted">
-                            Listed On
-                        </div>
-
-                        <div class="col-sm-7">
-                            @Model.CreatedAt.ToShortDateString()
-                        </div>
-
-                    </div>
-
-                    <div class="row mb-3">
-
-                        <div class="col-sm-5 text-muted">
-                            Views
-                        </div>
-
-                        <div class="col-sm-7">
-                            @Model.ViewCount
-                        </div>
-
-                    </div>
-
-                    <hr />
-
-                    <!-- Condition Description -->
-                    <h5 class="mb-3">
-                        Condition Description
-                    </h5>
-
-                    <p class="text-muted">
+                <!-- Condition Description -->
+                <div class="mb-4">
+                    <h6 class="fw-bold text-dark mb-2">Seller's Description</h6>
+                    <div class="p-3 rounded-3 small text-secondary" style="background: #F9F8F5; border: 1px solid #ECE7DE; line-height: 1.6;">
                         @Model.ConditionDescription
-                    </p>
-
-                    <hr />
-
-                    <!-- Owner Privacy -->
-                    <div class="alert alert-info">
-
-                        <strong>Owner Privacy</strong>
-
-                        <p class="mb-0 mt-1">
-                            Owner contact information is hidden at this stage.
-                            Contact and offer options will be available through
-                            the appropriate marketplace process.
-                        </p>
-
                     </div>
+                </div>
 
+                <!-- Privacy Shield Alert -->
+                <div class="p-3 rounded-3 small" style="background: #EFF6FF; border: 1px solid #DBEAFE; color: #1E40AF;">
+                    <div class="d-flex gap-2">
+                        <i class="bi bi-shield-check fs-5"></i>
+                        <div>
+                            <strong>Platform Privacy Protected</strong>
+                            <p class="mb-0 mt-1">
+                                Seller direct contact info is protected. Negotiations, quotes, and communications proceed securely via the SmartDeviceMatch offer and messaging system.
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
             </div>
-
         </div>
 
     </div>

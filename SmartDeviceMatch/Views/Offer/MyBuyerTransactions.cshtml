@@ -1,339 +1,183 @@
-﻿@model IEnumerable<SmartDeviceMatch.Models.Offer>
+@model IEnumerable<SmartDeviceMatch.Models.Offer>
 
 @{
-    ViewData["Title"] = "My Transactions";
+    ViewData["Title"] = "My Purchases & Transactions";
 }
 
-<div class="container mt-4 mb-5">
+<div class="d-flex flex-column gap-4">
 
-    <div class="mb-4">
-        <h2>My Transactions</h2>
-        <p class="text-muted">
-            View your accepted purchase transactions.
-        </p>
+    <!-- Page Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">My Purchase Transactions</h2>
+            <p class="text-muted mb-0">
+                Track your orders, escrow security deposits, hardware verification, and reviews.
+            </p>
+        </div>
+
+        <a asp-controller="Marketplace" asp-action="Refurbished" class="btn btn-terracotta rounded-pill px-4">
+            <i class="bi bi-bag-check me-1"></i> Browse Marketplace
+        </a>
     </div>
 
     @if (TempData["TransactionMessage"] != null)
     {
-        <div class="alert alert-info">
-            @TempData["TransactionMessage"]
+        <div class="alert alert-info rounded-3 border-0 shadow-sm">
+            <i class="bi bi-info-circle me-1"></i> @TempData["TransactionMessage"]
         </div>
     }
 
     @if (!Model.Any())
     {
-        <div class="card shadow-sm text-center p-5">
-
-            <h4>No transactions yet.</h4>
-
-            <p class="text-muted">
-                Your accepted purchase offers will appear here.
+        <div class="card border-0 shadow-sm text-center p-5" style="border-radius: 20px; border: 1px dashed var(--sdm-border) !important;">
+            <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3"
+                 style="width: 72px; height: 72px; background: #DBEAFE; color: #2563EB; font-size: 30px;">
+                <i class="bi bi-bag-x"></i>
+            </div>
+            <h4 class="fw-bold text-dark mb-2">No active purchase transactions</h4>
+            <p class="text-muted mx-auto mb-4" style="max-width: 440px;">
+                When a seller accepts your purchase offer for a refurbished device, your secure transaction will appear here.
             </p>
-
-            <a asp-controller="Marketplace"
-               asp-action="Refurbished"
-               class="btn btn-primary">
-                Browse Refurbished Devices
-            </a>
-
+            <div>
+                <a asp-controller="Marketplace" asp-action="Refurbished" class="btn btn-terracotta rounded-pill px-4 py-2">
+                    Browse Refurbished Devices
+                </a>
+            </div>
         </div>
     }
     else
     {
-        <div class="mb-3">
-            <strong>@Model.Count()</strong>
-            transaction(s)
-        </div>
-
         <div class="row g-4">
-
             @foreach (var transaction in Model)
             {
                 <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm sdm-card-hover p-4 d-flex flex-column justify-content-between"
+                         style="border-radius: 20px; border: 1px solid var(--sdm-border) !important;">
 
-                    <div class="card h-100 shadow-sm">
-
-                        <div class="card-body">
-
-                            @if (transaction.Device != null)
-                            {
-                                <h5 class="card-title">
-                                    @transaction.Device.BrandName
-                                    @transaction.Device.ModelName
-                                </h5>
-
-                                <p class="text-muted">
-                                    @transaction.Device.Category?.Name
-                                </p>
-                            }
-
-                            <hr />
-
-                            @if (transaction.RepairShop != null)
-                            {
-                                <div class="mb-2">
-                                    <span class="text-muted">
-                                        Seller:
-                                    </span>
-
-                                    <strong>
-                                        @transaction.RepairShop.ShopName
-                                    </strong>
-                                </div>
-                            }
-
-                            <div class="mb-2">
-                                <span class="text-muted">
-                                    Amount:
-                                </span>
-
-                                <strong>
-                                    ₹@transaction.OfferAmount.ToString("0.00")
-                                </strong>
-                            </div>
-
-                            <div class="mb-2">
-                                <span class="text-muted">
-                                    Transaction Status:
+                        <div>
+                            <!-- Header -->
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge rounded-pill px-2 py-1 bg-light text-secondary border small">
+                                    Order #@transaction.Id
                                 </span>
 
                                 @if (transaction.Status == "Accepted")
                                 {
-                                    <span class="badge bg-success">
-                                        Accepted
-                                    </span>
+                                    <span class="badge rounded-pill px-3 py-1" style="background: #FEF3C7; color: #D97706; font-weight: 600;">Offer Accepted</span>
                                 }
                                 else if (transaction.Status == "Escrowed")
                                 {
-                                    <span class="badge bg-primary">
-                                        Escrowed
-                                    </span>
+                                    <span class="badge rounded-pill px-3 py-1" style="background: #EFF6FF; color: #2563EB; font-weight: 600;">Escrow Protected</span>
                                 }
                                 else if (transaction.Status == "Verified")
                                 {
-                                    <span class="badge bg-success">
-                                        Verified
-                                    </span>
+                                    <span class="badge rounded-pill px-3 py-1" style="background: #DCFCE7; color: #16A34A; font-weight: 600;">Verified</span>
                                 }
                                 else if (transaction.Status == "Released")
                                 {
-                                    <span class="badge bg-info text-dark">
-                                        Released
-                                    </span>
+                                    <span class="badge rounded-pill px-3 py-1" style="background: #E0E7FF; color: #4338CA; font-weight: 600;">Payment Released</span>
                                 }
                                 else if (transaction.Status == "Completed")
                                 {
-                                    <span class="badge bg-success">
-                                        Completed
-                                    </span>
+                                    <span class="badge rounded-pill px-3 py-1" style="background: #DCFCE7; color: #16A34A; font-weight: 600;">Completed</span>
                                 }
                                 else
                                 {
-                                    <span class="badge bg-secondary">
-                                        @transaction.Status
-                                    </span>
+                                    <span class="badge rounded-pill bg-secondary px-3 py-1">@transaction.Status</span>
                                 }
                             </div>
 
-                            <div class="mb-2">
-                                <span class="text-muted">
-                                    Offer Type:
+                            @if (transaction.Device != null)
+                            {
+                                <h5 class="fw-bold text-dark mb-1">
+                                    @transaction.Device.BrandName @transaction.Device.ModelName
+                                </h5>
+                                <span class="small text-muted d-block mb-3">
+                                    @(transaction.Device.Category?.Name ?? "Hardware")
                                 </span>
+                            }
 
-                                @transaction.OfferType
-                            </div>
-
-                            <div class="mb-3">
-                                <span class="text-muted">
-                                    Offer Expiry:
+                            <!-- Price -->
+                            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                <span class="text-muted small">Purchase Price</span>
+                                <span class="fs-5 fw-bold" style="color: var(--sdm-primary);">
+                                    ₹@transaction.OfferAmount.ToString("N2")
                                 </span>
-
-                                @transaction.ExpiresAt.ToShortDateString()
                             </div>
 
                             @if (transaction.EscrowedAt.HasValue)
                             {
-                                <div class="mb-3">
-                                    <span class="text-muted">
-                                        Escrowed On:
-                                    </span>
-
-                                    @transaction.EscrowedAt.Value
-                                    .ToLocalTime()
-                                    .ToString("dd MMM yyyy, hh:mm tt")
+                                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                    <span class="text-muted small">Escrow Funded</span>
+                                    <span class="small text-muted">@transaction.EscrowedAt.Value.ToLocalTime().ToString("dd MMM, hh:mm tt")</span>
                                 </div>
                             }
 
                             @if (transaction.VerifiedAt.HasValue)
                             {
-                                <div class="mb-3">
-                                    <span class="text-muted">
-                                        Verified On:
-                                    </span>
-
-                                    @transaction.VerifiedAt.Value
-                                    .ToLocalTime()
-                                    .ToString("dd MMM yyyy, hh:mm tt")
-                                </div>
-                            }
-
-                            @if (transaction.ReleasedAt.HasValue)
-                            {
-                                <div class="mb-3">
-                                    <span class="text-muted">
-                                        Released On:
-                                    </span>
-
-                                    @transaction.ReleasedAt.Value
-                                    .ToLocalTime()
-                                    .ToString("dd MMM yyyy, hh:mm tt")
+                                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                    <span class="text-muted small">Verified On</span>
+                                    <span class="small text-muted">@transaction.VerifiedAt.Value.ToLocalTime().ToString("dd MMM, hh:mm tt")</span>
                                 </div>
                             }
 
                             @if (!string.IsNullOrWhiteSpace(transaction.Message))
                             {
-                                <div class="mb-3">
-                                    <strong>
-                                        Your Message:
-                                    </strong>
-
-                                    <p class="text-muted mb-0">
-                                        @transaction.Message
-                                    </p>
+                                <div class="mt-3 p-3 rounded-3 small text-secondary" style="background: #F9F8F5; border: 1px solid #ECE7DE;">
+                                    <strong>Notes:</strong> @transaction.Message
                                 </div>
                             }
+                        </div>
 
+                        <!-- Buyer Actions -->
+                        <div class="pt-3 mt-3 border-top d-flex flex-column gap-2">
                             @if (transaction.Status == "Accepted")
                             {
-                                <div class="mt-3">
-
-                                    <form asp-controller="Offer"
-                                          asp-action="Escrow"
-                                          method="post">
-
-                                        @Html.AntiForgeryToken()
-
-                                        <input type="hidden"
-                                               name="id"
-                                               value="@transaction.Id" />
-
-                                        <button type="submit"
-                                                class="btn btn-primary w-100">
-                                            Pay &amp; Place in Escrow
-                                        </button>
-
-                                    </form>
-
-                                </div>
+                                <form asp-controller="Offer" asp-action="Escrow" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@transaction.Id" />
+                                    <button type="submit" class="btn btn-terracotta rounded-pill w-100 btn-sm">
+                                        <i class="bi bi-shield-check me-1"></i> Pay &amp; Place in Escrow
+                                    </button>
+                                </form>
                             }
                             else if (transaction.Status == "Escrowed")
                             {
-                                <div class="alert alert-primary mt-3">
-
-                                    <strong>
-                                        Payment in Escrow
-                                    </strong>
-
-                                    <br />
-
-                                    <small>
-                                        Your payment has been placed
-                                        in escrow.
-                                    </small>
-
+                                <div class="p-2 rounded-3 text-center small mb-1" style="background: #EFF6FF; color: #1E40AF;">
+                                    <i class="bi bi-shield-lock me-1"></i> Funds held securely in escrow. Inspect your device upon receipt.
                                 </div>
 
-                                <form asp-controller="Offer"
-                                      asp-action="VerifyDevice"
-                                      method="post"
-                                      class="mt-3">
-
+                                <form asp-controller="Offer" asp-action="VerifyDevice" method="post">
                                     @Html.AntiForgeryToken()
-
-                                    <input type="hidden"
-                                           name="id"
-                                           value="@transaction.Id" />
-
-                                    <button type="submit"
-                                            class="btn btn-success w-100">
-                                        Verify Device
+                                    <input type="hidden" name="id" value="@transaction.Id" />
+                                    <button type="submit" class="btn btn-success rounded-pill w-100 btn-sm">
+                                        <i class="bi bi-check2-circle me-1"></i> Confirm &amp; Verify Device
                                     </button>
-
                                 </form>
                             }
                             else if (transaction.Status == "Verified")
                             {
-                                <div class="alert alert-success mt-3 mb-0">
-
-                                    <strong>
-                                        Device Verified
-                                    </strong>
-
-                                    <br />
-
-                                    <small>
-                                        You have successfully verified
-                                        the device. Payment can now be
-                                        released.
-                                    </small>
-
+                                <div class="p-2 rounded-3 text-center small" style="background: #DCFCE7; color: #15803D;">
+                                    <i class="bi bi-check-circle-fill me-1"></i> Device verified. Payout is being processed.
                                 </div>
                             }
-                            else if (transaction.Status == "Released")
+                            else if (transaction.Status == "Released" || transaction.Status == "Completed")
                             {
-                                <div class="alert alert-info mt-3 mb-0">
-
-                                    <strong>
-                                        Payment Released
-                                    </strong>
-
-                                    <br />
-
-                                    <small>
-                                        The payment has been released
-                                        to the seller.
-                                    </small>
-
+                                <div class="p-2 rounded-3 text-center small mb-1" style="background: #DCFCE7; color: #15803D;">
+                                    <i class="bi bi-bag-check-fill me-1"></i> Order Fulfilled
                                 </div>
+
+                                <a asp-controller="Offer" asp-action="CreateReview" asp-route-offerId="@transaction.Id"
+                                   class="btn btn-outline-secondary rounded-pill btn-sm w-100">
+                                    <i class="bi bi-star me-1"></i> Leave a Review
+                                </a>
                             }
-                            else if (transaction.Status == "Completed")
-                            {
-                                <div class="alert alert-success mt-3 mb-0">
-
-                                    <strong>
-                                        Transaction Completed
-                                    </strong>
-
-                                    <br />
-
-                                    <small>
-                                        This transaction has been
-                                        successfully completed.
-                                    </small>
-
-                                </div>
-                            }
-
                         </div>
 
                     </div>
-
                 </div>
-
-                @if (transaction.Status == "Completed")
-                {
-                    <a asp-controller="Offer"
-                       asp-action="CreateReview"
-                       asp-route-offerId="@transaction.Id"
-                       class="btn btn-outline-primary w-100 mt-3">
-
-                        Write Review
-
-                    </a>
-                }
             }
-
         </div>
     }
 
-</div>  
+</div>

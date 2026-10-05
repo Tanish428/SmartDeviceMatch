@@ -1,187 +1,83 @@
-﻿@{
+@{
     ViewData["Title"] = "Write Review";
-
-    var offer =
-        ViewBag.Offer as SmartDeviceMatch.Models.Offer;
+    var offer = ViewBag.Offer as SmartDeviceMatch.Models.Offer;
 }
 
-<div class="container mt-4 mb-5">
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
 
-    <div class="row justify-content-center">
+        <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 20px; border: 1px solid var(--sdm-border) !important;">
 
-        <div class="col-md-7">
-
-            <div class="card shadow-sm">
-
-                <div class="card-body p-4">
-
-                    <h2 class="mb-2">
-                        Write a Review
-                    </h2>
-
-                    <p class="text-muted mb-4">
-                        Share your experience with the other party.
-                    </p>
-
-
-                    <!-- ========================= -->
-                    <!-- TRANSACTION INFORMATION -->
-                    <!-- ========================= -->
-                    @if (offer?.Device != null)
-                    {
-                        <div class="alert alert-light border">
-
-                            <strong>
-                                @offer.Device.BrandName
-                                @offer.Device.ModelName
-                            </strong>
-
-                            <br />
-
-                            <small class="text-muted">
-                                @offer.Device.Category?.Name
-                            </small>
-
-                            <br />
-
-                            <small class="text-success">
-                                Transaction Completed
-                            </small>
-
-                        </div>
-                    }
-
-
-                    <!-- ========================= -->
-                    <!-- REVIEW FORM -->
-                    <!-- ========================= -->
-
-                    <form asp-controller="Offer"
-                          asp-action="CreateReview"
-                          method="post">
-
-                        @Html.AntiForgeryToken()
-
-                        <input type="hidden"
-                               name="offerId"
-                               value="@offer?.Id" />
-
-
-                        <!-- Rating -->
-
-                        <div class="mb-4">
-
-                            <label class="form-label">
-                                Rating
-                            </label>
-
-                            <select name="rating"
-                                    class="form-select"
-                                    required>
-
-                                <option value="">
-                                    Select Rating
-                                </option>
-
-                                <option value="5">
-                                    ⭐⭐⭐⭐⭐ — Excellent
-                                </option>
-
-                                <option value="4">
-                                    ⭐⭐⭐⭐ — Very Good
-                                </option>
-
-                                <option value="3">
-                                    ⭐⭐⭐ — Good
-                                </option>
-
-                                <option value="2">
-                                    ⭐⭐ — Poor
-                                </option>
-
-                                <option value="1">
-                                    ⭐ — Very Poor
-                                </option>
-
-                            </select>
-
-                            <span class="text-danger">
-                                @Html.ValidationMessage("rating")
-                            </span>
-
-                        </div>
-
-
-                        <!-- Comment -->
-
-                        <div class="mb-4">
-
-                            <label class="form-label">
-                                Comment
-                            </label>
-
-                            <textarea name="comment"
-                                      class="form-control"
-                                      rows="5"
-                                      maxlength="500"
-                                      placeholder="Write your experience..."></textarea>
-
-                            <div class="form-text">
-                                Optional
-                            </div>
-
-                        </div>
-
-
-                        <!-- Anonymous -->
-
-                        <div class="form-check mb-4">
-
-                            <input class="form-check-input"
-                                   type="checkbox"
-                                   name="isAnonymous"
-                                   value="true"
-                                   id="anonymousReview" />
-
-                            <label class="form-check-label"
-                                   for="anonymousReview">
-
-                                Submit anonymously
-
-                            </label>
-
-                        </div>
-
-
-                        <!-- Buttons -->
-
-                        <div class="d-flex gap-2">
-
-                            <button type="submit"
-                                    class="btn btn-primary">
-
-                                Submit Review
-
-                            </button>
-
-                            <a asp-controller="Home"
-                               asp-action="Index"
-                               class="btn btn-outline-secondary">
-
-                                Cancel
-
-                            </a>
-
-                        </div>
-
-                    </form>
-
+            <!-- Header -->
+            <div class="p-4 p-md-5 text-center" style="background: linear-gradient(135deg, #FFF8F4 0%, #FAEDE4 100%); border-bottom: 1px solid #F3E4DA;">
+                <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-2"
+                     style="width: 60px; height: 60px; background: #FEF3C7; color: #D97706; font-size: 26px;">
+                    <i class="bi bi-star-fill"></i>
                 </div>
+                <h3 class="fw-bold text-dark mb-1">Write a Review</h3>
+                <p class="text-muted small mb-0">Help build trust in the community by rating your transaction partner.</p>
+            </div>
+
+            <div class="card-body p-4 p-md-5">
+
+                @if (offer?.Device != null)
+                {
+                    <div class="p-3 rounded-3 mb-4 text-center" style="background: #F9F8F5; border: 1px solid #ECE7DE;">
+                        <span class="small text-muted d-block">Transaction Completed For</span>
+                        <strong class="text-dark">@offer.Device.BrandName @offer.Device.ModelName</strong>
+                        <span class="badge rounded-pill bg-light text-secondary border small ms-1">@offer.Device.Category?.Name</span>
+                    </div>
+                }
+
+                <form asp-controller="Offer" asp-action="CreateReview" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="offerId" value="@offer?.Id" />
+
+                    <!-- Rating Select -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold text-dark">Overall Experience Rating</label>
+                        <select name="rating" class="form-select" required>
+                            <option value="">-- Choose Rating --</option>
+                            <option value="5">★★★★★ — 5 Stars (Excellent / Highly Recommended)</option>
+                            <option value="4">★★★★☆ — 4 Stars (Very Good / Smooth Transaction)</option>
+                            <option value="3">★★★☆☆ — 3 Stars (Good / Average Experience)</option>
+                            <option value="2">★★☆☆☆ — 2 Stars (Fair / Room for Improvement)</option>
+                            <option value="1">★☆☆☆☆ — 1 Star (Poor Experience)</option>
+                        </select>
+                        <span class="text-danger small">@Html.ValidationMessage("rating")</span>
+                    </div>
+
+                    <!-- Comment -->
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold text-dark">Detailed Feedback</label>
+                        <textarea name="comment" class="form-control" rows="4" maxlength="500"
+                                  placeholder="Mention communication speed, device accuracy, repair quality, or packaging..."></textarea>
+                        <div class="form-text small text-muted">Optional &bull; Max 500 characters.</div>
+                    </div>
+
+                    <!-- Anonymous Checkbox -->
+                    <div class="form-check p-3 rounded-3 mb-4" style="background: #F9F8F5; border: 1px solid #ECE7DE;">
+                        <input class="form-check-input ms-0 me-3" type="checkbox" name="isAnonymous" value="true" id="anonymousReview" />
+                        <label class="form-check-label text-dark fw-semibold small" for="anonymousReview" style="cursor: pointer;">
+                            Submit as an anonymous review
+                            <span class="d-block text-muted fw-normal">Your initials and name will be hidden on public reviews.</span>
+                        </label>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-2">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-terracotta rounded-pill px-5">
+                            Submit Review
+                        </button>
+                    </div>
+
+                </form>
 
             </div>
 
         </div>
 
     </div>
-
 </div>

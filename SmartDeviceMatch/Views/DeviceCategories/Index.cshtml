@@ -1,33 +1,58 @@
-﻿@model IEnumerable<SmartDeviceMatch.Models.DeviceCategory>
+@model IEnumerable<SmartDeviceMatch.Models.DeviceCategory>
 
 @{
     ViewData["Title"] = "Device Categories";
 }
 
-<div class="container mt-4">
-    <h2>Device Categories</h2>
+<div class="d-flex flex-column gap-4">
 
-   
-    <a href="/DeviceCategories/Create" class="btn btn-primary mb-3">Add New Category</a>
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Device Categories</h2>
+            <p class="text-muted mb-0">
+                Hardware categories supported by the SmartDeviceMatch marketplace.
+            </p>
+        </div>
 
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Category Name</th>
-                <th>Description</th>
-            </tr>
-        </thead>
-        <tbody>
-           
-            @foreach (var category in Model)
-            {
-                <tr>
-                    <td>@category.Id</td>
-                    <td>@category.Name</td>
-                    <td>@category.Description</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+        <a asp-action="Create" class="btn btn-terracotta rounded-pill px-4">
+            <i class="bi bi-plus-lg me-1"></i> Add Category
+        </a>
+    </div>
+
+    <!-- Categories Card & Table -->
+    <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 20px; border: 1px solid var(--sdm-border) !important;">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead style="background: #F9F7F3;">
+                    <tr>
+                        <th class="py-3 px-4 text-secondary small fw-bold text-uppercase" style="width: 80px;">ID</th>
+                        <th class="py-3 px-3 text-secondary small fw-bold text-uppercase">Category Name</th>
+                        <th class="py-3 px-3 text-secondary small fw-bold text-uppercase">Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var category in Model)
+                    {
+                        <tr style="border-bottom: 1px solid #F4EFEA;">
+                            <td class="py-3 px-4 text-muted small">#@category.Id</td>
+                            <td class="py-3 px-3 fw-bold text-dark">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                         style="width: 32px; height: 32px; background: #F4EFEA; color: var(--sdm-primary);">
+                                        <i class="bi bi-tag"></i>
+                                    </div>
+                                    <span>@category.Name</span>
+                                </div>
+                            </td>
+                            <td class="py-3 px-3 text-secondary small">
+                                @(string.IsNullOrWhiteSpace(category.Description) ? "—" : category.Description)
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 </div>

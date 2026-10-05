@@ -1,433 +1,227 @@
-﻿@model SmartDeviceMatch.Models.Device
+@model SmartDeviceMatch.Models.Device
 
 @{
-    ViewData["Title"] = "Device Details";
+    ViewData["Title"] = $"{Model.BrandName} {Model.ModelName} - Details";
 }
 
-<div class="container mt-4 mb-5">
+<div class="d-flex flex-column gap-4">
 
-    <!-- Page Header -->
-    <div class="mb-4">
-        <h2>Device Details</h2>
-        <p class="text-muted">
-            View complete information about this device.
-        </p>
-    </div>
+    <!-- Back Navigation & Breadcrumb -->
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <a asp-controller="Device" asp-action="Index" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1">
+            <i class="bi bi-arrow-left me-1"></i> Back to My Devices
+        </a>
 
-    <div class="row">
-
-        <!-- Device Information -->
-        <div class="col-md-8">
-
-            <div class="card shadow-sm mb-4">
-
-                <div class="card-body">
-
-                    <!-- Device Name -->
-                    <h3 class="mb-1">
-                        @Model.BrandName @Model.ModelName
-                    </h3>
-
-                    @if (Model.Category != null)
-                    {
-                        <p class="text-muted mb-4">
-                            @Model.Category.Name
-                        </p>
-                    }
-
-                    <hr />
-
-                    <!-- Device Information -->
-                    <h5 class="mb-3">
-                        Device Information
-                    </h5>
-
-                    <div class="row">
-
-                        <!-- Brand -->
-                        <div class="col-md-6 mb-3">
-                            <span class="text-muted">
-                                Brand
-                            </span>
-
-                            <div>
-                                <strong>
-                                    @Model.BrandName
-                                </strong>
-                            </div>
-                        </div>
-
-                        <!-- Model -->
-                        <div class="col-md-6 mb-3">
-                            <span class="text-muted">
-                                Model
-                            </span>
-
-                            <div>
-                                <strong>
-                                    @Model.ModelName
-                                </strong>
-                            </div>
-                        </div>
-
-                        <!-- Category -->
-                        <div class="col-md-6 mb-3">
-                            <span class="text-muted">
-                                Category
-                            </span>
-
-                            <div>
-                                <strong>
-                                    @(Model.Category?.Name ?? "Not specified")
-                                </strong>
-                            </div>
-                        </div>
-
-                        <!-- Condition -->
-                        <div class="col-md-6 mb-3">
-                            <span class="text-muted">
-                                Condition Grade
-                            </span>
-
-                            <div>
-                                <strong>
-                                    @Model.ConditionGrade
-                                </strong>
-                            </div>
-                        </div>
-
-                        <!-- Damage -->
-                        <div class="col-md-6 mb-3">
-                            <span class="text-muted">
-                                Damage Type
-                            </span>
-
-                            <div>
-                                <strong>
-                                    @Model.DamageType
-                                </strong>
-                            </div>
-                        </div>
-
-                        <!-- Asking Price -->
-                        <div class="col-md-6 mb-3">
-                            <span class="text-muted">
-                                Asking Price
-                            </span>
-
-                            <div>
-                                <strong>
-                                    ₹@Model.AskingPrice.ToString("0.00")
-                                </strong>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <hr />
-
-                    <!-- Condition Description -->
-                    <h5 class="mb-3">
-                        Condition Details
-                    </h5>
-
-                    <p class="text-muted">
-                        @Model.ConditionDescription
-                    </p>
-
-                    <hr />
-
-                    <!-- Location -->
-                    <h5 class="mb-3">
-                        Location
-                    </h5>
-
-                    <div class="row">
-
-                        <div class="col-md-4 mb-3">
-                            <span class="text-muted">
-                                City
-                            </span>
-
-                            <div>
-                                <strong>
-                                    @Model.City
-                                </strong>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4 mb-3">
-                            <span class="text-muted">
-                                State
-                            </span>
-
-                            <div>
-                                <strong>
-                                    @Model.State
-                                </strong>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4 mb-3">
-                            <span class="text-muted">
-                                Pin Code
-                            </span>
-
-                            <div>
-                                <strong>
-                                    @Model.PinCode
-                                </strong>
-                            </div>
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- Matching Section -->
+        <div class="d-flex gap-2">
             @if (User.IsInRole("DeviceOwner"))
             {
-                <div class="card shadow-sm mb-4">
+                <a asp-controller="Device" asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1">
+                    <i class="bi bi-pencil me-1"></i> Edit Device
+                </a>
+            }
+        </div>
+    </div>
 
-                    <div class="card-body">
+    <!-- Main Content Layout -->
+    <div class="row g-4">
 
-                        <h5 class="mb-2">
-                            🤖 Find Matching Repair Shops
-                        </h5>
+        <!-- Left Column: Device Presentation & Details -->
+        <div class="col-lg-8">
 
-                        <p class="text-muted mb-3">
-                            Find suitable repair shops for this device
-                            based on category, brand, location,
-                            expertise and shop rating.
-                        </p>
-
-                        <a asp-controller="Match"
-                           asp-action="Index"
-                           asp-route-deviceId="@Model.Id"
-                           class="btn btn-primary">
-                            🤖 Find Matching Repair Shops
-                        </a>
-
+            <!-- Device Summary Banner Card -->
+            <div class="card border-0 shadow-sm p-4 mb-4" style="border-radius: 20px; border: 1px solid var(--sdm-border) !important;">
+                <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="badge rounded-pill px-3 py-1 bg-light text-secondary border">
+                                @(Model.Category?.Name ?? "General Device")
+                            </span>
+                            @if (Model.IsUrgent)
+                            {
+                                <span class="badge rounded-pill px-3 py-1" style="background: #FEE2E2; color: #DC2626; font-weight: 600;">
+                                    <i class="bi bi-fire me-1"></i> Urgent Sale/Repair
+                                </span>
+                            }
+                        </div>
+                        <h2 class="fw-bold text-dark mb-1">
+                            @Model.BrandName @Model.ModelName
+                        </h2>
+                        <span class="text-muted small">
+                            <i class="bi bi-geo-alt me-1"></i>@(Model.City ?? "Local"), @(Model.State ?? "") &bull; Listed on @Model.CreatedAt.ToString("MMM dd, yyyy")
+                        </span>
                     </div>
 
+                    <div class="text-lg-end">
+                        <span class="small text-muted d-block">Asking Price</span>
+                        <h3 class="fw-bold text-dark mb-0" style="color: var(--sdm-primary) !important;">
+                            ₹@Model.AskingPrice.ToString("N2")
+                        </h3>
+                    </div>
                 </div>
-            }
 
-
-            <!-- Navigation / Actions -->
-            <div class="d-flex gap-2 flex-wrap">
-
-                <a asp-controller="Device"
-                   asp-action="Index"
-                   class="btn btn-outline-secondary">
-                    ← Back to My Devices
-                </a>
-
-                @if (User.IsInRole("DeviceOwner"))
+                <!-- Photos Carousel/Grid if any -->
+                @if (Model.Images != null && Model.Images.Any())
                 {
-                    <a asp-controller="Device"
-                       asp-action="Edit"
-                       asp-route-id="@Model.Id"
-                       class="btn btn-outline-primary">
-                        Edit Device
-                    </a>
+                    <div class="mt-4 pt-3 border-top">
+                        <h6 class="fw-bold text-dark mb-3">Device Photos</h6>
+                        <div class="row g-2">
+                            @foreach (var img in Model.Images.OrderBy(i => i.DisplayOrder))
+                            {
+                                <div class="col-4 col-sm-3 col-md-2">
+                                    <img src="@img.ImageUrl" class="img-fluid rounded-3 border" style="height: 90px; width: 100%; object-fit: cover;" alt="Device photo" />
+                                </div>
+                            }
+                        </div>
+                    </div>
                 }
-
             </div>
 
-        </div>
+            <!-- Hardware Condition & Diagnostics Card -->
+            <div class="card border-0 shadow-sm p-4 mb-4" style="border-radius: 20px; border: 1px solid var(--sdm-border) !important;">
+                <h5 class="fw-bold text-dark mb-3 pb-2 border-bottom">
+                    <i class="bi bi-cpu text-secondary me-2"></i>Condition & Specifications
+                </h5>
 
+                <div class="row g-3 mb-3">
+                    <div class="col-sm-6">
+                        <div class="p-3 rounded-3" style="background: #F9F8F5; border: 1px solid #ECE7DE;">
+                            <span class="text-muted small d-block mb-1">Condition Grade</span>
+                            <span class="badge rounded-pill bg-light text-dark border px-3 py-1 fs-6 fw-bold">
+                                Grade @Model.ConditionGrade
+                            </span>
+                        </div>
+                    </div>
 
-        <!-- Right Side Summary -->
-        <div class="col-md-4">
+                    <div class="col-sm-6">
+                        <div class="p-3 rounded-3" style="background: #F9F8F5; border: 1px solid #ECE7DE;">
+                            <span class="text-muted small d-block mb-1">Reported Damage</span>
+                            <span class="badge rounded-pill px-3 py-1 fs-6 fw-bold" style="background: #FEF3C7; color: #B45309;">
+                                @Model.DamageType
+                            </span>
+                        </div>
+                    </div>
 
-            <div class="card shadow-sm mb-4">
+                    <div class="col-sm-6">
+                        <div class="p-3 rounded-3" style="background: #F9F8F5; border: 1px solid #ECE7DE;">
+                            <span class="text-muted small d-block mb-1">Views</span>
+                            <strong class="text-dark fs-6"><i class="bi bi-eye me-1"></i>@Model.ViewCount views</strong>
+                        </div>
+                    </div>
 
-                <div class="card-body">
-
-                    <h5 class="mb-3">
-                        Listing Summary
-                    </h5>
-
-                    <!-- Status -->
-                    <div class="mb-3">
-
-                        <span class="text-muted">
-                            Status
-                        </span>
-
-                        <div class="mt-1">
-
+                    <div class="col-sm-6">
+                        <div class="p-3 rounded-3" style="background: #F9F8F5; border: 1px solid #ECE7DE;">
+                            <span class="text-muted small d-block mb-1">Listing Status</span>
                             @if (Model.Status == "Listed")
                             {
-                                <span class="badge bg-success">
-                                    Listed
-                                </span>
+                                <span class="badge rounded-pill px-3 py-1" style="background: #E8F8F0; color: #10B981; font-weight: 600;">Active Listed</span>
                             }
                             else if (Model.Status == "Matched")
                             {
-                                <span class="badge bg-primary">
-                                    Matched
-                                </span>
-                            }
-                            else if (Model.Status == "OfferAccepted")
-                            {
-                                <span class="badge bg-warning text-dark">
-                                    Offer Accepted
-                                </span>
-                            }
-                            else if (Model.Status == "Sold")
-                            {
-                                <span class="badge bg-secondary">
-                                    Sold
-                                </span>
-                            }
-                            else if (Model.Status == "Withdrawn")
-                            {
-                                <span class="badge bg-danger">
-                                    Withdrawn
-                                </span>
+                                <span class="badge rounded-pill px-3 py-1" style="background: #EFF6FF; color: #2563EB; font-weight: 600;">Matched</span>
                             }
                             else
                             {
-                                <span class="badge bg-secondary">
-                                    @Model.Status
-                                </span>
+                                <span class="badge rounded-pill bg-secondary px-3 py-1">@Model.Status</span>
                             }
-
                         </div>
-
                     </div>
-
-
-                    <!-- Urgent -->
-                    <div class="mb-3">
-
-                        <span class="text-muted">
-                            Priority
-                        </span>
-
-                        <div class="mt-1">
-
-                            @if (Model.IsUrgent)
-                            {
-                                <span class="badge bg-danger">
-                                    🔴 Urgent
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-light text-dark">
-                                    Normal
-                                </span>
-                            }
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Views -->
-                    <div class="mb-3">
-
-                        <span class="text-muted">
-                            Views
-                        </span>
-
-                        <div>
-                            <strong>
-                                @Model.ViewCount
-                            </strong>
-                        </div>
-
-                    </div>
-
-
-                    <!-- Price -->
-                    <div class="mb-3">
-
-                        <span class="text-muted">
-                            Asking Price
-                        </span>
-
-                        <div>
-                            <strong class="fs-5">
-                                ₹@Model.AskingPrice.ToString("0.00")
-                            </strong>
-                        </div>
-
-                    </div>
-
-
-                    <!-- Estimated Value -->
-                    @if (Model.EstimatedValue.HasValue)
-                    {
-                        <div class="mb-3">
-
-                            <span class="text-muted">
-                                Estimated Value
-                            </span>
-
-                            <div>
-                                <strong>
-                                    ₹@Model.EstimatedValue.Value.ToString("0.00")
-                                </strong>
-                            </div>
-
-                        </div>
-                    }
-
                 </div>
 
+                <div class="mt-3">
+                    <h6 class="fw-bold text-dark mb-2">Detailed Condition Description</h6>
+                    <div class="p-3 rounded-3 text-secondary" style="background: #FFFFFF; border: 1px solid #EAE6DF; line-height: 1.6;">
+                        @Model.ConditionDescription
+                    </div>
+                </div>
             </div>
 
-
-            <!-- Matching Explanation -->
+            <!-- Match Actions Card for Device Owner -->
             @if (User.IsInRole("DeviceOwner"))
             {
-                <div class="card shadow-sm">
-
-                    <div class="card-body">
-
-                        <h6 class="mb-3">
-                            How Matching Works
-                        </h6>
-
-                        <ul class="text-muted mb-0 ps-3">
-
-                            <li class="mb-2">
-                                Category Match — 30 points
-                            </li>
-
-                            <li class="mb-2">
-                                Brand / Model Match — 25 points
-                            </li>
-
-                            <li class="mb-2">
-                                Proximity — 20 points
-                            </li>
-
-                            <li class="mb-2">
-                                Expertise — 15 points
-                            </li>
-
-                            <li>
-                                Shop Rating — 10 points
-                            </li>
-
-                        </ul>
-
-                        <div class="alert alert-info mt-3 mb-0">
-                            Shops with a compatibility score of
-                            <strong>60 or more</strong> are shown as
-                            suitable matches.
+                <div class="card border-0 shadow-sm p-4" style="background: linear-gradient(135deg, #FFF9F6 0%, #FDF1EA 100%); border-radius: 20px; border: 1px solid #F6DCD2 !important;">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                        <div>
+                            <h5 class="fw-bold text-dark mb-1">Find Compatible Repair Shops</h5>
+                            <p class="text-muted small mb-0">
+                                Match this device with verified local shops based on specialization, proximity, and rating.
+                            </p>
                         </div>
-
+                        <a asp-controller="Match" asp-action="Index" asp-route-deviceId="@Model.Id" class="btn btn-terracotta rounded-pill px-4 py-2">
+                            <i class="bi bi-bullseye me-1"></i> Find Matching Shops
+                        </a>
                     </div>
+                </div>
+            }
 
+        </div>
+
+        <!-- Right Column: Financials & Matching Logic -->
+        <div class="col-lg-4">
+
+            <!-- Pricing & Valuation Card -->
+            <div class="card border-0 shadow-sm p-4 mb-4" style="border-radius: 20px; border: 1px solid var(--sdm-border) !important;">
+                <h6 class="fw-bold text-dark mb-3">Price & Valuation Summary</h6>
+
+                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                    <span class="text-muted">Asking Price</span>
+                    <strong class="fs-5 text-dark">₹@Model.AskingPrice.ToString("N2")</strong>
+                </div>
+
+                @if (Model.EstimatedValue.HasValue)
+                {
+                    <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                        <span class="text-muted">Estimated Market Value</span>
+                        <strong class="text-success">₹@Model.EstimatedValue.Value.ToString("N2")</strong>
+                    </div>
+                }
+
+                <div class="d-flex justify-content-between align-items-center py-2">
+                    <span class="text-muted">Listing Priority</span>
+                    @if (Model.IsUrgent)
+                    {
+                        <span class="badge rounded-pill bg-danger">Urgent</span>
+                    }
+                    else
+                    {
+                        <span class="badge rounded-pill bg-light text-secondary border">Normal</span>
+                    }
+                </div>
+            </div>
+
+            <!-- Matching Algorithm Card -->
+            @if (User.IsInRole("DeviceOwner"))
+            {
+                <div class="card border-0 shadow-sm p-4" style="border-radius: 20px; border: 1px solid var(--sdm-border) !important;">
+                    <h6 class="fw-bold text-dark mb-3">
+                        <i class="bi bi-info-circle me-1 text-primary"></i> How Matching Works
+                    </h6>
+
+                    <ul class="list-unstyled d-flex flex-column gap-2 mb-3 small text-secondary">
+                        <li class="d-flex justify-content-between">
+                            <span><i class="bi bi-check2 text-success me-1"></i> Category Match</span>
+                            <span class="fw-bold text-dark">30 pts</span>
+                        </li>
+                        <li class="d-flex justify-content-between">
+                            <span><i class="bi bi-check2 text-success me-1"></i> Brand & Model</span>
+                            <span class="fw-bold text-dark">25 pts</span>
+                        </li>
+                        <li class="d-flex justify-content-between">
+                            <span><i class="bi bi-check2 text-success me-1"></i> Proximity / Distance</span>
+                            <span class="fw-bold text-dark">20 pts</span>
+                        </li>
+                        <li class="d-flex justify-content-between">
+                            <span><i class="bi bi-check2 text-success me-1"></i> Shop Expertise</span>
+                            <span class="fw-bold text-dark">15 pts</span>
+                        </li>
+                        <li class="d-flex justify-content-between">
+                            <span><i class="bi bi-check2 text-success me-1"></i> Customer Rating</span>
+                            <span class="fw-bold text-dark">10 pts</span>
+                        </li>
+                    </ul>
+
+                    <div class="p-3 rounded-3 small" style="background: #EFF6FF; border: 1px solid #DBEAFE; color: #1E40AF;">
+                        <i class="bi bi-shield-check me-1"></i> Repair shops scoring <strong>60 points or above</strong> are highlighted as suitable matches.
+                    </div>
                 </div>
             }
 

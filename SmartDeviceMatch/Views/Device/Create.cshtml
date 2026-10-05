@@ -1,324 +1,219 @@
-﻿@model SmartDeviceMatch.Models.Device
+@model SmartDeviceMatch.Models.Device
 
 @{
     ViewData["Title"] = "List a Device";
 }
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
+<div class="row justify-content-center">
+    <div class="col-lg-9 col-xl-8">
 
-            <div class="mb-4">
-                <h2>List a Broken or Used Device</h2>
-                <p class="text-muted">
-                    Provide details to help repair shops and buyers give you the best offer.
-                </p>
-            </div>
+        <!-- Page Header -->
+        <div class="mb-4 text-center">
+            <span class="badge rounded-pill px-3 py-1 mb-2" style="background: var(--sdm-primary-light); color: var(--sdm-primary); font-weight: 600;">
+                <i class="bi bi-tag me-1"></i> Device Listing
+            </span>
+            <h2 class="fw-bold text-dark mb-2">List a Broken or Used Device</h2>
+            <p class="text-muted mx-auto mb-0" style="max-width: 500px;">
+                Provide accurate details to receive fast and competitive repair quotes and purchase offers.
+            </p>
+        </div>
 
-            <form asp-action="Create"
-                  method="post"
-                  enctype="multipart/form-data">
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger rounded-3 mb-4"></div>
 
-                <div asp-validation-summary="ModelOnly"
-                     class="text-danger mb-3"></div>
-
-                <!-- Device Basics -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Device Basics</h5>
+            <!-- Card 1: Device Basics -->
+            <div class="card border-0 shadow-sm mb-4" style="border-radius: 20px; border: 1px solid var(--sdm-border) !important;">
+                <div class="card-body p-4 p-md-5">
+                    <div class="d-flex align-items-center gap-3 mb-4 pb-2 border-bottom">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center"
+                             style="width: 40px; height: 40px; background: #FCE1DC; color: var(--sdm-primary); font-size: 18px;">
+                            <i class="bi bi-phone"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold text-dark mb-0">Device Basics</h5>
+                            <small class="text-muted">Brand, model, and hardware categorization</small>
+                        </div>
                     </div>
 
-                    <div class="card-body">
-
+                    <div class="row g-3">
                         <!-- Category -->
-                        <div class="mb-3">
-                            <label asp-for="CategoryId" class="form-label">
-                                Device Category
-                            </label>
-
-                            <select asp-for="CategoryId"
-                                    class="form-select"
-                                    asp-items="ViewBag.CategoryId">
-                                <option value="">Select Category</option>
+                        <div class="col-md-12">
+                            <label asp-for="CategoryId" class="form-label fw-semibold text-dark">Device Category</label>
+                            <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.CategoryId">
+                                <option value="">-- Select Category --</option>
                             </select>
-
-                            <span asp-validation-for="CategoryId"
-                                  class="text-danger"></span>
+                            <span asp-validation-for="CategoryId" class="text-danger small"></span>
                         </div>
 
                         <!-- Brand -->
-                        <div class="mb-3">
-                            <label asp-for="BrandName" class="form-label">
-                                Brand
-                            </label>
-
-                            <input asp-for="BrandName"
-                                   class="form-control"
-                                   placeholder="e.g. Apple, Samsung, Dell" />
-
-                            <span asp-validation-for="BrandName"
-                                  class="text-danger"></span>
+                        <div class="col-md-6">
+                            <label asp-for="BrandName" class="form-label fw-semibold text-dark">Brand</label>
+                            <input asp-for="BrandName" class="form-control" placeholder="e.g. Apple, Samsung, Dell, Sony" />
+                            <span asp-validation-for="BrandName" class="text-danger small"></span>
                         </div>
 
                         <!-- Model -->
-                        <div class="mb-3">
-                            <label asp-for="ModelName" class="form-label">
-                                Model
-                            </label>
-
-                            <input asp-for="ModelName"
-                                   class="form-control"
-                                   placeholder="Enter device model" />
-
-                            <span asp-validation-for="ModelName"
-                                  class="text-danger"></span>
+                        <div class="col-md-6">
+                            <label asp-for="ModelName" class="form-label fw-semibold text-dark">Model Name</label>
+                            <input asp-for="ModelName" class="form-control" placeholder="e.g. iPhone 13 Pro, Galaxy S22, XPS 15" />
+                            <span asp-validation-for="ModelName" class="text-danger small"></span>
                         </div>
-
                     </div>
                 </div>
+            </div>
 
-
-                <!-- Condition & Damage -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Condition & Damage</h5>
+            <!-- Card 2: Condition & Damage -->
+            <div class="card border-0 shadow-sm mb-4" style="border-radius: 20px; border: 1px solid var(--sdm-border) !important;">
+                <div class="card-body p-4 p-md-5">
+                    <div class="d-flex align-items-center gap-3 mb-4 pb-2 border-bottom">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center"
+                             style="width: 40px; height: 40px; background: #DBEAFE; color: #2563EB; font-size: 18px;">
+                            <i class="bi bi-wrench-adjustable"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold text-dark mb-0">Condition & Damage Details</h5>
+                            <small class="text-muted">Accurate descriptions help get accurate repair estimates</small>
+                        </div>
                     </div>
 
-                    <div class="card-body">
-
+                    <div class="row g-3">
                         <!-- Condition Grade -->
-                        <div class="mb-3">
-                            <label asp-for="ConditionGrade"
-                                   class="form-label">
-                                Condition Grade
-                            </label>
-
-                            <select asp-for="ConditionGrade"
-                                    class="form-select">
-
-                                <option value="">Select Condition</option>
-                                <option value="A">A - Excellent</option>
-                                <option value="B">B - Good</option>
-                                <option value="C">C - Fair</option>
-                                <option value="D">D - Poor</option>
-                                <option value="E">E - Very Poor</option>
-                                <option value="F">F - Heavily Damaged</option>
-
+                        <div class="col-md-6">
+                            <label asp-for="ConditionGrade" class="form-label fw-semibold text-dark">Condition Grade</label>
+                            <select asp-for="ConditionGrade" class="form-select">
+                                <option value="">Select Condition Grade</option>
+                                <option value="A">A - Excellent (Flawless cosmetic condition)</option>
+                                <option value="B">B - Good (Minor scratches or scuffs)</option>
+                                <option value="C">C - Fair (Noticeable wear, still usable)</option>
+                                <option value="D">D - Poor (Deep scratches, minor cracks)</option>
+                                <option value="E">E - Very Poor (Heavily worn or broken casing)</option>
+                                <option value="F">F - Heavily Damaged (Cracked screen / dead hardware)</option>
                             </select>
-
-                            <span asp-validation-for="ConditionGrade"
-                                  class="text-danger"></span>
+                            <span asp-validation-for="ConditionGrade" class="text-danger small"></span>
                         </div>
-
 
                         <!-- Damage Type -->
-                        <div class="mb-3">
-                            <label asp-for="DamageType"
-                                   class="form-label">
-                                Primary Damage Type
-                            </label>
-
-                            <select asp-for="DamageType"
-                                    class="form-select">
-
+                        <div class="col-md-6">
+                            <label asp-for="DamageType" class="form-label fw-semibold text-dark">Primary Issue / Damage</label>
+                            <select asp-for="DamageType" class="form-select">
                                 <option value="">Select Damage Type</option>
-                                <option value="Screen">Screen</option>
-                                <option value="Battery">Battery</option>
-                                <option value="Water Damage">Water Damage</option>
-                                <option value="Camera">Camera</option>
-                                <option value="Charging Port">Charging Port</option>
-                                <option value="Software">Software</option>
-                                <option value="Other">Other</option>
-
+                                <option value="Screen">Screen (Cracked, dead pixels, touch unresponsive)</option>
+                                <option value="Battery">Battery (Rapid drain, swollen, doesn't charge)</option>
+                                <option value="Water Damage">Water Damage (Liquid spill, corrosion)</option>
+                                <option value="Camera">Camera (Lens cracked, sensor failure)</option>
+                                <option value="Charging Port">Charging Port (Loose connector, bent pins)</option>
+                                <option value="Software">Software (Boot loop, OS crash)</option>
+                                <option value="Other">Other / Motherboard</option>
                             </select>
-
-                            <span asp-validation-for="DamageType"
-                                  class="text-danger"></span>
+                            <span asp-validation-for="DamageType" class="text-danger small"></span>
                         </div>
-
 
                         <!-- Description -->
-                        <div class="mb-3">
-                            <label asp-for="ConditionDescription"
-                                   class="form-label">
-                                Detailed Description
-                            </label>
-
-                            <textarea asp-for="ConditionDescription"
-                                      class="form-control"
-                                      rows="4"
-                                      placeholder="Describe the device condition and damage"></textarea>
-
-                            <span asp-validation-for="ConditionDescription"
-                                  class="text-danger"></span>
+                        <div class="col-12">
+                            <label asp-for="ConditionDescription" class="form-label fw-semibold text-dark">Detailed Description</label>
+                            <textarea asp-for="ConditionDescription" class="form-control" rows="4"
+                                      placeholder="Describe what works, what doesn't, previous repairs, and included accessories..."></textarea>
+                            <span asp-validation-for="ConditionDescription" class="text-danger small"></span>
                         </div>
-
                     </div>
                 </div>
+            </div>
 
-
-                <!-- Pricing & Location -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Pricing & Location</h5>
+            <!-- Card 3: Pricing & Location -->
+            <div class="card border-0 shadow-sm mb-4" style="border-radius: 20px; border: 1px solid var(--sdm-border) !important;">
+                <div class="card-body p-4 p-md-5">
+                    <div class="d-flex align-items-center gap-3 mb-4 pb-2 border-bottom">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center"
+                             style="width: 40px; height: 40px; background: #DCFCE7; color: #16A34A; font-size: 18px;">
+                            <i class="bi bi-cash-stack"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold text-dark mb-0">Pricing, Location & Photos</h5>
+                            <small class="text-muted">Set expectations and upload clear photos</small>
+                        </div>
                     </div>
 
-                    <div class="card-body">
-
+                    <div class="row g-3">
                         <!-- Asking Price -->
-                        <div class="mb-3">
-                            <label asp-for="AskingPrice"
-                                   class="form-label">
-                                Asking Price
-                            </label>
-
+                        <div class="col-md-6">
+                            <label asp-for="AskingPrice" class="form-label fw-semibold text-dark">Asking Price</label>
                             <div class="input-group">
-                                <span class="input-group-text">₹</span>
-
-                                <input asp-for="AskingPrice"
-                                       class="form-control"
-                                       type="number"
-                                       step="0.01"
-                                       placeholder="0.00" />
+                                <span class="input-group-text bg-light border-end-0 fw-bold">₹</span>
+                                <input asp-for="AskingPrice" class="form-control border-start-0 ps-0" type="number" step="0.01" placeholder="0.00" />
                             </div>
-
-                            <span asp-validation-for="AskingPrice"
-                                  class="text-danger"></span>
+                            <span asp-validation-for="AskingPrice" class="text-danger small"></span>
                         </div>
-
 
                         <!-- Estimated Value -->
-                        <div class="mb-3">
-                            <label asp-for="EstimatedValue"
-                                   class="form-label">
-                                Estimated Value (Optional)
-                            </label>
-
+                        <div class="col-md-6">
+                            <label asp-for="EstimatedValue" class="form-label fw-semibold text-dark">Estimated Value (Optional)</label>
                             <div class="input-group">
-                                <span class="input-group-text">₹</span>
-
-                                <input asp-for="EstimatedValue"
-                                       class="form-control"
-                                       type="number"
-                                       step="0.01"
-                                       placeholder="0.00" />
+                                <span class="input-group-text bg-light border-end-0 fw-bold">₹</span>
+                                <input asp-for="EstimatedValue" class="form-control border-start-0 ps-0" type="number" step="0.01" placeholder="0.00" />
                             </div>
-
-                            <span asp-validation-for="EstimatedValue"
-                                  class="text-danger"></span>
+                            <span asp-validation-for="EstimatedValue" class="text-danger small"></span>
                         </div>
-
 
                         <!-- City -->
-                        <div class="mb-3">
-                            <label asp-for="City"
-                                   class="form-label">
-                                City
-                            </label>
-
-                            <input asp-for="City"
-                                   class="form-control"
-                                   placeholder="Enter city" />
-
-                            <span asp-validation-for="City"
-                                  class="text-danger"></span>
+                        <div class="col-md-4">
+                            <label asp-for="City" class="form-label fw-semibold text-dark">City</label>
+                            <input asp-for="City" class="form-control" placeholder="e.g. Mumbai" />
+                            <span asp-validation-for="City" class="text-danger small"></span>
                         </div>
-
 
                         <!-- State -->
-                        <div class="mb-3">
-                            <label asp-for="State"
-                                   class="form-label">
-                                State
-                            </label>
-
-                            <input asp-for="State"
-                                   class="form-control"
-                                   placeholder="Enter state" />
-
-                            <span asp-validation-for="State"
-                                  class="text-danger"></span>
+                        <div class="col-md-4">
+                            <label asp-for="State" class="form-label fw-semibold text-dark">State</label>
+                            <input asp-for="State" class="form-control" placeholder="e.g. Maharashtra" />
+                            <span asp-validation-for="State" class="text-danger small"></span>
                         </div>
-
 
                         <!-- Pin Code -->
-                        <div class="mb-3">
-                            <label asp-for="PinCode"
-                                   class="form-label">
-                                Pin Code
-                            </label>
-
-                            <input asp-for="PinCode"
-                                   class="form-control"
-                                   placeholder="Enter pin code" />
-
-                            <span asp-validation-for="PinCode"
-                                  class="text-danger"></span>
+                        <div class="col-md-4">
+                            <label asp-for="PinCode" class="form-label fw-semibold text-dark">PIN Code</label>
+                            <input asp-for="PinCode" class="form-control" placeholder="e.g. 400001" />
+                            <span asp-validation-for="PinCode" class="text-danger small"></span>
                         </div>
 
-
-                        <!-- Images -->
-                        <div class="mb-3">
-                            <label class="form-label">
-                                Device Images
-                            </label>
-
-                            <input type="file"
-                                   name="images"
-                                   class="form-control"
-                                   accept="image/*"
-                                   multiple />
-
-                            <small class="text-muted">
-                                You can select multiple images.
+                        <!-- Images Upload -->
+                        <div class="col-12 mt-3">
+                            <label class="form-label fw-semibold text-dark">Device Photos</label>
+                            <input type="file" name="images" class="form-control" accept="image/*" multiple />
+                            <small class="text-muted d-block mt-1">
+                                <i class="bi bi-info-circle me-1"></i> You can select multiple clear photos showing the front, back, and any visible damage.
                             </small>
                         </div>
 
-
-                        <!-- Urgent -->
-                        <div class="form-check mb-3">
-
-                            <input asp-for="IsUrgent"
-                                   class="form-check-input" />
-
-                            <label asp-for="IsUrgent"
-                                   class="form-check-label">
-
-                                Mark as Urgent Sale
-
-                                <small class="text-muted">
-                                    (Need to sell/repair within 48 hours)
-                                </small>
-
-                            </label>
-
+                        <!-- Urgent Switch -->
+                        <div class="col-12 mt-3">
+                            <div class="form-check form-switch p-3 rounded-3" style="background: #FDF4F2; border: 1px solid #FCE4DC;">
+                                <input asp-for="IsUrgent" class="form-check-input ms-0 me-3" role="switch" style="cursor: pointer;" />
+                                <label asp-for="IsUrgent" class="form-check-label fw-semibold text-dark" style="cursor: pointer;">
+                                    Mark as Urgent Listing
+                                    <span class="d-block text-muted small fw-normal">
+                                        Highlights your device for repair shops and buyers needing swift resolution within 48 hours.
+                                    </span>
+                                </label>
+                            </div>
                         </div>
-
                     </div>
                 </div>
+            </div>
 
+            <!-- Action Buttons -->
+            <div class="d-flex align-items-center justify-content-end gap-3 mb-5">
+                <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 py-2">
+                    Cancel
+                </a>
+                <button type="submit" class="btn btn-terracotta rounded-pill px-5 py-2 fs-6">
+                    <i class="bi bi-check2-circle me-1"></i> Publish Listing
+                </button>
+            </div>
 
-                <!-- Buttons -->
-                <div class="d-flex gap-2 mb-5">
+        </form>
 
-                    <button type="submit"
-                            class="btn btn-primary">
-                        Publish Listing
-                    </button>
-
-                    <a asp-action="Index"
-                       class="btn btn-secondary">
-                        Cancel
-                    </a>
-
-                </div>
-
-            </form>
-
-        </div>
     </div>
 </div>
-
 
 @section Scripts {
     @{

@@ -1,226 +1,207 @@
-﻿@model IEnumerable<SmartDeviceMatch.Models.Offer>
+@model IEnumerable<SmartDeviceMatch.Models.Offer>
 
 @{
     ViewData["Title"] = "Manage Offers";
 }
 
-<div class="container mt-4 mb-5">
+<div class="container-fluid px-0">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
         <div>
-            <h2>Manage Offers</h2>
-            <p class="text-muted mb-0">
-                View all offers and transactions on SmartDeviceMatch.
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge rounded-pill" style="background: rgba(186, 60, 42, 0.1); color: var(--sdm-primary); font-weight: 600;">
+                    <i class="bi bi-shield-lock me-1"></i> Admin Console
+                </span>
+            </div>
+            <h2 class="fw-bold text-dark mb-1">Manage Offers</h2>
+            <p class="text-muted small mb-0">
+                Audit, track, and oversee all repair bids, purchase offers, and escrow transactions across the platform.
             </p>
         </div>
 
-        <a asp-controller="Admin"
-           asp-action="Index"
-           class="btn btn-outline-secondary">
-            ← Back to Dashboard
+        <a asp-controller="Admin" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
         </a>
     </div>
 
-
     @if (!Model.Any())
     {
-        <div class="card shadow-sm">
-            <div class="card-body text-center p-5">
-                <h5>No offers found</h5>
-                <p class="text-muted mb-0">
-                    There are currently no offers in the system.
-                </p>
+        <div class="card sdm-card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                     style="width: 64px; height: 64px; background: #F8F6F2; color: #8C827A;">
+                    <i class="bi bi-tag" style="font-size: 28px;"></i>
+                </div>
+                <h5 class="fw-bold text-dark mb-1">No offers found</h5>
+                <p class="text-muted small mb-0">There are currently no offers or escrow records in the system.</p>
             </div>
         </div>
     }
     else
     {
-        <div class="card shadow-sm">
+        <div class="card sdm-card border-0 shadow-sm overflow-hidden">
+            <div class="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+                <span class="fw-bold text-dark">
+                    <i class="bi bi-receipt me-2 text-muted"></i>All Marketplace Offers
+                </span>
+                <span class="badge rounded-pill bg-light text-secondary border px-3 py-2">
+                    Total: @Model.Count()
+                </span>
+            </div>
 
-            <div class="card-body">
-
+            <div class="card-body p-0">
                 <div class="table-responsive">
-
-                    <table class="table table-hover align-middle">
-
-                        <thead class="table-light">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead style="background: #FAF8F5; font-size: 0.85rem;" class="text-uppercase text-muted border-bottom">
                             <tr>
-                                <th>ID</th>
-                                <th>Device</th>
-                                <th>Offer Type</th>
-                                <th>Buyer</th>
-                                <th>Repair Shop</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                                <th>Expires</th>
+                                <th class="ps-4 py-3">ID</th>
+                                <th class="py-3">Device</th>
+                                <th class="py-3">Offer Type</th>
+                                <th class="py-3">Buyer / Client</th>
+                                <th class="py-3">Repair Shop</th>
+                                <th class="py-3">Amount</th>
+                                <th class="py-3">Status</th>
+                                <th class="pe-4 py-3 text-end">Expires</th>
                             </tr>
                         </thead>
-
                         <tbody>
-
                             @foreach (var offer in Model)
                             {
                                 <tr>
-
-                                    <td>
-                                        <strong>#@offer.Id</strong>
+                                    <td class="ps-4 py-3">
+                                        <span class="fw-bold text-dark font-monospace">#@offer.Id</span>
                                     </td>
 
-
-                                    <td>
+                                    <td class="py-3">
                                         @if (offer.Device != null)
                                         {
-                                            <div>
-                                                <strong>
-                                                    @offer.Device.BrandName
-                                                    @offer.Device.ModelName
-                                                </strong>
-
-                                                <br />
-
-                                                <small class="text-muted">
-                                                    @offer.Device.Category?.Name
-                                                </small>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="rounded-3 d-flex align-items-center justify-content-center text-muted"
+                                                     style="width: 36px; height: 36px; background: #F4F1EA; font-size: 16px;">
+                                                    <i class="bi bi-phone"></i>
+                                                </div>
+                                                <div>
+                                                    <a asp-controller="Device" asp-action="Details" asp-route-id="@offer.Device.Id" 
+                                                       class="fw-bold text-dark text-decoration-none hover-underline">
+                                                        @offer.Device.BrandName @offer.Device.ModelName
+                                                    </a>
+                                                    <br />
+                                                    <small class="text-muted">@offer.Device.Category?.Name</small>
+                                                </div>
                                             </div>
                                         }
                                         else
                                         {
-                                            <span class="text-muted">
-                                                Device unavailable
-                                            </span>
+                                            <span class="text-muted small">Device unavailable</span>
                                         }
                                     </td>
 
-
-                                    <td>
-
+                                    <td class="py-3">
                                         @if (offer.OfferType == "Repair")
                                         {
-                                            <span class="badge bg-warning text-dark">
-                                                Repair
+                                            <span class="badge rounded-pill" style="background: rgba(245, 158, 11, 0.15); color: #D97706; font-weight: 600;">
+                                                <i class="bi bi-tools me-1"></i>Repair Bid
                                             </span>
                                         }
                                         else if (offer.OfferType == "Buy")
                                         {
-                                            <span class="badge bg-primary">
-                                                Buy
+                                            <span class="badge rounded-pill" style="background: rgba(37, 99, 235, 0.1); color: #2563EB; font-weight: 600;">
+                                                <i class="bi bi-bag-check me-1"></i>Purchase
                                             </span>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-secondary">
+                                            <span class="badge rounded-pill bg-light text-secondary border">
                                                 @offer.OfferType
                                             </span>
                                         }
-
                                     </td>
 
-
-                                    <td>
+                                    <td class="py-3">
                                         @if (offer.Buyer != null)
                                         {
-                                            @offer.Buyer.FullName
+                                            <div class="fw-semibold text-dark">@offer.Buyer.FullName</div>
+                                            <small class="text-muted">Buyer #@offer.BuyerId</small>
                                         }
                                         else
                                         {
-                                            <span class="text-muted">
-                                                —
-                                            </span>
+                                            <span class="text-muted">—</span>
                                         }
                                     </td>
 
-
-                                    <td>
+                                    <td class="py-3">
                                         @if (offer.RepairShop?.User != null)
                                         {
-                                            @offer.RepairShop.User.FullName
+                                            <div class="fw-semibold text-dark">@offer.RepairShop.ShopName</div>
+                                            <small class="text-muted">Owner: @offer.RepairShop.User.FullName</small>
                                         }
                                         else
                                         {
-                                            <span class="text-muted">
-                                                —
-                                            </span>
+                                            <span class="text-muted">—</span>
                                         }
                                     </td>
 
-
-                                    <td>
-                                        <strong>
-                                            @offer.Currency
-                                            @offer.OfferAmount.ToString("N2")
-                                        </strong>
+                                    <td class="py-3">
+                                        <span class="fw-bold fs-6 text-dark">
+                                            @offer.Currency @offer.OfferAmount.ToString("N2")
+                                        </span>
                                     </td>
 
-
-                                    <td>
-
+                                    <td class="py-3">
                                         @if (offer.Status == "Pending")
                                         {
-                                            <span class="badge bg-warning text-dark">
+                                            <span class="badge rounded-pill" style="background: rgba(245, 158, 11, 0.15); color: #D97706; font-weight: 600;">
                                                 Pending
                                             </span>
                                         }
                                         else if (offer.Status == "Accepted")
                                         {
-                                            <span class="badge bg-success">
+                                            <span class="badge rounded-pill" style="background: rgba(16, 185, 129, 0.12); color: #059669; font-weight: 600;">
                                                 Accepted
                                             </span>
                                         }
                                         else if (offer.Status == "Rejected")
                                         {
-                                            <span class="badge bg-danger">
+                                            <span class="badge rounded-pill bg-light text-danger border border-danger-subtle">
                                                 Rejected
                                             </span>
                                         }
                                         else if (offer.Status == "Escrowed")
                                         {
-                                            <span class="badge bg-primary">
-                                                Escrowed
+                                            <span class="badge rounded-pill" style="background: rgba(37, 99, 235, 0.12); color: #1D4ED8; font-weight: 600;">
+                                                <i class="bi bi-shield-check me-1"></i>Escrowed
                                             </span>
                                         }
                                         else if (offer.Status == "Verified")
                                         {
-                                            <span class="badge bg-info text-dark">
-                                                Verified
+                                            <span class="badge rounded-pill" style="background: rgba(14, 165, 233, 0.12); color: #0284C7; font-weight: 600;">
+                                                <i class="bi bi-check2-all me-1"></i>Verified
                                             </span>
                                         }
-                                        else if (offer.Status == "Released")
+                                        else if (offer.Status == "Released" || offer.Status == "Completed")
                                         {
-                                            <span class="badge bg-info text-dark">
-                                                Released
-                                            </span>
-                                        }
-                                        else if (offer.Status == "Completed")
-                                        {
-                                            <span class="badge bg-success">
-                                                Completed
+                                            <span class="badge rounded-pill" style="background: rgba(16, 185, 129, 0.12); color: #059669; font-weight: 600;">
+                                                <i class="bi bi-patch-check-fill me-1"></i>Completed
                                             </span>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-secondary">
+                                            <span class="badge rounded-pill bg-light text-secondary border">
                                                 @offer.Status
                                             </span>
                                         }
-
                                     </td>
 
-
-                                    <td>
+                                    <td class="pe-4 py-3 text-end text-muted small">
                                         @offer.ExpiresAt.ToString("dd MMM yyyy")
                                     </td>
-
                                 </tr>
                             }
-
                         </tbody>
-
                     </table>
-
                 </div>
-
             </div>
-
         </div>
     }
 

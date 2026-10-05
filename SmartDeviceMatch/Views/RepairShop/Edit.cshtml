@@ -1,238 +1,108 @@
-﻿@model SmartDeviceMatch.Models.RepairShop
+@model SmartDeviceMatch.Models.RepairShop
 
 @{
     ViewData["Title"] = "Edit Shop Profile";
 }
 
-<div class="container mt-4 mb-5">
-
-    <div class="row justify-content-center">
-
-        <div class="col-lg-8">
-
-            <div class="mb-4">
-
-                <h2>Edit Shop Profile</h2>
-
-                <p class="text-muted">
-                    Update your repair shop's business information.
-                </p>
-
-            </div>
-
-
-            <form asp-action="Edit" method="post">
-
-                @Html.AntiForgeryToken()
-
-                <input type="hidden"
-                       asp-for="Id" />
-
-
-                <div asp-validation-summary="ModelOnly"
-                     class="text-danger mb-3">
-                </div>
-
-
-                <div class="card shadow-sm mb-4">
-
-                    <div class="card-header">
-                        <h5 class="mb-0">
-                            Business Information
-                        </h5>
-                    </div>
-
-                    <div class="card-body">
-
-                        <div class="mb-3">
-
-                            <label asp-for="ShopName"
-                                   class="form-label">
-                                Shop Name
-                            </label>
-
-                            <input asp-for="ShopName"
-                                   class="form-control" />
-
-                            <span asp-validation-for="ShopName"
-                                  class="text-danger">
-                            </span>
-
-                        </div>
-
-
-                        <div class="mb-3">
-
-                            <label asp-for="Description"
-                                   class="form-label">
-                                Description
-                            </label>
-
-                            <textarea asp-for="Description"
-                                      class="form-control"
-                                      rows="4"
-                                      placeholder="Describe your repair services...">
-                            </textarea>
-
-                            <span asp-validation-for="Description"
-                                  class="text-danger">
-                            </span>
-
-                        </div>
-
-
-                        <div class="row">
-
-                            <div class="col-md-6 mb-3">
-
-                                <label asp-for="LicenseNumber"
-                                       class="form-label">
-                                    License Number
-                                </label>
-
-                                <input asp-for="LicenseNumber"
-                                       class="form-control"
-                                       placeholder="Optional" />
-
-                                <span asp-validation-for="LicenseNumber"
-                                      class="text-danger">
-                                </span>
-
-                            </div>
-
-
-                            <div class="col-md-6 mb-3">
-
-                                <label asp-for="YearsOfExperience"
-                                       class="form-label">
-                                    Years of Experience
-                                </label>
-
-                                <input asp-for="YearsOfExperience"
-                                       type="number"
-                                       min="0"
-                                       class="form-control" />
-
-                                <span asp-validation-for="YearsOfExperience"
-                                      class="text-danger">
-                                </span>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="mb-3">
-
-                            <label asp-for="OperatingHours"
-                                   class="form-label">
-                                Operating Hours
-                            </label>
-
-                            <input asp-for="OperatingHours"
-                                   class="form-control"
-                                   placeholder="e.g. Mon-Sat, 9:00 AM - 7:00 PM" />
-
-                            <span asp-validation-for="OperatingHours"
-                                  class="text-danger">
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="card shadow-sm mb-4">
-
-                    <div class="card-header">
-                        <h5 class="mb-0">
-                            Location
-                        </h5>
-                    </div>
-
-                    <div class="card-body">
-
-                        <div class="row">
-
-                            <div class="col-md-6 mb-3">
-
-                                <label asp-for="City"
-                                       class="form-label">
-                                    City
-                                </label>
-
-                                <input asp-for="City"
-                                       class="form-control" />
-
-                                <span asp-validation-for="City"
-                                      class="text-danger">
-                                </span>
-
-                            </div>
-
-
-                            <div class="col-md-6 mb-3">
-
-                                <label asp-for="State"
-                                       class="form-label">
-                                    State
-                                </label>
-
-                                <input asp-for="State"
-                                       class="form-control" />
-
-                                <span asp-validation-for="State"
-                                      class="text-danger">
-                                </span>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="mb-3">
-
-                            <label asp-for="PinCode"
-                                   class="form-label">
-                                PIN Code
-                            </label>
-
-                            <input asp-for="PinCode"
-                                   class="form-control" />
-
-                            <span asp-validation-for="PinCode"
-                                  class="text-danger">
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-
-                <div class="d-flex justify-content-between">
-
-                    <a asp-action="Index"
-                       class="btn btn-outline-secondary">
-                        Cancel
-                    </a>
-
-                    <button type="submit"
-                            class="btn btn-primary">
-                        Save Changes
-                    </button>
-
-                </div>
-
-            </form>
-
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+
+        <!-- Header -->
+        <div class="mb-4">
+            <h2 class="fw-bold text-dark mb-1">Edit Shop Profile</h2>
+            <p class="text-muted mb-0">Update your workshop's details, capabilities, and business address.</p>
         </div>
 
-    </div>
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
 
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <!-- Card 1: Business Details -->
+            <div class="card border-0 shadow-sm mb-4" style="border-radius: 20px; border: 1px solid var(--sdm-border) !important;">
+                <div class="card-body p-4 p-md-5">
+                    <h5 class="fw-bold text-dark mb-4 pb-2 border-bottom">
+                        <i class="bi bi-building text-secondary me-2"></i>Business Details
+                    </h5>
+
+                    <div class="mb-3">
+                        <label asp-for="ShopName" class="form-label fw-semibold text-dark">Shop Name</label>
+                        <input asp-for="ShopName" class="form-control" placeholder="Business or Trade Name" required />
+                        <span asp-validation-for="ShopName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label fw-semibold text-dark">Description</label>
+                        <textarea asp-for="Description" class="form-control" rows="4"
+                                  placeholder="Describe your specialties, warranty policy, repair facilities..."></textarea>
+                        <span asp-validation-for="Description" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="LicenseNumber" class="form-label fw-semibold text-dark">Business License / Tax ID</label>
+                            <input asp-for="LicenseNumber" class="form-control" placeholder="Optional" />
+                            <span asp-validation-for="LicenseNumber" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="YearsOfExperience" class="form-label fw-semibold text-dark">Years of Experience</label>
+                            <input asp-for="YearsOfExperience" type="number" min="0" class="form-control" />
+                            <span asp-validation-for="YearsOfExperience" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="OperatingHours" class="form-label fw-semibold text-dark">Operating Hours</label>
+                            <input asp-for="OperatingHours" class="form-control" placeholder="e.g. Mon-Sat, 9:00 AM - 7:00 PM" />
+                            <span asp-validation-for="OperatingHours" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Location -->
+            <div class="card border-0 shadow-sm mb-4" style="border-radius: 20px; border: 1px solid var(--sdm-border) !important;">
+                <div class="card-body p-4 p-md-5">
+                    <h5 class="fw-bold text-dark mb-4 pb-2 border-bottom">
+                        <i class="bi bi-geo-alt text-secondary me-2"></i>Location
+                    </h5>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="City" class="form-label fw-semibold text-dark">City</label>
+                            <input asp-for="City" class="form-control" />
+                            <span asp-validation-for="City" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label asp-for="State" class="form-label fw-semibold text-dark">State</label>
+                            <input asp-for="State" class="form-control" />
+                            <span asp-validation-for="State" class="text-danger small"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label asp-for="PinCode" class="form-label fw-semibold text-dark">Postal / PIN Code</label>
+                            <input asp-for="PinCode" class="form-control" />
+                            <span asp-validation-for="PinCode" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="d-flex justify-content-end gap-2 mb-5">
+                <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+                    Cancel
+                </a>
+                <button type="submit" class="btn btn-terracotta rounded-pill px-5">
+                    Save Changes
+                </button>
+            </div>
+
+        </form>
+
+    </div>
 </div>
 
 @section Scripts {

@@ -1,675 +1,333 @@
-﻿@model SmartDeviceMatch.ViewModels.AdminDashboardViewModel
+@model SmartDeviceMatch.ViewModels.AdminDashboardViewModel
 
 @{
     ViewData["Title"] = "Admin Dashboard";
 }
 
-<div class="container-fluid mt-4 mb-5">
+<div class="d-flex flex-column gap-4">
 
-    <!-- HEADER -->
-    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
         <div>
-            <h2 class="fw-bold">Admin Dashboard</h2>
+            <h2 class="fw-bold text-dark mb-1">Administrator Dashboard</h2>
             <p class="text-muted mb-0">
-                Monitor marketplace performance and platform activity.
+                Platform-wide telemetry, user activity, hardware supply, and escrow settlements.
             </p>
         </div>
 
-        <span class="badge bg-dark p-2">
-            Administrator
-        </span>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge rounded-pill px-3 py-2 bg-dark text-white">
+                <i class="bi bi-shield-lock-fill me-1"></i> Root Administrator
+            </span>
+            <a asp-action="Disputes" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                <i class="bi bi-exclamation-triangle me-1"></i> Disputes
+            </a>
+        </div>
     </div>
 
-    <!-- ADMIN MESSAGE -->
+    <!-- Admin Message -->
     @if (TempData["AdminMessage"] != null)
     {
-        <div class="alert alert-info alert-dismissible fade show">
-            @TempData["AdminMessage"]
-
-            <button type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert">
-            </button>
+        <div class="alert alert-info alert-dismissible fade show rounded-3 border-0 shadow-sm">
+            <i class="bi bi-info-circle me-1"></i> @TempData["AdminMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     }
 
-    <!-- USER ANALYTICS -->
-    <h5 class="fw-semibold mb-3">User Analytics</h5>
+    <!-- Quick Navigation Bar -->
+    <div class="card border-0 shadow-sm p-3" style="border-radius: 16px; border: 1px solid var(--sdm-border) !important; background: #FFFFFF;">
+        <div class="d-flex flex-wrap gap-2">
+            <a asp-action="Users" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                <i class="bi bi-people me-1"></i> Users
+            </a>
+            <a asp-action="Devices" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                <i class="bi bi-phone me-1"></i> Devices
+            </a>
+            <a asp-action="RepairShops" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                <i class="bi bi-shop me-1"></i> Repair Shops
+            </a>
+            <a asp-action="Offers" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                <i class="bi bi-tag me-1"></i> Offers
+            </a>
+            <a asp-action="Reviews" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                <i class="bi bi-star me-1"></i> Reviews
+            </a>
+            <a asp-action="Disputes" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                <i class="bi bi-exclamation-octagon me-1"></i> Disputes
+            </a>
+        </div>
+    </div>
 
-    <div class="row g-3 mb-4">
-
-        <div class="col-6 col-lg-3">
-            <div class="card shadow-sm h-100 border-0">
-                <div class="card-body">
-                    <small class="text-muted">Total Users</small>
-                    <h3 class="fw-bold mt-2">@Model.TotalUsers</h3>
+    <!-- 1. USER ANALYTICS ROW -->
+    <div>
+        <h6 class="fw-bold text-dark text-uppercase small mb-3">User & Account Analytics</h6>
+        <div class="row g-3">
+            <div class="col-6 col-lg-3">
+                <div class="card border-0 shadow-sm p-4 h-100" style="border-radius: 18px; border: 1px solid var(--sdm-border) !important;">
+                    <span class="text-muted small fw-semibold">Total Accounts</span>
+                    <h3 class="fw-bold text-dark my-2">@Model.TotalUsers</h3>
                     <small class="text-muted">Registered profiles</small>
                 </div>
             </div>
-        </div>
 
-        <div class="col-6 col-lg-3">
-            <div class="card shadow-sm h-100 border-0">
-                <div class="card-body">
-                    <small class="text-muted">Device Owners</small>
-                    <h3 class="fw-bold mt-2">@Model.DeviceOwners</h3>
-                    <small class="text-muted">Listing users</small>
+            <div class="col-6 col-lg-3">
+                <div class="card border-0 shadow-sm p-4 h-100" style="border-radius: 18px; border: 1px solid var(--sdm-border) !important;">
+                    <span class="text-muted small fw-semibold">Device Owners</span>
+                    <h3 class="fw-bold my-2" style="color: var(--sdm-primary);">@Model.DeviceOwners</h3>
+                    <small class="text-muted">Listing electronics</small>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="card border-0 shadow-sm p-4 h-100" style="border-radius: 18px; border: 1px solid var(--sdm-border) !important;">
+                    <span class="text-muted small fw-semibold">Buyers</span>
+                    <h3 class="fw-bold text-primary my-2">@Model.Buyers</h3>
+                    <small class="text-muted">Refurbished hardware buyers</small>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="card border-0 shadow-sm p-4 h-100" style="border-radius: 18px; border: 1px solid var(--sdm-border) !important;">
+                    <span class="text-muted small fw-semibold">Banned Accounts</span>
+                    <h3 class="fw-bold text-danger my-2">@Model.BannedUsers</h3>
+                    <small class="text-muted">Restricted users</small>
                 </div>
             </div>
         </div>
-
-        <div class="col-6 col-lg-3">
-            <div class="card shadow-sm h-100 border-0">
-                <div class="card-body">
-                    <small class="text-muted">Buyers</small>
-                    <h3 class="fw-bold mt-2">@Model.Buyers</h3>
-                    <small class="text-muted">Marketplace buyers</small>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-6 col-lg-3">
-            <div class="card shadow-sm h-100 border-0">
-                <div class="card-body">
-                    <small class="text-muted">Banned Users</small>
-                    <h3 class="fw-bold mt-2">@Model.BannedUsers</h3>
-                    <small class="text-muted">Restricted accounts</small>
-                </div>
-            </div>
-        </div>
-
     </div>
 
-    <!-- REPAIR SHOP ANALYTICS -->
-    <h5 class="fw-semibold mb-3">Repair Shop Analytics</h5>
+    <!-- 2. REPAIR SHOP ANALYTICS -->
+    <div>
+        <h6 class="fw-bold text-dark text-uppercase small mb-3">Repair Shop Verification Pipeline</h6>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm p-4 h-100" style="border-radius: 18px; border: 1px solid var(--sdm-border) !important;">
+                    <span class="text-muted small fw-semibold">Total Service Shops</span>
+                    <h3 class="fw-bold text-dark my-2">@Model.TotalRepairShops</h3>
+                    <small class="text-muted">Technicians enrolled</small>
+                </div>
+            </div>
 
-    <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm p-4 h-100" style="border-radius: 18px; border: 1px solid #DCFCE7 !important; background: #F0FDF4;">
+                    <span class="text-success small fw-semibold">Verified Centers</span>
+                    <h3 class="fw-bold text-success my-2">@Model.VerifiedRepairShops</h3>
+                    <small class="text-muted">Active trusted partners</small>
+                </div>
+            </div>
 
-        <div class="col-6 col-lg-4">
-            <div class="card shadow-sm h-100 border-0">
-                <div class="card-body">
-                    <small class="text-muted">Total Repair Shops</small>
-                    <h3 class="fw-bold mt-2">@Model.TotalRepairShops</h3>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm p-4 h-100" style="border-radius: 18px; border: 1px solid #FEF3C7 !important; background: #FFFDF5;">
+                    <span class="text-warning small fw-semibold">Pending Audit</span>
+                    <h3 class="fw-bold text-warning my-2">@Model.PendingRepairShops</h3>
+                    <small class="text-muted">Awaiting certificate approval</small>
                 </div>
             </div>
         </div>
-
-        <div class="col-6 col-lg-4">
-            <div class="card shadow-sm h-100 border-0">
-                <div class="card-body">
-                    <small class="text-muted">Verified Shops</small>
-                    <h3 class="fw-bold text-success mt-2">
-                        @Model.VerifiedRepairShops
-                    </h3>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-6 col-lg-4">
-            <div class="card shadow-sm h-100 border-0">
-                <div class="card-body">
-                    <small class="text-muted">Pending Verification</small>
-                    <h3 class="fw-bold text-warning mt-2">
-                        @Model.PendingRepairShops
-                    </h3>
-                </div>
-            </div>
-        </div>
-
     </div>
 
-    <!-- MARKETPLACE ANALYTICS -->
-    <h5 class="fw-semibold mb-3">Marketplace Analytics</h5>
-
-    <div class="row g-3 mb-4">
-
-        <div class="col-6 col-lg-3">
-            <div class="card shadow-sm h-100 border-0">
-                <div class="card-body">
+    <!-- 3. MARKETPLACE & TRANSACTIONS METRICS -->
+    <div>
+        <h6 class="fw-bold text-dark text-uppercase small mb-3">Marketplace Supply & Escrow Volume</h6>
+        <div class="row g-3">
+            <div class="col-6 col-lg-3">
+                <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 16px; border: 1px solid var(--sdm-border) !important;">
                     <small class="text-muted">Total Devices</small>
-                    <h3 class="fw-bold mt-2">@Model.TotalDevices</h3>
+                    <h4 class="fw-bold text-dark mt-1 mb-0">@Model.TotalDevices</h4>
                 </div>
             </div>
-        </div>
-
-        <div class="col-6 col-lg-3">
-            <div class="card shadow-sm h-100 border-0">
-                <div class="card-body">
+            <div class="col-6 col-lg-3">
+                <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 16px; border: 1px solid var(--sdm-border) !important;">
                     <small class="text-muted">Active Listings</small>
-                    <h3 class="fw-bold text-primary mt-2">
-                        @Model.ActiveListings
-                    </h3>
+                    <h4 class="fw-bold text-success mt-1 mb-0">@Model.ActiveListings</h4>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 16px; border: 1px solid var(--sdm-border) !important;">
+                    <small class="text-muted">Urgent Sale</small>
+                    <h4 class="fw-bold text-danger mt-1 mb-0">@Model.UrgentListings</h4>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 16px; border: 1px solid var(--sdm-border) !important;">
+                    <small class="text-muted">Under Repair</small>
+                    <h4 class="fw-bold text-warning mt-1 mb-0">@Model.DevicesInRepair</h4>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 16px; border: 1px solid var(--sdm-border) !important;">
+                    <small class="text-muted">Refurbished Stock</small>
+                    <h4 class="fw-bold text-primary mt-1 mb-0">@Model.RefurbishedDevices</h4>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 16px; border: 1px solid var(--sdm-border) !important;">
+                    <small class="text-muted">Total Bids/Offers</small>
+                    <h4 class="fw-bold text-dark mt-1 mb-0">@Model.TotalOffers</h4>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 16px; border: 1px solid var(--sdm-border) !important;">
+                    <small class="text-muted">Escrowed Funds</small>
+                    <h4 class="fw-bold text-info mt-1 mb-0">@Model.EscrowedTransactions</h4>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card border-0 shadow-sm p-3 h-100" style="border-radius: 16px; border: 1px solid var(--sdm-border) !important;">
+                    <small class="text-muted">Completed Deals</small>
+                    <h4 class="fw-bold text-success mt-1 mb-0">@Model.CompletedTransactions</h4>
                 </div>
             </div>
         </div>
-
-        <div class="col-6 col-lg-3">
-            <div class="card shadow-sm h-100 border-0">
-                <div class="card-body">
-                    <small class="text-muted">Urgent Listings</small>
-                    <h3 class="fw-bold text-danger mt-2">
-                        @Model.UrgentListings
-                    </h3>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-6 col-lg-3">
-            <div class="card shadow-sm h-100 border-0">
-                <div class="card-body">
-                    <small class="text-muted">Deleted Listings</small>
-                    <h3 class="fw-bold mt-2">@Model.DeletedDevices</h3>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-6 col-lg-4">
-            <div class="card shadow-sm h-100 border-0">
-                <div class="card-body">
-                    <small class="text-muted">Devices in Repair</small>
-                    <h3 class="fw-bold mt-2">@Model.DevicesInRepair</h3>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-6 col-lg-4">
-            <div class="card shadow-sm h-100 border-0">
-                <div class="card-body">
-                    <small class="text-muted">Refurbished Devices</small>
-                    <h3 class="fw-bold mt-2">@Model.RefurbishedDevices</h3>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-6 col-lg-4">
-            <div class="card shadow-sm h-100 border-0">
-                <div class="card-body">
-                    <small class="text-muted">Total Offers</small>
-                    <h3 class="fw-bold mt-2">@Model.TotalOffers</h3>
-                </div>
-            </div>
-        </div>
-
     </div>
 
-    <!-- TRANSACTION ANALYTICS -->
-    <h5 class="fw-semibold mb-3">Transaction Analytics</h5>
-
-    <div class="row g-3 mb-4">
-
-        <div class="col-6 col-lg-3">
-            <div class="card shadow-sm h-100 border-0">
-                <div class="card-body">
-                    <small class="text-muted">Pending Offers</small>
-                    <h3 class="fw-bold mt-2">@Model.PendingOffers</h3>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-6 col-lg-3">
-            <div class="card shadow-sm h-100 border-0">
-                <div class="card-body">
-                    <small class="text-muted">Accepted Offers</small>
-                    <h3 class="fw-bold mt-2">@Model.AcceptedOffers</h3>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-6 col-lg-3">
-            <div class="card shadow-sm h-100 border-0">
-                <div class="card-body">
-                    <small class="text-muted">Escrowed Transactions</small>
-                    <h3 class="fw-bold text-warning mt-2">
-                        @Model.EscrowedTransactions
-                    </h3>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-6 col-lg-3">
-            <div class="card shadow-sm h-100 border-0">
-                <div class="card-body">
-                    <small class="text-muted">Completed Transactions</small>
-                    <h3 class="fw-bold text-success mt-2">
-                        @Model.CompletedTransactions
-                    </h3>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- MATCH AND REVIEW ANALYTICS -->
-    <h5 class="fw-semibold mb-3">Platform Performance</h5>
-
-    <div class="row g-3 mb-4">
-
-        <div class="col-6 col-lg-3">
-            <div class="card shadow-sm h-100 border-0">
-                <div class="card-body">
-                    <small class="text-muted">Total Matches</small>
-                    <h3 class="fw-bold mt-2">@Model.TotalMatches</h3>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-6 col-lg-3">
-            <div class="card shadow-sm h-100 border-0">
-                <div class="card-body">
-                    <small class="text-muted">Active Matches</small>
-                    <h3 class="fw-bold mt-2">@Model.ActiveMatches</h3>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-6 col-lg-3">
-            <div class="card shadow-sm h-100 border-0">
-                <div class="card-body">
-                    <small class="text-muted">Total Reviews</small>
-                    <h3 class="fw-bold mt-2">@Model.TotalReviews</h3>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-6 col-lg-3">
-            <div class="card shadow-sm h-100 border-0">
-                <div class="card-body">
-                    <small class="text-muted">Average Rating</small>
-                    <h3 class="fw-bold text-warning mt-2">
-                        @Model.AverageRating.ToString("0.0") / 5
-                    </h3>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- CHART DATA -->
-    <div class="row g-3 mb-4">
-
-        <!-- SIX MONTH LISTING TREND -->
+    <!-- 4. TRENDS & GRAPHS -->
+    <div class="row g-4">
+        <!-- Six Month Listing Trend -->
         <div class="col-lg-7">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
+            <div class="card border-0 shadow-sm p-4 h-100" style="border-radius: 20px; border: 1px solid var(--sdm-border) !important;">
+                <h5 class="fw-bold text-dark mb-1">Listing Volume Trend</h5>
+                <p class="text-muted small mb-4">Hardware listings registered across the past 6 months.</p>
 
-                    <h5 class="fw-semibold mb-3">
-                        Device Listing Trend
-                    </h5>
+                @{
+                    var maxListingCount = Model.MonthlyListings.Select(x => x.Count).DefaultIfEmpty(0).Max();
+                }
 
-                    <p class="text-muted small">
-                        Listings created during the last six months.
-                    </p>
-
-                    @{
-                        var maxListingCount = Model.MonthlyListings
-                            .Select(x => x.Count)
-                            .DefaultIfEmpty(0)
-                            .Max();
-                    }
-
-                    @foreach (var item in Model.MonthlyListings)
-                    {
-                        var barWidth = maxListingCount > 0
-                            ? (double)item.Count / maxListingCount * 100
-                            : 0;
-
-                        <div class="mb-3">
-
-                            <div class="d-flex justify-content-between mb-1">
-                                <small>@item.Month</small>
-                                <small class="fw-semibold">@item.Count</small>
-                            </div>
-
-                            <div class="progress"
-                                 style="height: 12px;"
-                                 role="progressbar"
-                                 aria-valuenow="@item.Count"
-                                 aria-valuemin="0"
-                                 aria-valuemax="@maxListingCount">
-
-                                <div class="progress-bar bg-primary"
-                                     style="width: @barWidth.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)%">
-                                </div>
-
-                            </div>
-
+                @foreach (var item in Model.MonthlyListings)
+                {
+                    var barWidth = maxListingCount > 0 ? (double)item.Count / maxListingCount * 100 : 0;
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1 small">
+                            <span class="text-secondary fw-semibold">@item.Month</span>
+                            <span class="fw-bold text-dark">@item.Count listings</span>
                         </div>
-                    }
-
-                </div>
+                        <div class="progress" style="height: 10px; border-radius: 8px;">
+                            <div class="progress-bar" style="width: @barWidth.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)%; background-color: var(--sdm-primary);"></div>
+                        </div>
+                    </div>
+                }
             </div>
         </div>
 
-        <!-- DEVICE STATUS -->
+        <!-- Device Status Breakdown -->
         <div class="col-lg-5">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
+            <div class="card border-0 shadow-sm p-4 h-100" style="border-radius: 20px; border: 1px solid var(--sdm-border) !important;">
+                <h5 class="fw-bold text-dark mb-1">Status Distribution</h5>
+                <p class="text-muted small mb-3">Live state of devices in database.</p>
 
-                    <h5 class="fw-semibold mb-3">
-                        Device Status Breakdown
-                    </h5>
+                @if (Model.DeviceStatuses.Count == 0)
+                {
+                    <p class="text-muted small">No device records available.</p>
+                }
+                else
+                {
+                    <div class="d-flex flex-column gap-2">
+                        @foreach (var item in Model.DeviceStatuses)
+                        {
+                            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                <span class="text-secondary small fw-semibold">@item.Status</span>
+                                <span class="badge rounded-pill bg-light text-dark border px-3 py-1">@item.Count</span>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
 
-                    @if (Model.DeviceStatuses.Count == 0)
+    <!-- 5. RECENT USERS TABLE -->
+    <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 20px; border: 1px solid var(--sdm-border) !important;">
+        <div class="d-flex justify-content-between align-items-center p-4 border-bottom bg-white">
+            <h5 class="fw-bold text-dark mb-0">Recent User Registrations</h5>
+            <a asp-action="Users" class="btn btn-sm btn-outline-secondary rounded-pill px-3">View All Users</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead style="background: #F9F7F3;">
+                    <tr>
+                        <th class="py-3 px-4 text-secondary small fw-bold text-uppercase">Full Name</th>
+                        <th class="py-3 px-3 text-secondary small fw-bold text-uppercase">Role</th>
+                        <th class="py-3 px-3 text-secondary small fw-bold text-uppercase">City</th>
+                        <th class="py-3 px-3 text-secondary small fw-bold text-uppercase">Joined</th>
+                        <th class="py-3 px-4 text-secondary small fw-bold text-uppercase text-end">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.RecentUsers.Count == 0)
                     {
-                        <p class="text-muted">
-                            No active device records available.
-                        </p>
+                        <tr><td colspan="5" class="text-center text-muted p-4">No users registered yet.</td></tr>
                     }
                     else
                     {
-                        @foreach (var item in Model.DeviceStatuses)
+                        @foreach (var user in Model.RecentUsers)
                         {
-                            <div class="d-flex justify-content-between
-                                align-items-center border-bottom py-3">
-
-                                <span>@item.Status</span>
-
-                                <span class="badge bg-primary rounded-pill">
-                                    @item.Count
-                                </span>
-
-                            </div>
+                            <tr style="border-bottom: 1px solid #F4EFEA;">
+                                <td class="py-3 px-4 fw-bold text-dark">@user.FullName</td>
+                                <td class="py-3 px-3"><span class="badge rounded-pill bg-light text-secondary border">@user.UserType</span></td>
+                                <td class="py-3 px-3 text-muted small">@(user.City ?? "—")</td>
+                                <td class="py-3 px-3 text-muted small">@user.CreatedAt.ToString("MMM dd, yyyy")</td>
+                                <td class="py-3 px-4 text-end">
+                                    @if (user.IsBanned)
+                                    {
+                                        <span class="badge rounded-pill bg-danger">Banned</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge rounded-pill px-3 py-1" style="background: #DCFCE7; color: #16A34A;">Active</span>
+                                    }
+                                </td>
+                            </tr>
                         }
                     }
-
-                </div>
-            </div>
+                </tbody>
+            </table>
         </div>
-
     </div>
 
-    <!-- RECENT USERS -->
-    <div class="card shadow-sm border-0 mb-4">
-
-        <div class="card-body">
-
-            <div class="d-flex justify-content-between
-                align-items-center mb-3">
-
-                <h5 class="fw-semibold mb-0">Recent Users</h5>
-
-                <a asp-action="Users"
-                   class="btn btn-sm btn-outline-primary">
-                    View All
-                </a>
-
-            </div>
-
-            <div class="table-responsive">
-
-                <table class="table table-hover align-middle">
-
-                    <thead class="table-light">
-                        <tr>
-                            <th>Name</th>
-                            <th>Role</th>
-                            <th>City</th>
-                            <th>Joined</th>
-                            <th>Account</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-
-                        @if (Model.RecentUsers.Count == 0)
+    <!-- 6. RECENT OFFERS TABLE -->
+    <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 20px; border: 1px solid var(--sdm-border) !important;">
+        <div class="d-flex justify-content-between align-items-center p-4 border-bottom bg-white">
+            <h5 class="fw-bold text-dark mb-0">Recent Offers & Bids</h5>
+            <a asp-action="Offers" class="btn btn-sm btn-outline-secondary rounded-pill px-3">View All Offers</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead style="background: #F9F7F3;">
+                    <tr>
+                        <th class="py-3 px-4 text-secondary small fw-bold text-uppercase">Offer ID</th>
+                        <th class="py-3 px-3 text-secondary small fw-bold text-uppercase">Device</th>
+                        <th class="py-3 px-3 text-secondary small fw-bold text-uppercase">Type</th>
+                        <th class="py-3 px-3 text-secondary small fw-bold text-uppercase">Amount</th>
+                        <th class="py-3 px-4 text-secondary small fw-bold text-uppercase text-end">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.RecentOffers.Count == 0)
+                    {
+                        <tr><td colspan="5" class="text-center text-muted p-4">No offers submitted yet.</td></tr>
+                    }
+                    else
+                    {
+                        @foreach (var offer in Model.RecentOffers)
                         {
-                            <tr>
-                                <td colspan="5"
-                                    class="text-center text-muted">
-                                    No users found.
+                            <tr style="border-bottom: 1px solid #F4EFEA;">
+                                <td class="py-3 px-4 text-muted small">#@offer.Id</td>
+                                <td class="py-3 px-3 fw-bold text-dark">
+                                    @(offer.Device?.BrandName ?? "—") @(offer.Device?.ModelName ?? "")
+                                </td>
+                                <td class="py-3 px-3 text-secondary small">@offer.OfferType</td>
+                                <td class="py-3 px-3 fw-bold text-dark">
+                                    @offer.Currency @offer.OfferAmount.ToString("N2")
+                                </td>
+                                <td class="py-3 px-4 text-end">
+                                    <span class="badge rounded-pill bg-light text-dark border">@offer.Status</span>
                                 </td>
                             </tr>
                         }
-                        else
-                        {
-                            @foreach (var user in Model.RecentUsers)
-                            {
-                                <tr>
-                                    <td>@user.FullName</td>
-                                    <td>@user.UserType</td>
-                                    <td>@(user.City ?? "N/A")</td>
-                                    <td>@user.CreatedAt.ToString("dd MMM yyyy")</td>
-                                    <td>
-                                        @if (user.IsBanned)
-                                        {
-                                            <span class="badge bg-danger">
-                                                Banned
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-success">
-                                                Active
-                                            </span>
-                                        }
-                                    </td>
-                                </tr>
-                            }
-                        }
-
-                    </tbody>
-
-                </table>
-
-            </div>
-        </div>
-    </div>
-
-    <!-- RECENT OFFERS -->
-    <div class="card shadow-sm border-0 mb-4">
-
-        <div class="card-body">
-
-            <div class="d-flex justify-content-between
-                align-items-center mb-3">
-
-                <h5 class="fw-semibold mb-0">Recent Offers</h5>
-
-                <a asp-action="Offers"
-                   class="btn btn-sm btn-outline-primary">
-                    View All
-                </a>
-
-            </div>
-
-            <div class="table-responsive">
-
-                <table class="table table-hover align-middle">
-
-                    <thead class="table-light">
-                        <tr>
-                            <th>Offer ID</th>
-                            <th>Device</th>
-                            <th>Type</th>
-                            <th>Amount</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-
-                        @if (Model.RecentOffers.Count == 0)
-                        {
-                            <tr>
-                                <td colspan="5"
-                                    class="text-center text-muted">
-                                    No offers found.
-                                </td>
-                            </tr>
-                        }
-                        else
-                        {
-                            @foreach (var offer in Model.RecentOffers)
-                            {
-                                <tr>
-                                    <td>#@offer.Id</td>
-
-                                    <td>
-                                        @(offer.Device?.BrandName ?? "N/A")
-                                        @(offer.Device?.ModelName ?? "")
-                                    </td>
-
-                                    <td>@offer.OfferType</td>
-
-                                    <td>
-                                        @offer.Currency
-                                        @offer.OfferAmount.ToString("N2")
-                                    </td>
-
-                                    <td>
-                                        @if (offer.Status == "Completed")
-                                        {
-                                            <span class="badge bg-success">
-                                                @offer.Status
-                                            </span>
-                                        }
-                                        else if (offer.Status == "Pending")
-                                        {
-                                            <span class="badge bg-warning text-dark">
-                                                @offer.Status
-                                            </span>
-                                        }
-                                        else
-                                        {
-                                            <span class="badge bg-secondary">
-                                                @offer.Status
-                                            </span>
-                                        }
-                                    </td>
-                                </tr>
-                            }
-                        }
-
-                    </tbody>
-
-                </table>
-
-            </div>
-        </div>
-    </div>
-
-    <!-- RECENT REVIEWS -->
-    <div class="card shadow-sm border-0 mb-4">
-
-        <div class="card-body">
-
-            <div class="d-flex justify-content-between
-                align-items-center mb-3">
-
-                <h5 class="fw-semibold mb-0">Recent Reviews</h5>
-
-                <a asp-action="Reviews"
-                   class="btn btn-sm btn-outline-primary">
-                    View All
-                </a>
-
-            </div>
-
-            <div class="table-responsive">
-
-                <table class="table table-hover align-middle">
-
-                    <thead class="table-light">
-                        <tr>
-                            <th>Reviewer</th>
-                            <th>Reviewee</th>
-                            <th>Rating</th>
-                            <th>Comment</th>
-                            <th>Date</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-
-                        @if (Model.RecentReviews.Count == 0)
-                        {
-                            <tr>
-                                <td colspan="5"
-                                    class="text-center text-muted">
-                                    No reviews found.
-                                </td>
-                            </tr>
-                        }
-                        else
-                        {
-                            @foreach (var review in Model.RecentReviews)
-                            {
-                                <tr>
-                                    <td>
-                                        @(review.IsAnonymous
-                                            ? "Anonymous"
-                                            : review.Reviewer?.FullName ?? "N/A")
-                                    </td>
-
-                                    <td>
-                                        @(review.Reviewee?.FullName ?? "N/A")
-                                    </td>
-
-                                    <td>
-                                        <span class="text-warning">
-                                            @review.Rating / 5 ★
-                                        </span>
-                                    </td>
-
-                                    <td>
-                                        @(string.IsNullOrWhiteSpace(review.Comment)
-                                            ? "No comment"
-                                            : review.Comment)
-                                    </td>
-
-                                    <td>
-                                        @review.CreatedAt.ToString("dd MMM yyyy")
-                                    </td>
-                                </tr>
-                            }
-                        }
-
-                    </tbody>
-
-                </table>
-
-            </div>
-        </div>
-    </div>
-
-    <!-- ADMINISTRATION -->
-    <div class="card shadow-sm border-0">
-
-        <div class="card-body">
-
-            <h5 class="fw-semibold mb-3">
-                Administration
-            </h5>
-
-            <div class="d-flex flex-wrap gap-2">
-
-                <a asp-action="Users"
-                   class="btn btn-outline-primary">
-                    Manage Users
-                </a>
-
-                <a asp-action="Devices"
-                   class="btn btn-outline-primary">
-                    Manage Devices
-                </a>
-
-                <a asp-action="RepairShops"
-                   class="btn btn-outline-primary">
-                    Manage Repair Shops
-                </a>
-
-                <a asp-action="Offers"
-                   class="btn btn-outline-primary">
-                    Manage Offers
-                </a>
-
-                <a asp-action="Reviews"
-                   class="btn btn-outline-primary">
-                    Manage Reviews
-                </a>
-
-            </div>
-
+                    }
+                </tbody>
+            </table>
         </div>
     </div>
 

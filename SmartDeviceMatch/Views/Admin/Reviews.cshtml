@@ -1,130 +1,138 @@
-﻿@model IEnumerable<SmartDeviceMatch.Models.Review>
+@model IEnumerable<SmartDeviceMatch.Models.Review>
 
 @{
     ViewData["Title"] = "All Reviews";
 }
 
-<div class="container mt-4 mb-5">
+<div class="container-fluid px-0">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
         <div>
-            <h2>All Reviews</h2>
-
-            <p class="text-muted">
-                Monitor reviews submitted by marketplace users.
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge rounded-pill" style="background: rgba(186, 60, 42, 0.1); color: var(--sdm-primary); font-weight: 600;">
+                    <i class="bi bi-shield-lock me-1"></i> Admin Console
+                </span>
+            </div>
+            <h2 class="fw-bold text-dark mb-1">All Reviews</h2>
+            <p class="text-muted small mb-0">
+                Audit and monitor ratings, feedback, and customer satisfaction across the marketplace.
             </p>
         </div>
 
-        <a asp-action="Index"
-           class="btn btn-outline-secondary">
-            Back to Dashboard
+        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+            <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
         </a>
-
     </div>
 
+    <!-- Reviews Card Table -->
+    <div class="card sdm-card border-0 shadow-sm overflow-hidden">
+        <div class="card-header bg-white py-3 px-4 border-bottom d-flex justify-content-between align-items-center">
+            <span class="fw-bold text-dark">
+                <i class="bi bi-star me-2 text-muted"></i>Marketplace Testimonials
+            </span>
+            <span class="badge rounded-pill bg-light text-secondary border px-3 py-2">
+                Total: @Model.Count()
+            </span>
+        </div>
 
-    <div class="card shadow-sm">
-
-        <div class="card-body">
-
+        <div class="card-body p-0">
             @if (!Model.Any())
             {
-                <p class="text-muted">
-                    No reviews found.
-                </p>
+                <div class="text-center py-5">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                         style="width: 64px; height: 64px; background: #F8F6F2; color: #8C827A;">
+                        <i class="bi bi-chat-square-quote" style="font-size: 28px;"></i>
+                    </div>
+                    <h5 class="fw-bold text-dark mb-1">No reviews found</h5>
+                    <p class="text-muted small mb-0">There are currently no reviews submitted on the platform.</p>
+                </div>
             }
             else
             {
                 <div class="table-responsive">
-
-                    <table class="table table-hover align-middle">
-
-                        <thead>
-
+                    <table class="table table-hover align-middle mb-0">
+                        <thead style="background: #FAF8F5; font-size: 0.85rem;" class="text-uppercase text-muted border-bottom">
                             <tr>
-                                <th>Reviewer</th>
-                                <th>Reviewee</th>
-                                <th>Rating</th>
-                                <th>Comment</th>
-                                <th>Date</th>
+                                <th class="ps-4 py-3">Reviewer</th>
+                                <th class="py-3">Reviewee</th>
+                                <th class="py-3">Rating</th>
+                                <th class="py-3" style="width: 40%;">Feedback Comment</th>
+                                <th class="pe-4 py-3 text-end">Date</th>
                             </tr>
-
                         </thead>
 
                         <tbody>
-
                             @foreach (var review in Model)
                             {
                                 <tr>
-
-                                    <td>
-
+                                    <td class="ps-4 py-3">
                                         @if (review.IsAnonymous)
                                         {
-                                            <span>
-                                                Anonymous User
+                                            <span class="badge rounded-pill bg-light text-muted border px-2 py-1">
+                                                <i class="bi bi-incognito me-1"></i>Anonymous User
                                             </span>
                                         }
                                         else
                                         {
-                                            @review.Reviewer?.FullName
+                                            <div class="fw-semibold text-dark">
+                                                @(review.Reviewer?.FullName ?? "User")
+                                            </div>
+                                            <small class="text-muted font-monospace">@review.ReviewerId</small>
                                         }
-
                                     </td>
 
-                                    <td>
-                                        @review.Reviewee?.FullName
+                                    <td class="py-3">
+                                        <div class="fw-semibold text-dark">
+                                            @(review.Reviewee?.FullName ?? "User")
+                                        </div>
+                                        <small class="text-muted font-monospace">@review.RevieweeId</small>
                                     </td>
 
-                                    <td>
-
-                                        <span class="text-warning">
-
-                                            @for (int i = 1; i <= 5; i++)
-                                            {
-                                                if (i <= review.Rating)
+                                    <td class="py-3">
+                                        <div class="d-flex align-items-center gap-1">
+                                            <span class="text-warning">
+                                                @for (int i = 1; i <= 5; i++)
                                                 {
-                                                    <span>★</span>
+                                                    if (i <= review.Rating)
+                                                    {
+                                                        <i class="bi bi-star-fill"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="bi bi-star text-muted opacity-50"></i>
+                                                    }
                                                 }
-                                                else
-                                                {
-                                                    <span>☆</span>
-                                                }
-                                            }
-
-                                        </span>
-
-                                        <small>
-                                            (@review.Rating/5)
-                                        </small>
-
+                                            </span>
+                                            <span class="badge rounded-pill bg-light text-dark border ms-1 fw-bold">
+                                                @review.Rating/5
+                                            </span>
+                                        </div>
                                     </td>
 
-                                    <td>
-                                        @(string.IsNullOrWhiteSpace(review.Comment)
-                                            ? "No comment"
-                                            : review.Comment)
+                                    <td class="py-3">
+                                        @if (string.IsNullOrWhiteSpace(review.Comment))
+                                        {
+                                            <span class="text-muted fst-italic small">No comment provided</span>
+                                        }
+                                        else
+                                        {
+                                            <div class="p-2 rounded-3 bg-light border small text-dark">
+                                                <i class="bi bi-quote text-muted me-1"></i>@review.Comment
+                                            </div>
+                                        }
                                     </td>
 
-                                    <td>
-                                        @review.CreatedAt
-                                            .ToLocalTime()
-                                            .ToString("dd MMM yyyy")
+                                    <td class="pe-4 py-3 text-end text-muted small">
+                                        @review.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")
                                     </td>
-
                                 </tr>
                             }
-
                         </tbody>
-
                     </table>
-
                 </div>
             }
-
         </div>
-
     </div>
 
 </div>

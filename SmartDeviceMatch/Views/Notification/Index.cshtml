@@ -1,187 +1,142 @@
-﻿@model IEnumerable<SmartDeviceMatch.Models.Notification>
+@model IEnumerable<SmartDeviceMatch.Models.Notification>
 
 @{
     ViewData["Title"] = "Notifications";
 }
 
-<div class="container mt-4 mb-5">
+<div class="d-flex flex-column gap-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-
+    <!-- Page Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
         <div>
-            <h2>Notifications</h2>
-
+            <h2 class="fw-bold text-dark mb-1">Notifications</h2>
             <p class="text-muted mb-0">
-                View your latest marketplace notifications.
+                Live alerts for new offers, accepted quotes, status changes, and platform updates.
             </p>
         </div>
 
         @if (Model.Any(n => !n.IsRead))
         {
-            <form asp-action="MarkAllAsRead"
-                  method="post"
-                  id="markAllForm">
-
+            <form asp-action="MarkAllAsRead" method="post" id="markAllForm">
                 @Html.AntiForgeryToken()
-
-                <button type="submit"
-                        class="btn btn-outline-primary">
-                    Mark All as Read
+                <button type="submit" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-2">
+                    <i class="bi bi-check2-all me-1"></i> Mark All as Read
                 </button>
-
             </form>
         }
-
     </div>
-
 
     @if (!Model.Any())
     {
-        <div class="card shadow-sm">
-
-            <div class="card-body text-center p-5">
-
-                <div style="font-size: 40px;">
-                    🔔
-                </div>
-
-                <h4 class="mt-3">
-                    No notifications
-                </h4>
-
-                <p class="text-muted">
-                    You will see marketplace updates here.
-                </p>
-
+        <div class="card border-0 shadow-sm text-center p-5" style="border-radius: 20px; border: 1px dashed var(--sdm-border) !important;">
+            <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3"
+                 style="width: 72px; height: 72px; background: #F4EFEA; color: var(--sdm-text-muted); font-size: 30px;">
+                <i class="bi bi-bell-slash"></i>
             </div>
-
+            <h4 class="fw-bold text-dark mb-2">No notifications yet</h4>
+            <p class="text-muted mx-auto mb-0" style="max-width: 400px;">
+                You'll receive real-time updates here whenever you receive an offer, message, or device status update.
+            </p>
         </div>
     }
     else
     {
-        <div class="card shadow-sm">
-
+        <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 20px; border: 1px solid var(--sdm-border) !important;">
             <div class="list-group list-group-flush">
-
                 @foreach (var notification in Model)
                 {
-                    <div class="list-group-item
-                                notification-item
-                                @(notification.IsRead
-                                    ? ""
-                                    : "bg-light")"
+                    <div class="list-group-item p-4 border-bottom notification-item @(notification.IsRead ? "" : "bg-white")"
+                         style="@(!notification.IsRead ? "background-color: #FFFDFC !important; border-left: 4px solid var(--sdm-primary) !important;" : "border-left: 4px solid transparent;")"
                          data-notification-id="@notification.Id">
 
-                        <div class="d-flex">
+                        <div class="d-flex align-items-start gap-3">
 
-                            <div class="me-3"
-                                 style="font-size: 28px;">
+                            <!-- Icon based on type -->
+                            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                                 style="width: 44px; height: 44px; font-size: 20px;
+                                 @(notification.Type == "NewOffer" ? "background: #FCE1DC; color: #BA3C2A;" :
+                                   notification.Type == "OfferAccepted" ? "background: #DCFCE7; color: #16A34A;" :
+                                   notification.Type == "OfferRejected" ? "background: #FEE2E2; color: #DC2626;" :
+                                   notification.Type == "EscrowAlert" ? "background: #FEF3C7; color: #D97706;" :
+                                   notification.Type == "MatchAlert" ? "background: #EFF6FF; color: #2563EB;" :
+                                   "background: #F3EFEA; color: #4B5563;")">
 
                                 @if (notification.Type == "NewOffer")
                                 {
-                                    <span>🔔</span>
+                                    <i class="bi bi-tag-fill"></i>
                                 }
                                 else if (notification.Type == "OfferAccepted")
                                 {
-                                    <span>✅</span>
+                                    <i class="bi bi-check-circle-fill"></i>
                                 }
                                 else if (notification.Type == "OfferRejected")
                                 {
-                                    <span>❌</span>
+                                    <i class="bi bi-x-circle-fill"></i>
                                 }
-                                else if (notification.Type == "EscrowAlert")
+                                else if (notification.Type == "EscrowAlert" || notification.Type == "PaymentReleased")
                                 {
-                                    <span>💰</span>
-                                }
-                                else if (notification.Type == "DeviceVerified")
-                                {
-                                    <span>📱</span>
-                                }
-                                else if (notification.Type == "PaymentReleased")
-                                {
-                                    <span>💵</span>
+                                    <i class="bi bi-cash-coin"></i>
                                 }
                                 else if (notification.Type == "MatchAlert")
                                 {
-                                    <span>🎯</span>
+                                    <i class="bi bi-bullseye"></i>
                                 }
                                 else
                                 {
-                                    <span>🔔</span>
+                                    <i class="bi bi-bell-fill"></i>
                                 }
-
                             </div>
 
-
+                            <!-- Content -->
                             <div class="flex-grow-1">
-
-                                <div class="d-flex justify-content-between">
-
-                                    <h6 class="mb-1">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <h6 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
                                         @notification.Title
-
                                         @if (!notification.IsRead)
                                         {
-                                            <span class="badge bg-primary ms-2">
-                                                New
+                                            <span class="badge rounded-pill px-2 py-0" style="background: var(--sdm-primary); font-size: 10px;">
+                                                NEW
                                             </span>
                                         }
                                     </h6>
-
                                     <small class="text-muted">
-                                        @notification.CreatedAt.ToLocalTime().ToString(
-                                            "dd MMM yyyy, hh:mm tt")
+                                        @notification.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
                                     </small>
-
                                 </div>
 
-                                <p class="mb-0 text-muted">
+                                <p class="text-secondary small mb-0" style="line-height: 1.5;">
                                     @notification.Message
                                 </p>
-
                             </div>
 
                         </div>
 
                     </div>
                 }
-
             </div>
-
         </div>
     }
 
 </div>
 
-
 @section Scripts
 {
     <script>
-        document
-            .getElementById("markAllForm")
-            ?.addEventListener("submit", async function (event) {
+        document.getElementById("markAllForm")?.addEventListener("submit", async function (event) {
+            event.preventDefault();
+            const form = event.target;
+            const token = form.querySelector('input[name="__RequestVerificationToken"]').value;
 
-                event.preventDefault();
-
-                const form = event.target;
-
-                const token =
-                    form.querySelector(
-                        'input[name="__RequestVerificationToken"]'
-                    ).value;
-
-                const response = await fetch(
-                    '@Url.Action("MarkAllAsRead", "Notification")',
-                    {
-                        method: 'POST',
-                        headers: {
-                            'RequestVerificationToken': token
-                        }
-                    });
-
-                if (response.ok) {
-                    window.location.reload();
+            const response = await fetch('@Url.Action("MarkAllAsRead", "Notification")', {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': token
                 }
             });
+
+            if (response.ok) {
+                window.location.reload();
+            }
+        });
     </script>
 }

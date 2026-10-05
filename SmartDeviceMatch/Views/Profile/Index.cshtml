@@ -1,4 +1,4 @@
-﻿@model SmartDeviceMatch.Models.AppUser
+@model SmartDeviceMatch.Models.AppUser
 
 @{
     ViewData["Title"] = "My Profile";
@@ -7,235 +7,100 @@
     int reviewCount = ViewBag.ReviewCount ?? 0;
 }
 
-<div class="container mt-5 mb-5">
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-7">
 
-    <div class="row justify-content-center">
+        <!-- Profile Card -->
+        <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 20px; border: 1px solid var(--sdm-border) !important;">
 
-        <div class="col-md-8">
+            <!-- Header Backdrop -->
+            <div class="p-4 text-center position-relative" style="background: linear-gradient(135deg, #FFF6F2 0%, #FAEDE4 100%); border-bottom: 1px solid #F3E4DA;">
+                <div class="rounded-circle text-white fw-bold d-inline-flex align-items-center justify-content-center mb-2 shadow"
+                     style="width: 80px; height: 80px; background-color: #9B3224; font-size: 28px; border: 3px solid #FFFFFF;">
+                    @(string.IsNullOrEmpty(Model.FullName) ? "U" : Model.FullName[0].ToString().ToUpper())
+                </div>
 
-            <!-- ================================= -->
-            <!-- PROFILE CARD -->
-            <!-- ================================= -->
+                <h3 class="fw-bold text-dark mb-1">@Model.FullName</h3>
+                <span class="badge rounded-pill px-3 py-1" style="background: var(--sdm-primary-light); color: var(--sdm-primary); font-weight: 600;">
+                    @Model.UserType
+                </span>
+            </div>
 
-            <div class="card shadow-sm border-0">
+            <div class="card-body p-4 p-md-5">
 
-                <div class="card-body p-4">
+                <!-- Overall Rating Banner -->
+                <div class="p-4 rounded-3 text-center mb-4" style="background: #FFFDF5; border: 1px solid #FEF3C7;">
+                    <span class="text-muted small fw-semibold text-uppercase d-block mb-1">Platform Reputation</span>
 
-                    <!-- ================================= -->
-                    <!-- PROFILE HEADER -->
-                    <!-- ================================= -->
+                    @if (reviewCount > 0)
+                    {
+                        <div class="display-6 fw-bold text-dark mb-1">
+                            @averageRating.ToString("0.0") <span class="text-muted fs-6">/ 5.0</span>
+                        </div>
 
-                    <div class="text-center mb-4">
-
-                        <h2 class="mb-2">
-                            @Model.FullName
-                        </h2>
-
-                        <span class="badge bg-primary">
-                            @Model.UserType
-                        </span>
-
-                    </div>
-
-
-                    <!-- ================================= -->
-                    <!-- RATING CARD -->
-                    <!-- ================================= -->
-
-                    <div class="card bg-light border-0 mb-4">
-
-                        <div class="card-body text-center">
-
-                            <h5 class="text-muted mb-3">
-                                Overall Rating
-                            </h5>
-
-
-                            @if (reviewCount > 0)
+                        <div class="fs-5 mb-1" style="color: #F59E0B;">
+                            @for (int i = 1; i <= 5; i++)
                             {
-                                <!-- Average Number -->
-
-                                <div class="display-5 fw-bold">
-
-                                    @averageRating.ToString("0.0")
-
-                                    <span class="text-muted fs-5">
-                                        / 5
-                                    </span>
-
-                                </div>
-
-
-                                <!-- Stars -->
-
-                                <div class="fs-3 mb-2">
-
-                                    @for (int i = 1; i <= 5; i++)
-                                    {
-                                        if (i <= Math.Round(averageRating))
-                                        {
-                                            <span>⭐</span>
-                                        }
-                                        else
-                                        {
-                                            <span>☆</span>
-                                        }
-                                    }
-
-                                </div>
-
-
-                                <!-- Review Count -->
-
-                                <p class="text-muted mb-3">
-
-                                    Based on
-
-                                    <strong>
-                                        @reviewCount
-                                    </strong>
-
-                                    review@(reviewCount == 1 ? "" : "s")
-
-                                </p>
+                                if (i <= Math.Round(averageRating))
+                                {
+                                    <i class="bi bi-star-fill"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-star"></i>
+                                }
                             }
-                            else
-                            {
-                                <div class="display-6 text-muted">
-                                    No Rating
-                                </div>
-
-                                <p class="text-muted mb-3">
-                                    You have not received any reviews yet.
-                                </p>
-                            }
-
-
-                            <!-- View Reviews -->
-
-                            <a asp-controller="Offer"
-                               asp-action="MyReviews"
-                               class="btn btn-outline-primary">
-
-                                View My Reviews
-
-                            </a>
-
                         </div>
 
-                    </div>
-
-
-                    <!-- ================================= -->
-                    <!-- PROFILE INFORMATION -->
-                    <!-- ================================= -->
-
-                    <h5 class="mb-3">
-                        Profile Information
-                    </h5>
-
-
-                    <!-- Full Name -->
-
-                    <div class="mb-3">
-
-                        <label class="text-muted">
-                            Full Name
-                        </label>
-
-                        <div class="fw-semibold">
-                            @Model.FullName
+                        <span class="text-muted small">Based on <strong>@reviewCount</strong> verified review(s)</span>
+                    }
+                    else
+                    {
+                        <div class="text-muted py-2">
+                            <i class="bi bi-star fs-3 d-block text-secondary opacity-50 mb-1"></i>
+                            <span>No ratings or reviews received yet.</span>
                         </div>
+                    }
+                </div>
 
+                <!-- Profile Information Details -->
+                <h6 class="fw-bold text-dark mb-3">Account Information</h6>
+
+                <div class="d-flex flex-column gap-2 mb-4">
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="text-muted">Account Type</span>
+                        <strong class="text-dark">@Model.UserType</strong>
                     </div>
 
-
-                    <!-- User Type -->
-
-                    <div class="mb-3">
-
-                        <label class="text-muted">
-                            Role
-                        </label>
-
-                        <div class="fw-semibold">
-                            @Model.UserType
-                        </div>
-
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="text-muted">City</span>
+                        <span class="fw-semibold text-dark">@(Model.City ?? "Not Provided")</span>
                     </div>
 
-
-                    <!-- City + State -->
-
-                    <div class="row">
-
-                        <div class="col-md-6 mb-3">
-
-                            <label class="text-muted">
-                                City
-                            </label>
-
-                            <div class="fw-semibold">
-                                @(Model.City ?? "Not Provided")
-                            </div>
-
-                        </div>
-
-
-                        <div class="col-md-6 mb-3">
-
-                            <label class="text-muted">
-                                State
-                            </label>
-
-                            <div class="fw-semibold">
-                                @(Model.State ?? "Not Provided")
-                            </div>
-
-                        </div>
-
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="text-muted">State</span>
+                        <span class="fw-semibold text-dark">@(Model.State ?? "Not Provided")</span>
                     </div>
 
-
-                    <!-- Pin Code -->
-
-                    <div class="mb-3">
-
-                        <label class="text-muted">
-                            Pin Code
-                        </label>
-
-                        <div class="fw-semibold">
-                            @(Model.PinCode ?? "Not Provided")
-                        </div>
-
+                    <div class="d-flex justify-content-between py-2 border-bottom">
+                        <span class="text-muted">PIN Code</span>
+                        <span class="fw-semibold text-dark">@(Model.PinCode ?? "Not Provided")</span>
                     </div>
 
-
-                    <!-- ================================= -->
-                    <!-- ACTIONS -->
-                    <!-- ================================= -->
-
-                    <div class="d-flex gap-2 mt-4">
-
-                        <a asp-controller="Home"
-                           asp-action="Index"
-                           class="btn btn-outline-secondary">
-
-                            Back to Home
-
-                        </a>
-
-                        <a asp-controller="Offer"
-                           asp-action="MyReviews"
-                           class="btn btn-primary">
-
-                            View Reviews
-
-                        </a>
-
+                    <div class="d-flex justify-content-between py-2">
+                        <span class="text-muted">Member Since</span>
+                        <span class="text-muted">@Model.CreatedAt.ToString("MMM yyyy")</span>
                     </div>
+                </div>
 
+                <!-- Navigation Actions -->
+                <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                    <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+                        Back to Home
+                    </a>
+                    <a asp-controller="Offer" asp-action="MyReviews" class="btn btn-terracotta rounded-pill px-4">
+                        <i class="bi bi-star me-1"></i> View Reviews
+                    </a>
                 </div>
 
             </div>
@@ -243,5 +108,4 @@
         </div>
 
     </div>
-
 </div>

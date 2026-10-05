@@ -1,60 +1,70 @@
-﻿@model SmartDeviceMatch.Models.AppUser
+@model SmartDeviceMatch.Models.AppUser
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
     ViewData["Title"] = "Complete Your Profile";
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow-sm border-0 bg-light">
-                <div class="card-body p-5">
-                    <h2 class="text-center mb-2">Welcome to SmartDeviceMatch!</h2>
-                    <p class="text-muted text-center mb-4">Let's finish setting up your account.</p>
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
 
-                    <form asp-action="Create" method="post">
-
-                        <div class="mb-3">
-                            <label asp-for="FullName" class="form-label fw-bold">Full Name</label>
-                            <input asp-for="FullName" class="form-control" placeholder="e.g. John Doe" required />
-                            <span asp-validation-for="FullName" class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="UserType" class="form-label fw-bold">I am primarily a...</label>
-                            <select asp-for="UserType" class="form-select" required>
-                                <option value="">-- Select Your Role --</option>
-                                <option value="DeviceOwner">Device Owner (Selling broken electronics)</option>
-                                <option value="RepairShop">Repair Technician / Shop</option>
-                                <option value="Buyer">General Buyer / Refurbisher</option>
-                            </select>
-                            <span asp-validation-for="UserType" class="text-danger"></span>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label asp-for="City" class="form-label fw-bold">City</label>
-                                <input asp-for="City" class="form-control" />
-                            </div>
-                            <div class="col-md-6">
-                                <label asp-for="State" class="form-label fw-bold">State</label>
-                                <input asp-for="State" class="form-control" />
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <label asp-for="PinCode" class="form-label fw-bold">Pin Code</label>
-                            <input asp-for="PinCode" class="form-control" />
-                        </div>
-
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary btn-lg">Save Profile & Continue</button>
-                        </div>
-                    </form>
-
+        <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 20px; border: 1px solid var(--sdm-border) !important;">
+            
+            <div class="p-4 p-md-5 text-center" style="background: linear-gradient(135deg, #FFF8F4 0%, #FAEDE4 100%); border-bottom: 1px solid #F3E4DA;">
+                <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                     style="width: 64px; height: 64px; background: var(--sdm-primary); color: #fff; font-size: 26px;">
+                    <i class="bi bi-person-check-fill"></i>
                 </div>
+                <h3 class="fw-bold text-dark mb-1">Welcome to SmartDeviceMatch!</h3>
+                <p class="text-muted small mb-0">Let's finish setting up your profile so you can start trading and repairing.</p>
             </div>
+
+            <div class="card-body p-4 p-md-5">
+                <form asp-action="Create" method="post">
+
+                    <div class="mb-3">
+                        <label asp-for="FullName" class="form-label fw-semibold text-dark">Full Name</label>
+                        <input asp-for="FullName" class="form-control" placeholder="e.g. Tanish Mistry" required />
+                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="UserType" class="form-label fw-semibold text-dark">Primary Role</label>
+                        <select asp-for="UserType" class="form-select" required>
+                            <option value="">-- Select Your Role --</option>
+                            <option value="DeviceOwner">Device Owner (Sell or Repair Broken Devices)</option>
+                            <option value="RepairShop">Repair Technician / Service Center</option>
+                            <option value="Buyer">Hardware Buyer / Refurbisher</option>
+                        </select>
+                        <span asp-validation-for="UserType" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label asp-for="City" class="form-label fw-semibold text-dark">City</label>
+                            <input asp-for="City" class="form-control" placeholder="City" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="State" class="form-label fw-semibold text-dark">State</label>
+                            <input asp-for="State" class="form-control" placeholder="State" />
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="PinCode" class="form-label fw-semibold text-dark">PIN Code</label>
+                        <input asp-for="PinCode" class="form-control" placeholder="Postal Code" />
+                    </div>
+
+                    <div class="d-grid pt-2">
+                        <button type="submit" class="btn btn-terracotta rounded-pill py-2 fs-6">
+                            Save Profile & Continue <i class="bi bi-arrow-right ms-1"></i>
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+
         </div>
+
     </div>
 </div>

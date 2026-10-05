@@ -1,136 +1,140 @@
-﻿```cshtml
 @model IEnumerable<SmartDeviceMatch.Models.Device>
 
 @{
     ViewData["Title"] = "My Devices";
 }
 
-<div class="container mt-4">
+<div class="d-flex flex-column gap-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- Page Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
         <div>
-            <h2>My Devices</h2>
-            <p class="text-muted">
-                Manage the devices you have listed.
+            <h2 class="fw-bold text-dark mb-1">My Listed Devices</h2>
+            <p class="text-muted mb-0">
+                Manage all electronics you have listed for sale or repair.
             </p>
         </div>
 
-        <a asp-action="Create" class="btn btn-primary">
-            + List New Device
+        <a asp-action="Create" class="btn btn-terracotta d-inline-flex align-items-center gap-2">
+            <i class="bi bi-plus-lg"></i>
+            <span>List New Device</span>
         </a>
     </div>
 
     @if (!Model.Any())
     {
-        <div class="card text-center p-5">
-
-            <h4>You haven't listed any devices yet.</h4>
-
-            <p class="text-muted">
-                List your broken or used electronics to start receiving offers.
+        <!-- Empty State Card -->
+        <div class="card border-0 shadow-sm text-center p-5" style="border-radius: 20px; border: 1px dashed var(--sdm-border) !important;">
+            <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3"
+                 style="width: 72px; height: 72px; background: var(--sdm-primary-light); color: var(--sdm-primary); font-size: 30px;">
+                <i class="bi bi-phone"></i>
+            </div>
+            <h4 class="fw-bold text-dark mb-2">You haven't listed any devices yet</h4>
+            <p class="text-muted mx-auto mb-4" style="max-width: 420px;">
+                List your broken or used electronics to receive repair quotes and purchase offers from verified shops and buyers.
             </p>
-
             <div>
-                <a asp-action="Create" class="btn btn-primary">
-                    List a Device
+                <a asp-action="Create" class="btn btn-terracotta px-4 py-2">
+                    <i class="bi bi-plus-lg me-1"></i> List a Device Now
                 </a>
             </div>
-
         </div>
     }
     else
     {
-        <div class="table-responsive">
-
-            <table class="table table-bordered table-hover align-middle">
-
-                <thead class="table-light">
-                    <tr>
-                        <th>Device</th>
-                        <th>Category</th>
-                        <th>Condition</th>
-                        <th>Asking Price</th>
-                        <th>Status</th>
-                        <th>Listed On</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    @foreach (var item in Model)
-                    {
+        <!-- Device Table in Elevated Card -->
+        <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 20px; border: 1px solid var(--sdm-border) !important;">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead style="background: #F9F7F3; border-bottom: 1px solid var(--sdm-border);">
                         <tr>
-
-                            <td>
-                                <strong>
-                                    @item.BrandName @item.ModelName
-                                </strong>
-                            </td>
-
-                            <td>
-                                @item.Category?.Name
-                            </td>
-
-                            <td>
-                                Grade @item.ConditionGrade
-                            </td>
-
-                            <td>
-                                ₹@item.AskingPrice.ToString("0.00")
-                            </td>
-
-                            <td>
-                                @if (item.Status == "Listed")
-                                {
-                                    <span class="badge bg-success">
-                                        Active
+                            <th class="py-3 px-4 text-secondary small fw-bold text-uppercase">Device</th>
+                            <th class="py-3 px-3 text-secondary small fw-bold text-uppercase">Category</th>
+                            <th class="py-3 px-3 text-secondary small fw-bold text-uppercase">Condition</th>
+                            <th class="py-3 px-3 text-secondary small fw-bold text-uppercase">Asking Price</th>
+                            <th class="py-3 px-3 text-secondary small fw-bold text-uppercase">Status</th>
+                            <th class="py-3 px-3 text-secondary small fw-bold text-uppercase">Listed On</th>
+                            <th class="py-3 px-4 text-secondary small fw-bold text-uppercase text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr style="border-bottom: 1px solid #F4EFEA;">
+                                <td class="py-3 px-4">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="rounded-3 d-flex align-items-center justify-content-center flex-shrink-0"
+                                             style="width: 44px; height: 44px; background: #F6F3EE; color: #4B5563; font-size: 20px;">
+                                            <i class="bi bi-phone"></i>
+                                        </div>
+                                        <div>
+                                            <span class="fw-bold text-dark d-block">
+                                                @item.BrandName @item.ModelName
+                                            </span>
+                                            <span class="small text-muted">ID: #@item.Id</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-3 text-secondary">
+                                    @(item.Category?.Name ?? "Uncategorized")
+                                </td>
+                                <td class="py-3 px-3">
+                                    <span class="badge rounded-pill bg-light text-dark border px-3 py-1 fw-semibold">
+                                        Grade @item.ConditionGrade
                                     </span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary">
-                                        @item.Status
-                                    </span>
-                                }
-                            </td>
-
-                            <td>
-                                @item.CreatedAt.ToShortDateString()
-                            </td>
-
-                            <td>
-                                <div class="d-flex flex-wrap gap-2">
-
-                                    <a asp-controller="Device"
-                                       asp-action="Details"
-                                       asp-route-id="@item.Id"
-                                       class="btn btn-sm btn-outline-secondary">
-                                        View Details
-                                    </a>
-
+                                </td>
+                                <td class="py-3 px-3 fw-bold text-dark">
+                                    ₹@item.AskingPrice.ToString("N2")
+                                </td>
+                                <td class="py-3 px-3">
                                     @if (item.Status == "Listed")
                                     {
-                                        <a asp-controller="Match"
-                                           asp-action="Index"
-                                           asp-route-deviceId="@item.Id"
-                                           class="btn btn-sm btn-primary">
-                                            Find Matches
-                                        </a>
+                                        <span class="badge rounded-pill px-3 py-1" style="background: #E8F8F0; color: #10B981; font-weight: 600;">
+                                            Active
+                                        </span>
                                     }
+                                    else if (item.Status == "Matched")
+                                    {
+                                        <span class="badge rounded-pill px-3 py-1" style="background: #EFF6FF; color: #2563EB; font-weight: 600;">
+                                            Matched
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge rounded-pill bg-secondary px-3 py-1">
+                                            @item.Status
+                                        </span>
+                                    }
+                                </td>
+                                <td class="py-3 px-3 text-muted small">
+                                    @item.CreatedAt.ToString("MMM dd, yyyy")
+                                </td>
+                                <td class="py-3 px-4 text-end">
+                                    <div class="d-inline-flex gap-2">
+                                        <a asp-controller="Device"
+                                           asp-action="Details"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                                            Details
+                                        </a>
 
-                                </div>
-                            </td>
-
-                        </tr>
-                    }
-
-                </tbody>
-
-            </table>
-
+                                        @if (item.Status == "Listed")
+                                        {
+                                            <a asp-controller="Match"
+                                               asp-action="Index"
+                                               asp-route-deviceId="@item.Id"
+                                               class="btn btn-sm btn-terracotta rounded-pill px-3">
+                                                <i class="bi bi-bullseye me-1"></i> Matches
+                                            </a>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     }
 
 </div>
-```

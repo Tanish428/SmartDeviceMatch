@@ -1,277 +1,179 @@
-﻿@model IEnumerable<SmartDeviceMatch.Models.Offer>
+@model IEnumerable<SmartDeviceMatch.Models.Offer>
 
 @{
     ViewData["Title"] = "Received Repair Offers";
 }
 
-<div class="container mt-4 mb-5">
+<div class="d-flex flex-column gap-4">
 
-    <div class="mb-4">
-        <h2>Received Repair Offers</h2>
-        <p class="text-muted">
-            View and manage repair offers received for your devices.
-        </p>
+    <!-- Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">Received Repair Offers</h2>
+            <p class="text-muted mb-0">
+                Review repair bids, estimated turnarounds, and pricing proposals from verified repair shops.
+            </p>
+        </div>
+
+        <span class="badge rounded-pill px-3 py-2 bg-white text-secondary border shadow-sm">
+            <strong>@Model.Count()</strong> offer(s) received
+        </span>
     </div>
 
     @if (TempData["OfferMessage"] != null)
     {
-        <div class="alert alert-info">
-            @TempData["OfferMessage"]
+        <div class="alert alert-info rounded-3 border-0 shadow-sm">
+            <i class="bi bi-info-circle me-1"></i> @TempData["OfferMessage"]
         </div>
     }
 
     @if (!Model.Any())
     {
-        <div class="card shadow-sm text-center p-5">
-
-            <h4>No repair offers received yet.</h4>
-
-            <p class="text-muted">
-                When a repair shop makes an offer for one of
-                your devices, it will appear here.
+        <div class="card border-0 shadow-sm text-center p-5" style="border-radius: 20px; border: 1px dashed var(--sdm-border) !important;">
+            <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3"
+                 style="width: 72px; height: 72px; background: #FCE1DC; color: var(--sdm-primary); font-size: 30px;">
+                <i class="bi bi-tag"></i>
+            </div>
+            <h4 class="fw-bold text-dark mb-2">No repair offers received yet</h4>
+            <p class="text-muted mx-auto mb-4" style="max-width: 440px;">
+                When repair shops view your listed devices and make repair bids, they will appear here for your review and approval.
             </p>
-
-            <a asp-controller="Device"
-               asp-action="Index"
-               class="btn btn-primary">
-                View My Devices
-            </a>
-
+            <div>
+                <a asp-controller="Device" asp-action="Index" class="btn btn-terracotta rounded-pill px-4 py-2">
+                    View My Devices
+                </a>
+            </div>
         </div>
     }
     else
     {
-        <div class="mb-3">
-            <strong>@Model.Count()</strong>
-            repair offer(s) received
-        </div>
-
         <div class="row g-4">
-
             @foreach (var offer in Model)
             {
                 <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm sdm-card-hover p-4 d-flex flex-column justify-content-between"
+                         style="border-radius: 20px; border: 1px solid var(--sdm-border) !important;">
 
-                    <div class="card h-100 shadow-sm">
-
-                        <div class="card-body">
-
-                            <!-- Device -->
-                            @if (offer.Device != null)
-                            {
-                                <h5 class="card-title">
-                                    @offer.Device.BrandName
-                                    @offer.Device.ModelName
-                                </h5>
-
-                                <p class="text-muted mb-3">
-                                    @offer.Device.Category?.Name
-                                </p>
-                            }
-                            else
-                            {
-                                <h5 class="card-title">
-                                    Device unavailable
-                                </h5>
-                            }
-
-                            <hr />
-
-                            <!-- Repair Shop -->
-                            <h6 class="mb-2">
-                                Repair Shop
-                            </h6>
-
-                            @if (offer.RepairShop != null)
-                            {
-                                <p class="mb-1">
-                                    <strong>
-                                        @offer.RepairShop.ShopName
-                                    </strong>
-                                </p>
-
-                                <p class="text-muted mb-3">
-                                    @offer.RepairShop.City,
-                                    @offer.RepairShop.State
-                                </p>
-                            }
-
-                            <!-- Offer Amount -->
-                            <div class="mb-2">
-
-                                <span class="text-muted">
-                                    Repair Cost:
-                                </span>
-
-                                <strong>
-                                    ₹@offer.OfferAmount.ToString("0.00")
-                                </strong>
-
-                            </div>
-
-                            <!-- Status -->
-                            <div class="mb-2">
-
-                                <span class="text-muted">
-                                    Status:
-                                </span>
+                        <div>
+                            <!-- Header with Device & Shop -->
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <span class="badge rounded-pill px-2 py-1 bg-light text-secondary border small mb-1">
+                                        Device #@offer.DeviceId
+                                    </span>
+                                    <h5 class="fw-bold text-dark mb-0">
+                                        @(offer.Device != null ? $"{offer.Device.BrandName} {offer.Device.ModelName}" : "Target Device")
+                                    </h5>
+                                </div>
 
                                 @if (offer.Status == "Pending")
                                 {
-                                    <span class="badge bg-warning text-dark">
+                                    <span class="badge rounded-pill px-3 py-1" style="background: #FEF3C7; color: #D97706; font-weight: 600;">
                                         Pending
                                     </span>
                                 }
                                 else if (offer.Status == "Accepted")
                                 {
-                                    <span class="badge bg-success">
+                                    <span class="badge rounded-pill px-3 py-1" style="background: #DCFCE7; color: #16A34A; font-weight: 600;">
                                         Accepted
-                                    </span>
-                                }
-                                else if (offer.Status == "Rejected")
-                                {
-                                    <span class="badge bg-danger">
-                                        Rejected
-                                    </span>
-                                }
-                                else if (offer.Status == "Expired")
-                                {
-                                    <span class="badge bg-secondary">
-                                        Expired
                                     </span>
                                 }
                                 else
                                 {
-                                    <span class="badge bg-secondary">
-                                        @offer.Status
-                                    </span>
+                                    <span class="badge rounded-pill bg-secondary px-3 py-1">@offer.Status</span>
                                 }
-
                             </div>
 
-                            <!-- Expiry -->
-                            <div class="mb-3">
-
-                                <span class="text-muted">
-                                    Expires:
-                                </span>
-
-                                @offer.ExpiresAt.ToShortDateString()
-
-                            </div>
-
-                            <!-- Message -->
-                            @if (!string.IsNullOrWhiteSpace(offer.Message))
-                            {
-                                <div class="mb-3">
-
-                                    <strong>
-                                        Repair Shop Message:
-                                    </strong>
-
-                                    <p class="text-muted mb-0">
-                                        @offer.Message
-                                    </p>
-
-                                </div>
-                            }
-
-                            <!-- Chat with Repair Shop -->
+                            <!-- Shop Info -->
                             @if (offer.RepairShop != null)
                             {
-                                <div class="mb-3">
-
-                                    <a asp-controller="Chat"
-                                       asp-action="Start"
-                                       asp-route-offerId="@offer.Id"
-                                       class="btn btn-outline-primary w-100">
-
-                                        💬 Chat with Repair Shop
-
-                                    </a>
-
+                                <div class="p-3 rounded-3 mb-3" style="background: #F9F8F5; border: 1px solid #ECE7DE;">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div>
+                                            <span class="fw-bold text-dark d-block">
+                                                <i class="bi bi-shop me-1 text-primary"></i> @offer.RepairShop.ShopName
+                                            </span>
+                                            <small class="text-muted">@(offer.RepairShop.City ?? "Local")</small>
+                                        </div>
+                                        @if (offer.RepairShop.Rating > 0)
+                                        {
+                                            <span class="badge rounded-pill bg-warning text-dark">
+                                                ★ @offer.RepairShop.Rating.ToString("0.0")
+                                            </span>
+                                        }
+                                    </div>
                                 </div>
                             }
 
-                            <!-- Accept / Reject -->
+                            <!-- Financial Details -->
+                            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                <span class="text-muted small">Quoted Repair Cost</span>
+                                <span class="fs-5 fw-bold" style="color: var(--sdm-primary);">
+                                    ₹@offer.OfferAmount.ToString("N2")
+                                </span>
+                            </div>
+
+                            @if (offer.OfferType != null)
+                            {
+                                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                    <span class="text-muted small">Offer Type</span>
+                                    <span class="badge rounded-pill bg-light text-secondary border small">@offer.OfferType</span>
+                                </div>
+                            }
+
+                            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                <span class="text-muted small">Offer Expires</span>
+                                <span class="text-muted small">@offer.ExpiresAt.ToString("MMM dd, yyyy")</span>
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(offer.Message))
+                            {
+                                <div class="mt-3 p-3 rounded-3 small text-secondary" style="background: #FFFFFF; border: 1px solid #EAE6DF;">
+                                    <strong>Shop Note:</strong> @offer.Message
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex flex-column gap-2 pt-3 mt-3 border-top">
+                            @if (offer.RepairShop != null)
+                            {
+                                <a asp-controller="Chat" asp-action="Start" asp-route-offerId="@offer.Id" class="btn btn-outline-secondary rounded-pill btn-sm">
+                                    <i class="bi bi-chat-dots me-1"></i> Chat with Technician
+                                </a>
+                            }
+
                             @if (offer.Status == "Pending")
                             {
-                                <div class="d-grid gap-2">
-
-                                    <!-- Accept -->
-                                    <form asp-controller="Offer"
-                                          asp-action="Accept"
-                                          method="post">
-
+                                <div class="d-flex gap-2">
+                                    <form asp-controller="Offer" asp-action="Accept" method="post" class="flex-fill">
                                         @Html.AntiForgeryToken()
-
-                                        <input type="hidden"
-                                               name="id"
-                                               value="@offer.Id" />
-
-                                        <button type="submit"
-                                                class="btn btn-success w-100">
-
+                                        <input type="hidden" name="id" value="@offer.Id" />
+                                        <button type="submit" class="btn btn-terracotta rounded-pill btn-sm w-100">
                                             Accept Offer
-
                                         </button>
-
                                     </form>
 
-                                    <!-- Reject -->
-                                    <form asp-controller="Offer"
-                                          asp-action="Reject"
-                                          method="post">
-
+                                    <form asp-controller="Offer" asp-action="Reject" method="post" class="flex-fill">
                                         @Html.AntiForgeryToken()
-
-                                        <input type="hidden"
-                                               name="id"
-                                               value="@offer.Id" />
-
-                                        <button type="submit"
-                                                class="btn btn-outline-danger w-100">
-
-                                            Reject Offer
-
+                                        <input type="hidden" name="id" value="@offer.Id" />
+                                        <button type="submit" class="btn btn-outline-danger rounded-pill btn-sm w-100">
+                                            Reject
                                         </button>
-
                                     </form>
-
                                 </div>
                             }
                             else if (offer.Status == "Accepted")
                             {
-                                <div class="alert alert-success mb-0">
-
-                                    This repair offer has been accepted.
-
+                                <div class="alert alert-success py-2 px-3 text-center small rounded-pill mb-0">
+                                    <i class="bi bi-check-circle me-1"></i> Offer Accepted
                                 </div>
                             }
-                            else if (offer.Status == "Rejected")
-                            {
-                                <div class="alert alert-secondary mb-0">
-
-                                    This repair offer was rejected.
-
-                                </div>
-                            }
-                            else if (offer.Status == "Expired")
-                            {
-                                <div class="alert alert-secondary mb-0">
-
-                                    This repair offer has expired.
-
-                                </div>
-                            }
-
                         </div>
 
                     </div>
-
                 </div>
             }
-
         </div>
     }
 

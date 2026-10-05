@@ -1,77 +1,65 @@
-﻿@{
+@{
     ViewData["Title"] = "Report a Dispute";
 }
 
-<div class="container mt-5" style="max-width: 650px;">
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
 
-    <div class="card shadow-sm border-0">
+        <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 20px; border: 1px solid var(--sdm-border) !important;">
 
-        <div class="card-body p-4">
-
-            <h3 class="mb-2">Report a Dispute</h3>
-
-            <p class="text-muted">
-                Submit an issue related to this offer.
-                The Admin will review your report.
-            </p>
-
-            <hr />
-
-            <div class="mb-3">
-                <strong>Offer ID:</strong>
-                #@ViewBag.OfferId
+            <!-- Header -->
+            <div class="p-4 p-md-5 text-center" style="background: #FFF5F5; border-bottom: 1px solid #FED7D7;">
+                <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-2"
+                     style="width: 60px; height: 60px; background: #FEE2E2; color: #DC2626; font-size: 26px;">
+                    <i class="bi bi-shield-exclamation"></i>
+                </div>
+                <h3 class="fw-bold text-dark mb-1">Report a Dispute</h3>
+                <p class="text-muted small mb-0">Platform administrators will investigate your claim and review transaction logs.</p>
             </div>
 
-            <div class="mb-3">
-                <strong>Device:</strong>
-                @ViewBag.DeviceName
-            </div>
+            <div class="card-body p-4 p-md-5">
 
-            <form asp-controller="Offer"
-                  asp-action="ReportDispute"
-                  method="post">
-
-                @Html.AntiForgeryToken()
-
-                <input type="hidden"
-                       name="offerId"
-                       value="@ViewBag.OfferId" />
-
-                <div class="mb-3">
-
-                    <label for="reason"
-                           class="form-label">
-                        Explain your issue
-                    </label>
-
-                    <textarea name="reason"
-                              id="reason"
-                              class="form-control"
-                              rows="5"
-                              maxlength="1000"
-                              required
-                              placeholder="Describe the problem with this offer or transaction..."></textarea>
-
-                    @Html.ValidationMessage(
-                        "reason",
-                        "",
-                        new { @class = "text-danger" })
-
+                <div class="p-3 rounded-3 mb-4" style="background: #F9F8F5; border: 1px solid #ECE7DE;">
+                    <div class="d-flex justify-content-between py-1 border-bottom">
+                        <span class="text-muted small">Offer Reference</span>
+                        <strong class="text-dark">#@ViewBag.OfferId</strong>
+                    </div>
+                    <div class="d-flex justify-content-between py-1 pt-2">
+                        <span class="text-muted small">Associated Device</span>
+                        <strong class="text-dark">@ViewBag.DeviceName</strong>
+                    </div>
                 </div>
 
-                <button type="submit"
-                        class="btn btn-danger">
-                    Submit Dispute
-                </button>
+                <form asp-controller="Offer" asp-action="ReportDispute" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="offerId" value="@ViewBag.OfferId" />
 
-                <a asp-controller="Home"
-                   asp-action="Index"
-                   class="btn btn-outline-secondary ms-2">
-                    Cancel
-                </a>
+                    <div class="mb-4">
+                        <label for="reason" class="form-label fw-semibold text-dark">Describe the Issue in Detail</label>
+                        <textarea name="reason" id="reason" class="form-control" rows="5" maxlength="1000" required
+                                  placeholder="Explain what went wrong with the repair, device delivery, or payment..."></textarea>
+                        @Html.ValidationMessage("reason", "", new { @class = "text-danger small" })
+                    </div>
 
-            </form>
+                    <div class="p-3 rounded-3 small mb-4" style="background: #FFFBEB; border: 1px solid #FEF3C7; color: #92400E;">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Escrow funds remain frozen while a dispute is being investigated by platform administrators.
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-2">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-danger rounded-pill px-5">
+                            Submit Dispute Report
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
 
         </div>
+
     </div>
 </div>
